@@ -418,6 +418,16 @@
     </div>
 
     <script>
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const websiteId = urlParams.get('website_id') || 'default';
+        
+        // Store it for use in chat requests
+        window.CHAT_CONFIG = window.CHAT_CONFIG || {};
+        window.CHAT_CONFIG.websiteId = websiteId;
+        
+        console.log('Widget loaded for website:', websiteId);
+        
         const chatMessages = document.getElementById('chatMessages');
         const messageInput = document.getElementById('messageInput');
         const sendBtn = document.querySelector('.send-btn');
@@ -443,6 +453,15 @@
             messageInput.value = message;
             sendMessage();
         }
+
+        let userInfo = {
+            name: '',
+            email: '',
+            phone: '',
+            infoCollected: false,
+            currentStep: null
+        };
+
 
         function addMessage(content, isUser = false) {
             const messageDiv = document.createElement('div');
@@ -500,6 +519,7 @@
                     body: JSON.stringify({
                         message: message,
                         user_id: userId,
+                        website_id: 'sourceselect.ca',
                         name: userName
                     })
                 });

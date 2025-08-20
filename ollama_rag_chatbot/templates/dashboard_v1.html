@@ -3,82 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Advanced AI Dashboard</title>
     <style>
-
-        /* STEP 3B: Add these CSS styles to the dashboard.html <style> section */
-/* Find the existing styles in dashboard.html and add these new rules */
-
-.management-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-    margin-top: 20px;
-}
-
-.management-item {
-    background: #f8f9fa;
-    padding: 20px;
-    border-radius: 8px;
-    border: 1px solid #e1e5e9;
-}
-
-.management-item h3 {
-    color: #667eea;
-    margin-bottom: 10px;
-    font-size: 18px;
-}
-
-.management-item p {
-    color: #666;
-    margin-bottom: 15px;
-    font-size: 14px;
-}
-
-.management-item ul {
-    color: #666;
-    font-size: 13px;
-    margin: 10px 0 20px 20px;
-}
-
-.management-item ul li {
-    margin-bottom: 5px;
-}
-
-.btn-danger {
-    background: #dc3545;
-    border-color: #dc3545;
-}
-
-.btn-danger:hover {
-    background: #c82333;
-    border-color: #bd2130;
-}
-
-.btn-danger:disabled {
-    background: #f5c6cb;
-    border-color: #f1b0b7;
-    cursor: not-allowed;
-}
-
-/* Override for danger buttons in management section */
-.management-item .btn {
-    width: 100%;
-    font-weight: 600;
-    padding: 12px 20px;
-}
-
-@media (max-width: 768px) {
-    .management-grid {
-        grid-template-columns: 1fr;
-    }
-}
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+       /* Hide all scrollbars but maintain functionality */
+* {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE 10+ */
+}
 
+*::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge */
+}
+
+/* Ensure body doesn't scroll */
+body {
+    overflow: hidden;
+}
+
+/* Make main container scrollable */
+.container {
+    overflow-y: auto;
+    height: calc(100vh - 80px);
+    margin-top: 0;
+}
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #f5f7fa;
@@ -129,11 +81,52 @@
             padding: 30px 20px;
         }
 
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
+        /* Tab Navigation */
+        .tab-navigation {
+            display: flex;
+            background: white;
+            border-radius: 12px;
+            padding: 8px;
             margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            gap: 4px;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: #666;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-button.active {
+            background: #667eea;
+            color: white;
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .tab-button:hover:not(.active) {
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
         }
 
         .card {
@@ -142,6 +135,7 @@
             padding: 25px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             border: 1px solid #e1e5e9;
+            margin-bottom: 25px;
         }
 
         .card h2 {
@@ -154,92 +148,10 @@
             gap: 10px;
         }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #555;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.2s;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        textarea.form-control {
-            height: 120px;
-            resize: vertical;
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-        }
-
-        .btn {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn:hover {
-            background: #5a6fd8;
-            transform: translateY(-1px);
-        }
-
-        .btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-danger {
-            background: #e74c3c;
-        }
-
-        .btn-danger:hover {
-            background: #c44133;
-        }
-
-        .file-upload {
-            border: 2px dashed #ddd;
-            border-radius: 8px;
-            padding: 30px 20px;
-            text-align: center;
-            transition: all 0.2s;
-        }
-
-        .file-upload.dragover {
-            border-color: #667eea;
-            background: #f8f9ff;
-        }
-
-        .file-upload input[type="file"] {
-            display: none;
-        }
-
-        .upload-icon {
-            font-size: 48px;
-            color: #ddd;
-            margin-bottom: 15px;
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
         }
 
         .stats-grid {
@@ -271,29 +183,85 @@
             letter-spacing: 0.5px;
         }
 
-        .full-width {
-            grid-column: 1 / -1;
+        .form-group {
+            margin-bottom: 20px;
         }
 
-        .prompt-editor {
-            height: 200px;
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea.form-control {
+            height: 420px;
+            resize: vertical;
             font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-            font-size: 13px;
-            line-height: 1.5;
         }
 
-        .url-input-group {
-            display: flex;
-            gap: 12px;
-            align-items: end;
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .url-input-group .form-control {
-            flex: 1;
+        .btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
         }
 
-        .url-input-group .form-group {
-            margin-bottom: 0;
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
         }
 
         .alert {
@@ -313,6 +281,189 @@
             background: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* LLM Configuration Styles */
+        .website-tabs {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .website-tab {
+            padding: 8px 16px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .website-tab.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .provider-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #e1e5e9;
+        }
+
+        .provider-tab {
+            flex: 1;
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            color: #666;
+        }
+
+        .provider-tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .provider-config {
+            display: none;
+        }
+
+        .provider-config.active {
+            display: block;
+        }
+
+        .config-row {
+            display: grid;
+            grid-template-columns: 1fr 120px;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-dot.active {
+            background: #28a745;
+        }
+
+        .status-dot.inactive {
+            background: #dc3545;
+        }
+
+        .test-response {
+            background: #f8f9fa;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        /* File Management Styles */
+        .category-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .category-tab {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 12px;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .category-tab.active {
+            background: white;
+            border-color: #667eea;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .file-upload {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 30px 20px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .file-upload.dragover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #ddd;
+            margin-bottom: 15px;
         }
 
         .file-list {
@@ -346,26 +497,53 @@
             font-size: 11px;
         }
 
-        .loading {
-            display: none;
-            text-align: center;
+        /* System Management Styles */
+        .management-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .management-item {
+            background: #f8f9fa;
             padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e1e5e9;
         }
 
-        .spinner {
-            width: 20px;
-            height: 20px;
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            margin-right: 10px;
+        .management-item h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 18px;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .management-item p {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .management-item ul {
+            color: #666;
+            font-size: 13px;
+            margin: 10px 0 20px 20px;
+        }
+
+        .management-item ul li {
+            margin-bottom: 5px;
+        }
+
+        .management-item .btn {
+            width: 100%;
+            font-weight: 600;
+            padding: 12px 20px;
+        }
+
+        .prompt-editor {
+            height: 300px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            line-height: 1.5;
         }
 
         @media (max-width: 768px) {
@@ -377,8 +555,21 @@
                 grid-template-columns: repeat(2, 1fr);
             }
             
-            .url-input-group {
-                flex-direction: column;
+            .config-row {
+                grid-template-columns: 1fr;
+            }
+
+            .tab-navigation {
+                flex-wrap: wrap;
+            }
+
+            .tab-button {
+                font-size: 12px;
+                padding: 10px 12px;
+            }
+
+            .management-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -386,7 +577,7 @@
 <body>
     <div class="header">
         <div class="header-content">
-            <h1>AI Dashboard</h1>
+            <h1> Advanced AI Dashboard</h1>
             <div class="nav-links">
                 <a href="/">Chat Interface</a>
                 <a href="/widget">Widget Preview</a>
@@ -396,245 +587,883 @@
     </div>
 
     <div class="container">
-        <!-- Statistics Section -->
-        <div class="stats-grid" id="statsGrid">
-            <div class="stat-card">
-                <div class="stat-value" id="totalDocs">-</div>
-                <div class="stat-label">Documents</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="totalFiles">-</div>
-                <div class="stat-label">Uploaded Files</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="llmModel">-</div>
-                <!-- <div class="stat-label">LLM Model</div> -->
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="llmOption">-</div>
-                <!-- <div class="stat-label">LLM Type</div> -->
-            </div>
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="tab-button active" onclick="switchTab('overview')">
+                 Overview
+            </button>
+            <button class="tab-button" onclick="switchTab('llm')">
+                 LLM Configuration
+            </button>
+            <button class="tab-button" onclick="switchTab('knowledge')">
+                 Knowledge Management
+            </button>
+            <button class="tab-button" onclick="switchTab('prompt')">
+                 Prompt Editor
+            </button>
+            <button class="tab-button" onclick="switchTab('system')">
+                 System Management
+            </button>
         </div>
 
-        <!-- Main Dashboard Grid -->
-        <div class="dashboard-grid">
-            <!-- File Upload Section -->
-            <div class="card">
-                <h2> Upload Documents</h2>
-                
-                <div class="alert alert-success" id="uploadSuccess"></div>
-                <div class="alert alert-error" id="uploadError"></div>
-                
-                <div class="file-upload" id="fileUpload">
-                    <div class="upload-icon">📁</div>
-                    <p><strong>Drop files here or click to browse</strong></p>
-                    <p>Supported: PDF, TXT, DOC, DOCX, CSV (Max 16MB)</p>
-                    <input type="file" id="fileInput" multiple accept=".pdf,.txt,.doc,.docx,.csv">
+        <!-- Overview Tab -->
+        <div id="overview-tab" class="tab-content active">
+            <!-- Statistics Section -->
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalDocs">-</div>
+                    <div class="stat-label">Documents</div>
                 </div>
-                
-                <div class="loading" id="uploadLoading">
-                    <div class="spinner"></div>
-                    Processing file...
+                <div class="stat-card">
+                    <div class="stat-value" id="totalFiles">-</div>
+                    <div class="stat-label">Uploaded Files</div>
                 </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="llmModel">-</div>
+                    <div class="stat-label">LLM Model</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="currentWebsite">-</div>
+                    <div class="stat-label">Current Website</div>
+                </div>
+            </div>
 
-                <div style="margin-top: 20px;">
-                    <h3>Uploaded Files</h3>
-                    <div class="file-list" id="fileList">
-                        Loading files...
+            <!-- System Status -->
+            <div class="card">
+                <h2>🔋 System Status</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                    <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                        <div style="font-size: 24px; margin-bottom: 10px;">🤖</div>
+                        <div style="font-weight: 600; margin-bottom: 5px;">LLM Status</div>
+                        <span class="status-indicator" id="systemLLMStatus">
+                            <span class="status-dot" id="systemLLMDot"></span>
+                            <span id="systemLLMText">Loading...</span>
+                        </span>
+                    </div>
+                    <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                        <div style="font-size: 24px; margin-bottom: 10px;">🧠</div>
+                        <div style="font-weight: 600; margin-bottom: 5px;">Vector Store</div>
+                        <span class="status-indicator status-active">
+                            <span class="status-dot active"></span>
+                            Active
+                        </span>
+                    </div>
+                    <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                        <div style="font-size: 24px; margin-bottom: 10px;">💾</div>
+                        <div style="font-weight: 600; margin-bottom: 5px;">Database</div>
+                        <span class="status-indicator status-active">
+                            <span class="status-dot active"></span>
+                            Connected
+                        </span>
                     </div>
                 </div>
             </div>
 
-            <!-- URL Crawling Section -->
+            <!-- File List -->
             <div class="card">
-                <h2> Crawl Websites</h2>
+                <h2>📁 Recent Files</h2>
+                <div class="file-list" id="overviewFileList">
+                    Loading files...
+                </div>
+            </div>
+        </div>
+
+        <!-- LLM Configuration Tab -->
+        <div id="llm-tab" class="tab-content">
+            <div class="card">
+                <h2>⚙️ LLM Configuration</h2>
                 
-                <div class="alert alert-success" id="crawlSuccess"></div>
-                <div class="alert alert-error" id="crawlError"></div>
-                
-                <div class="form-group">
-                    <label for="urlInput">Website URL</label>
-                    <div class="url-input-group">
-                        <div class="form-group" style="flex: 1;">
-                            <input type="url" id="urlInput" class="form-control" placeholder="https://example.com">
+                <div class="alert alert-success" id="llmSuccess"></div>
+                <div class="alert alert-error" id="llmError"></div>
+
+                <!-- Website Selector -->
+                <div style="margin-bottom: 20px;">
+                    <label>Configure LLM for Website:</label>
+                    <div class="website-tabs" id="websiteTabs">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+
+                <!-- Global Configuration -->
+                <div style="border: 2px solid #e9ecef; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 15px; color: #495057;">Global LLM Settings</h3>
+
+                    <div class="provider-tabs">
+                        <button class="provider-tab active" id="globalOpenaiTab" onclick="selectGlobalProvider('openai')">
+                            OpenAI
+                        </button>
+                        <button class="provider-tab" id="globalOllamaTab" onclick="selectGlobalProvider('ollama')">
+                            Ollama (Local)
+                        </button>
+                    </div>
+
+                    <!-- OpenAI Configuration -->
+                    <div class="provider-config active" id="globalOpenaiConfig">
+                        <div class="form-group">
+                            <label for="globalOpenaiKey">OpenAI API Key</label>
+                            <input type="password" id="globalOpenaiKey" class="form-control" 
+                                   placeholder="sk-proj-... (leave empty to keep current)">
+                        </div>
+                        
+                        <div class="config-row">
+                            <div class="form-group">
+                                <label for="globalOpenaiDefaultModel">Default Model</label>
+                                <select id="globalOpenaiDefaultModel" class="form-control">
+                                    <option value="gpt-4o-mini">GPT-4o Mini (Recommended)</option>
+                                    <option value="gpt-4o">GPT-4o</option>
+                                    <option value="gpt-4">GPT-4</option>
+                                    <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="globalProvider">Global Provider</label>
+                                <select id="globalProvider" class="form-control">
+                                    <option value="openai">OpenAI</option>
+                                    <option value="ollama">Ollama</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ollama Configuration -->
+                    <div class="provider-config" id="globalOllamaConfig">
+                        <div class="config-row">
+                            <div class="form-group">
+                                <label for="globalOllamaUrl">Ollama Server URL</label>
+                                <input type="url" id="globalOllamaUrl" class="form-control" 
+                                       value="http://localhost:11434">
+                            </div>
+                            <div class="form-group">
+                                <label for="globalOllamaDefaultModel">Default Model</label>
+                                <select id="globalOllamaDefaultModel" class="form-control">
+                                    <option value="llama3.1:8b">Llama 3.1 8B</option>
+                                    <option value="llama3.1:70b">Llama 3.1 70B</option>
+                                    <option value="mistral">Mistral</option>
+                                    <option value="codellama">CodeLlama</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn" onclick="saveGlobalConfig()" id="saveGlobalBtn">
+                        💾 Save Global Settings
+                    </button>
+                </div>
+
+                <!-- Website-Specific Override -->
+                <div style="border: 2px solid #e9ecef; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 15px; color: #495057;">Website-Specific Override</h3>
+                    <small style="color: #666; margin-bottom: 15px; display: block;">Override global settings for <span id="currentWebsiteName">selected website</span></small>
+
+                    <div class="config-row">
+                        <div class="form-group">
+                            <label for="websiteProvider">LLM Provider</label>
+                            <select id="websiteProvider" class="form-control">
+                                <option value="">Use Global Default</option>
+                                <option value="openai">OpenAI</option>
+                                <option value="ollama">Ollama</option>
+                            </select>
                         </div>
                         <div class="form-group">
-                            <input type="number" id="maxPages" class="form-control" value="10" min="1" max="50" style="width: 80px;" title="Max pages">
+                            <label for="websiteTemperature">Temperature</label>
+                            <input type="number" id="websiteTemperature" class="form-control" 
+                                   min="0" max="2" step="0.1" placeholder="Global default">
                         </div>
-                        <button class="btn" onclick="crawlUrl()" id="crawlBtn">
-                             Crawl
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="websiteModel">Model</label>
+                        <input type="text" id="websiteModel" class="form-control" 
+                               placeholder="Leave empty to use provider default">
+                    </div>
+
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn" onclick="saveWebsiteConfig()" id="saveWebsiteBtn">
+                            💾 Save Website Override
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearWebsiteConfig()" id="clearWebsiteBtn">
+                            🗑️ Clear Override
                         </button>
                     </div>
                 </div>
 
-                <div class="loading" id="crawlLoading">
+                <!-- Testing Section -->
+                <div style="border: 2px solid #e9ecef; border-radius: 12px; padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 style="color: #495057;">LLM Testing</h3>
+                        <span class="status-indicator" id="llmStatusIndicator">
+                            <span class="status-dot" id="llmStatusDot"></span>
+                            <span id="llmStatusText">Loading...</span>
+                        </span>
+                    </div>
+
+                    <button class="btn btn-success" onclick="testLLM()" id="testLLMBtn">
+                        🧪 Test Current Configuration
+                    </button>
+
+                    <div class="loading" id="llmLoading">
+                        <div class="spinner"></div>
+                        Processing LLM request...
+                    </div>
+
+                    <div class="test-response" id="testResponse"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Knowledge Management Tab -->
+        <div id="knowledge-tab" class="tab-content">
+            <div class="dashboard-grid">
+                <!-- File Upload -->
+                <div class="card">
+                    <h2>📁 Upload Documents</h2>
+                    
+                    <div class="alert alert-success" id="uploadSuccess"></div>
+                    <div class="alert alert-error" id="uploadError"></div>
+
+                    <!-- Category Selection -->
+                    <div class="form-group">
+                        <label>Document Category</label>
+                        <div class="category-tabs" id="categoryTabs">
+                            <!-- Dynamically populated -->
+                        </div>
+                    </div>
+                    
+                    <div class="file-upload" id="fileUpload">
+                        <div class="upload-icon">📁</div>
+                        <p><strong>Drop files here or click to browse</strong></p>
+                        <p>Supported: PDF, TXT, DOC, DOCX, CSV (Max 16MB)</p>
+                        <input type="file" id="fileInput" multiple accept=".pdf,.txt,.doc,.docx,.csv">
+                    </div>
+                    
+                    <div class="loading" id="uploadLoading">
+                        <div class="spinner"></div>
+                        Processing file...
+                    </div>
+                </div>
+
+                <!-- URL Crawling -->
+                <div class="card">
+                    <h2>🌐 Crawl Websites</h2>
+                    
+                    <div class="alert alert-success" id="crawlSuccess"></div>
+                    <div class="alert alert-error" id="crawlError"></div>
+                    
+                    <div class="form-group">
+                        <label for="urlInput">Website URL</label>
+                        <div style="display: flex; gap: 12px; align-items: end;">
+                            <input type="url" id="urlInput" class="form-control" placeholder="https://example.com" style="flex: 1;">
+                            <input type="number" id="maxPages" class="form-control" value="10" min="1" max="50" 
+                                   style="width: 80px;" title="Max pages">
+                            <button class="btn" onclick="crawlUrl()" id="crawlBtn">
+                                🔍 Crawl
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="loading" id="crawlLoading">
+                        <div class="spinner"></div>
+                        Crawling website...
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <p><strong>Tips:</strong></p>
+                        <ul style="margin-left: 20px; color: #666; font-size: 14px;">
+                            <li>Enter the full URL including https://</li>
+                            <li>The system will extract text content from web pages</li>
+                            <li>Start with a small number of pages for testing</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Uploaded Files -->
+            <div class="card">
+                <h2>📂 Uploaded Files</h2>
+                <div class="file-list" id="fileList">
+                    Loading files...
+                </div>
+            </div>
+        </div>
+
+        <!-- Prompt Editor Tab -->
+        <div id="prompt-tab" class="tab-content">
+            <div class="card">
+                <h2>📝 Edit System Prompt</h2>
+                
+                <div class="alert alert-success" id="promptSuccess"></div>
+                <div class="alert alert-error" id="promptError"></div>
+                
+                <div class="form-group">
+                    <label for="promptEditor">System Prompt Template</label>
+                    <textarea id="promptEditor" class="form-control prompt-editor" placeholder="Loading prompt..."></textarea>
+                    <small style="color: #666; margin-top: 5px; display: block;">
+                        Use {context} for retrieved information and {question} for user input. HTML formatting supported.
+                    </small>
+                </div>
+                
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <button class="btn" onclick="savePrompt()" id="savePromptBtn">
+                        💾 Save Prompt
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetPrompt()">
+                        🔄 Reset to Default
+                    </button>
+                    <button class="btn btn-success" onclick="testPrompt()">
+                        🧪 Test in Chat
+                    </button>
+                </div>
+
+                <div class="loading" id="promptLoading">
                     <div class="spinner"></div>
-                    Crawling website...
-                </div>
-
-                <div style="margin-top: 20px;">
-                    <p><strong>Tips:</strong></p>
-                    <ul style="margin-left: 20px; color: #666; font-size: 14px;">
-                        <li>Enter the full URL including https://</li>
-                        <li>The system will extract text content from web pages</li>
-                        <li>Start with a small number of pages for testing</li>
-                    </ul>
+                    Updating prompt...
                 </div>
             </div>
         </div>
 
-        <!-- Prompt Editor Section -->
-        <div class="card full-width">
-            <h2> Edit System Prompt</h2>
-            
-            <div class="alert alert-success" id="promptSuccess"></div>
-            <div class="alert alert-error" id="promptError"></div>
-            
-            <div class="form-group">
-                <label for="promptEditor">System Prompt Template</label>
-                <textarea id="promptEditor" class="form-control prompt-editor" placeholder="Loading prompt..."></textarea>
-                <small style="color: #666; margin-top: 5px; display: block;">
-                    Use {context} for retrieved information and {question} for user input. HTML formatting supported.
-                </small>
-            </div>
-            
-            <div style="display: flex; gap: 12px;">
-                <button class="btn" onclick="savePrompt()" id="savePromptBtn">
-                     Save Prompt
-                </button>
-                <button class="btn" onclick="resetPrompt()" style="background: #6c757d;">
-                     Reset to Default
-                </button>
-                <button class="btn" onclick="testPrompt()" style="background: #28a745;">
-                     Test Prompt
-                </button>
-            </div>
-
-            <div class="loading" id="promptLoading">
-                <div class="spinner"></div>
-                Updating prompt...
-            </div>
-        </div>
-
-        <div class="card full-width">
-            <h2>🔧 System Management</h2>
-            
-            <div class="alert alert-success" id="systemSuccess"></div>
-            <div class="alert alert-error" id="systemError"></div>
-            
-            <div class="management-grid">
-                <div class="management-item">
-                    <h3>Reset Knowledge Base</h3>
-                    <p>Clear all uploaded files and AI knowledge. This will remove:</p>
-                    <ul>
-                        <li>All uploaded documents</li>
-                        <li>Vector database</li>
-                        <li>Learned conversations</li>
-                        <li>Knowledge base content</li>
-                    </ul>
-                    <button class="btn btn-danger" onclick="resetKnowledgeBase()" id="resetKnowledgeBtn">
-                        🗑️ Reset Knowledge Base
-                    </button>
-                </div>
+        <!-- System Management Tab -->
+        <div id="system-tab" class="tab-content">
+            <div class="card">
+                <h2>🔧 System Management</h2>
                 
-                <div class="management-item">
-                    <h3>Clear Chat Logs</h3>
-                    <p>Remove all chat history and conversation logs:</p>
-                    <ul>
-                        <li>Chat logs database</li>
-                        <li>Conversation history</li>
-                        <li>User session data</li>
-                    </ul>
-                    <button class="btn btn-danger" onclick="clearChatLogs()" id="clearLogsBtn">
-                        📝 Clear Chat Logs
-                    </button>
-                </div>
+                <div class="alert alert-success" id="systemSuccess"></div>
+                <div class="alert alert-error" id="systemError"></div>
                 
-                <div class="management-item">
-                    <h3>Full System Reset</h3>
-                    <p>⚠️ NUCLEAR OPTION: Reset everything to factory settings:</p>
-                    <ul>
-                        <li>All files and knowledge</li>
-                        <li>All chat logs</li>
-                        <li>All user data</li>
-                        <li>System configuration</li>
-                    </ul>
-                    <button class="btn btn-danger" onclick="fullSystemReset()" id="fullResetBtn">
-                        💀 Full System Reset
-                    </button>
-                </div>
-            </div>
+                <div class="management-grid">
+                    <div class="management-item">
+                        <h3>Reset Knowledge Base</h3>
+                        <p>Clear all uploaded files and AI knowledge. This will remove:</p>
+                        <ul>
+                            <li>All uploaded documents</li>
+                            <li>Vector database</li>
+                            <li>Learned conversations</li>
+                            <li>Knowledge base content</li>
+                        </ul>
+                        <button class="btn btn-danger" onclick="resetKnowledgeBase()" id="resetKnowledgeBtn">
+                            🗑️ Reset Knowledge Base
+                        </button>
+                    </div>
+                    
+                    <div class="management-item">
+                        <h3>Clear Chat Logs</h3>
+                        <p>Remove all chat history and conversation logs:</p>
+                        <ul>
+                            <li>Chat logs database</li>
+                            <li>Conversation history</li>
+                            <li>User session data</li>
+                        </ul>
+                        <button class="btn btn-danger" onclick="clearChatLogs()" id="clearLogsBtn">
+                            📝 Clear Chat Logs
+                        </button>
+                    </div>
+                    
+                    <div class="management-item">
+                        <h3>Backup System</h3>
+                        <p>Create a backup of all system data:</p>
+                        <ul>
+                            <li>Vector database</li>
+                            <li>Uploaded files</li>
+                            <li>Configuration</li>
+                            <li>Chat logs</li>
+                        </ul>
+                        <button class="btn btn-success" onclick="createBackup()" id="backupBtn">
+                            💾 Create Backup
+                        </button>
+                    </div>
 
-            <div class="loading" id="systemLoading">
-                <div class="spinner"></div>
-                Processing system operation...
+                    <div class="management-item">
+                        <h3>Refresh Session</h3>
+                        <p>Refresh the chat session without deleting data:</p>
+                        <ul>
+                            <li>Clear user sessions</li>
+                            <li>Reset conversation state</li>
+                            <li>Preserve all knowledge</li>
+                        </ul>
+                        <button class="btn btn-secondary" onclick="refreshSession()" id="refreshBtn">
+                            🔄 Refresh Session
+                        </button>
+                    </div>
+                    
+                    <div class="management-item" style="border: 2px solid #dc3545;">
+                        <h3>Full System Reset</h3>
+                        <p>⚠️ NUCLEAR OPTION: Reset everything to factory settings:</p>
+                        <ul>
+                            <li>All files and knowledge</li>
+                            <li>All chat logs</li>
+                            <li>All user data</li>
+                            <li>System configuration</li>
+                        </ul>
+                        <button class="btn btn-danger" onclick="fullSystemReset()" id="fullResetBtn">
+                            💀 Full System Reset
+                        </button>
+                    </div>
+
+                    <div class="management-item">
+                        <h3>System Information</h3>
+                        <p>Current system status and statistics:</p>
+                        <div id="systemInfo" style="background: #e9ecef; border-radius: 8px; padding: 15px; margin-top: 10px;">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+                                <div style="text-align: center;">
+                                    <strong id="vectorCount">-</strong>
+                                    <div style="font-size: 12px; color: #666;">Vector Documents</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <strong id="fileCount">-</strong>
+                                    <div style="font-size: 12px; color: #666;">Uploaded Files</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <strong id="chatLogCount">-</strong>
+                                    <div style="font-size: 12px; color: #666;">Chat Logs</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <strong id="backupCount">-</strong>
+                                    <div style="font-size: 12px; color: #666;">Backups</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="loading" id="systemLoading">
+                    <div class="spinner"></div>
+                    Processing system operation...
+                </div>
             </div>
         </div>
     </div>
 
     <script>
+        // Global variables
+        let currentTab = 'overview';
+        let currentWebsiteId = 'default';
+        let llmConfig = {};
+        let websites = {};
+        let selectedCategory = 'company_details';
+        let categories = {
+            'company_details': {
+                'name': 'Company Details',
+                'description': 'Business information, services, team details, contact info',
+                'color': '#007bff'
+            },
+            'sales_training': {
+                'name': 'Sales Training', 
+                'description': 'Sales scripts, objection handling, conversation examples',
+                'color': '#28a745'
+            },
+            'product_info': {
+                'name': 'Product Information',
+                'description': 'Product specs, pricing, features, documentation', 
+                'color': '#ffc107'
+            },
+            'policies_legal': {
+                'name': 'Policies & Legal',
+                'description': 'Terms of service, privacy policy, legal documents',
+                'color': '#dc3545'
+            }
+        };
+
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
-            loadStats();
-            loadPrompt();
-            setupFileUpload();
+            initializeDashboard();
         });
 
-        // Load knowledge base statistics
-        async function loadStats() {
+        async function initializeDashboard() {
             try {
-                const response = await fetch('/api/knowledge-stats');
-                const stats = await response.json();
-                
-                document.getElementById('totalDocs').textContent = stats.total_documents || 0;
-                document.getElementById('totalFiles').textContent = stats.uploaded_files?.length || 0;
-                document.getElementById('llmModel').textContent = stats.llm_model || 'Unknown';
-                document.getElementById('llmOption').textContent = stats.llm_option || 'Unknown';
-                
-                // Update file list
-                updateFileList(stats.uploaded_files || []);
+                await loadWebsites();
+                await loadLLMConfig();
+                loadStats();
+                setupFileUpload();
+                setupCategoryTabs();
+                console.log('✅ Dashboard initialized successfully');
             } catch (error) {
-                console.error('Failed to load stats:', error);
+                console.error('Dashboard initialization failed:', error);
             }
         }
 
-        // Update file list display
-        function updateFileList(files) {
-            const fileList = document.getElementById('fileList');
+        // ===========================
+        // TAB MANAGEMENT
+        // ===========================
+
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
             
-            if (files.length === 0) {
-                fileList.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">No files uploaded yet</p>';
-                return;
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            
+            currentTab = tabName;
+            
+            // Load tab-specific data
+            if (tabName === 'overview') {
+                loadStats();
+            } else if (tabName === 'prompt') {
+                loadPrompt();
+            }
+        }
+
+        // ===========================
+        // WEBSITE MANAGEMENT
+        // ===========================
+
+        async function loadWebsites() {
+            // Simulate website loading - replace with actual API call if needed
+            websites = {
+                'default': { name: 'Default', active: true },
+                'sourceselect.ca': { name: 'SourceSelect', active: true },
+                'example-business.com': { name: 'Example Business', active: false }
+            };
+            
+            updateWebsiteTabs();
+            selectWebsite('default');
+        }
+
+        function updateWebsiteTabs() {
+            const websiteTabs = document.getElementById('websiteTabs');
+            if (!websiteTabs) return;
+            
+            websiteTabs.innerHTML = '';
+            
+            Object.keys(websites).forEach(websiteId => {
+                const website = websites[websiteId];
+                const tab = document.createElement('div');
+                tab.className = `website-tab ${websiteId === currentWebsiteId ? 'active' : ''}`;
+                tab.textContent = website.name;
+                tab.onclick = () => selectWebsite(websiteId);
+                websiteTabs.appendChild(tab);
+            });
+        }
+
+        function selectWebsite(websiteId) {
+            currentWebsiteId = websiteId;
+            
+            // Update tab highlighting
+            document.querySelectorAll('.website-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Update displays
+            const currentWebsiteName = document.getElementById('currentWebsiteName');
+            if (currentWebsiteName) {
+                currentWebsiteName.textContent = websites[websiteId]?.name || websiteId;
             }
             
-            fileList.innerHTML = files.map(file => `
-                <div class="file-item">
-                    <div class="file-info">
-                        <div class="file-name">${file.name}</div>
-                        <div class="file-size">${formatFileSize(file.size)} • ${file.modified}</div>
-                    </div>
-                </div>
-            `).join('');
+            // Reload configuration for this website
+            loadLLMConfig();
+            loadStats();
+            
+            console.log(`Switched to website: ${websiteId}`);
         }
 
-        // Format file size
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        // ===========================
+        // LLM CONFIGURATION MANAGEMENT
+        // ===========================
+
+        async function loadLLMConfig() {
+            try {
+                const response = await fetch(`/api/llm-config?website_id=${currentWebsiteId}`);
+                llmConfig = await response.json();
+                
+                populateLLMConfig();
+                updateLLMStatus();
+            } catch (error) {
+                console.error('Failed to load LLM config:', error);
+                showAlert('llmError', 'Failed to load LLM configuration');
+            }
         }
 
-        // Setup file upload drag and drop
+        function populateLLMConfig() {
+            // Global settings
+            const globalProvider = document.getElementById('globalProvider');
+            if (globalProvider) {
+                globalProvider.value = llmConfig.global_provider || 'openai';
+            }
+            
+            if (llmConfig.openai) {
+                const openaiModel = document.getElementById('globalOpenaiDefaultModel');
+                const ollamaUrl = document.getElementById('globalOllamaUrl');
+                const ollamaModel = document.getElementById('globalOllamaDefaultModel');
+                
+                if (openaiModel) openaiModel.value = llmConfig.openai.default_model || 'gpt-4o-mini';
+                if (ollamaUrl) ollamaUrl.value = llmConfig.ollama?.base_url || 'http://localhost:11434';
+                if (ollamaModel) ollamaModel.value = llmConfig.ollama?.default_model || 'llama3.1:8b';
+            }
+            
+            // Website-specific overrides
+            const websiteOverride = llmConfig.website_overrides?.[currentWebsiteId];
+            if (websiteOverride) {
+                const websiteProvider = document.getElementById('websiteProvider');
+                const websiteModel = document.getElementById('websiteModel');
+                const websiteTemp = document.getElementById('websiteTemperature');
+                
+                if (websiteProvider) websiteProvider.value = websiteOverride.provider || '';
+                if (websiteModel) websiteModel.value = websiteOverride.model || '';
+                if (websiteTemp) websiteTemp.value = websiteOverride.temperature || '';
+            } else {
+                const websiteProvider = document.getElementById('websiteProvider');
+                const websiteModel = document.getElementById('websiteModel');
+                const websiteTemp = document.getElementById('websiteTemperature');
+                
+                if (websiteProvider) websiteProvider.value = '';
+                if (websiteModel) websiteModel.value = '';
+                if (websiteTemp) websiteTemp.value = '';
+            }
+            
+            // Update global provider tabs
+            selectGlobalProvider(llmConfig.global_provider || 'openai');
+        }
+
+        function selectGlobalProvider(provider) {
+            // Update tabs
+            document.querySelectorAll('.provider-tab').forEach(tab => tab.classList.remove('active'));
+            const providerTab = document.getElementById(`global${provider.charAt(0).toUpperCase() + provider.slice(1)}Tab`);
+            if (providerTab) providerTab.classList.add('active');
+            
+            // Show/hide config sections
+            document.querySelectorAll('.provider-config').forEach(config => config.classList.remove('active'));
+            const configSection = document.getElementById(`global${provider.charAt(0).toUpperCase() + provider.slice(1)}Config`);
+            if (configSection) configSection.classList.add('active');
+        }
+
+        async function saveGlobalConfig() {
+            const saveBtn = document.getElementById('saveGlobalBtn');
+            if (!saveBtn) return;
+            
+            const originalText = saveBtn.textContent;
+            
+            saveBtn.disabled = true;
+            saveBtn.textContent = '💾 Saving...';
+            hideAlert('llmSuccess');
+            hideAlert('llmError');
+            
+            try {
+                const configData = {
+                    config_type: 'global',
+                    global_provider: document.getElementById('globalProvider')?.value,
+                    openai: {
+                        api_key: document.getElementById('globalOpenaiKey')?.value || undefined,
+                        default_model: document.getElementById('globalOpenaiDefaultModel')?.value
+                    },
+                    ollama: {
+                        base_url: document.getElementById('globalOllamaUrl')?.value,
+                        default_model: document.getElementById('globalOllamaDefaultModel')?.value
+                    }
+                };
+                
+                const response = await fetch('/api/llm-config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(configData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showAlert('llmSuccess', result.message);
+                    const apiKeyField = document.getElementById('globalOpenaiKey');
+                    if (apiKeyField) apiKeyField.value = '';
+                    await loadLLMConfig();
+                    setTimeout(loadStats, 1000);
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                showAlert('llmError', `Failed to save configuration: ${error.message}`);
+            }
+            
+            saveBtn.disabled = false;
+            saveBtn.textContent = originalText;
+        }
+
+        async function saveWebsiteConfig() {
+            const saveBtn = document.getElementById('saveWebsiteBtn');
+            if (!saveBtn) return;
+            
+            const originalText = saveBtn.textContent;
+            
+            saveBtn.disabled = true;
+            saveBtn.textContent = '💾 Saving...';
+            hideAlert('llmSuccess');
+            hideAlert('llmError');
+            
+            try {
+                const configData = {
+                    config_type: 'website',
+                    website_id: currentWebsiteId,
+                    provider: document.getElementById('websiteProvider')?.value || undefined,
+                    model: document.getElementById('websiteModel')?.value || undefined,
+                    temperature: parseFloat(document.getElementById('websiteTemperature')?.value) || undefined
+                };
+                
+                const response = await fetch('/api/llm-config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(configData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showAlert('llmSuccess', `Website override saved for ${websites[currentWebsiteId]?.name}`);
+                    await loadLLMConfig();
+                    setTimeout(loadStats, 1000);
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                showAlert('llmError', `Failed to save website config: ${error.message}`);
+            }
+            
+            saveBtn.disabled = false;
+            saveBtn.textContent = originalText;
+        }
+
+        function clearWebsiteConfig() {
+            if (!confirm(`Clear LLM override for ${websites[currentWebsiteId]?.name}?`)) return;
+            
+            // Clear form fields
+            const websiteProvider = document.getElementById('websiteProvider');
+            const websiteModel = document.getElementById('websiteModel');
+            const websiteTemp = document.getElementById('websiteTemperature');
+            
+            if (websiteProvider) websiteProvider.value = '';
+            if (websiteModel) websiteModel.value = '';
+            if (websiteTemp) websiteTemp.value = '';
+            
+            // Save empty config to remove override
+            saveWebsiteConfig();
+        }
+
+        async function testLLM() {
+            const testBtn = document.getElementById('testLLMBtn');
+            const testResponse = document.getElementById('testResponse');
+            const llmLoading = document.getElementById('llmLoading');
+            
+            if (!testBtn) return;
+            
+            testBtn.disabled = true;
+            if (testResponse) testResponse.style.display = 'none';
+            if (llmLoading) llmLoading.style.display = 'block';
+            hideAlert('llmSuccess');
+            hideAlert('llmError');
+            
+            try {
+                const response = await fetch('/api/llm-test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        website_id: currentWebsiteId,
+                        message: "Hello! Please confirm you're working and tell me about yourself."
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && testResponse) {
+                    testResponse.innerHTML = `
+                        <div style="color: #28a745; font-weight: bold; margin-bottom: 10px;">
+                            ✅ LLM Test Successful for ${result.website_id}
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <strong>Provider:</strong> ${result.provider}<br>
+                            <strong>Model:</strong> ${result.config.model}<br>
+                            <strong>Temperature:</strong> ${result.config.temperature}
+                        </div>
+                        <div style="border-top: 1px solid #ddd; padding-top: 10px;">
+                            <strong>Response:</strong><br>
+                            ${result.response}
+                        </div>
+                    `;
+                    testResponse.style.display = 'block';
+                    showAlert('llmSuccess', 'LLM test completed successfully');
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                showAlert('llmError', `LLM test failed: ${error.message}`);
+            }
+            
+            testBtn.disabled = false;
+            if (llmLoading) llmLoading.style.display = 'none';
+        }
+
+        function updateLLMStatus() {
+            const statusElements = [
+                { indicator: 'llmStatusIndicator', dot: 'llmStatusDot', text: 'llmStatusText' },
+                { indicator: 'systemLLMStatus', dot: 'systemLLMDot', text: 'systemLLMText' }
+            ];
+            
+            statusElements.forEach(elements => {
+                const indicator = document.getElementById(elements.indicator);
+                const statusDot = document.getElementById(elements.dot);
+                const statusText = document.getElementById(elements.text);
+                
+                if (!indicator || !statusDot || !statusText) return;
+                
+                const effectiveProvider = llmConfig.effective_provider;
+                const effectiveModel = llmConfig.effective_model;
+                
+                // Check if we have valid configuration
+                const hasValidConfig = (effectiveProvider === 'openai' && llmConfig.openai?.has_api_key) || 
+                                    (effectiveProvider === 'ollama') ||
+                                    (effectiveProvider && effectiveModel);
+                
+                if (hasValidConfig) {
+                    indicator.className = 'status-indicator status-active';
+                    statusDot.className = 'status-dot active';
+                    statusText.textContent = `Active (${effectiveProvider} - ${effectiveModel})`;
+                } else {
+                    indicator.className = 'status-indicator status-inactive';
+                    statusDot.className = 'status-dot inactive';
+                    statusText.textContent = 'Needs Configuration';
+                }
+            });
+        }
+
+        // ===========================
+        // FILE MANAGEMENT
+        // ===========================
+
+        function setupCategoryTabs() {
+            const categoryTabs = document.getElementById('categoryTabs');
+            if (!categoryTabs) return;
+            
+            categoryTabs.innerHTML = '';
+            
+            Object.keys(categories).forEach(categoryId => {
+                const category = categories[categoryId];
+                const tab = document.createElement('div');
+                tab.className = `category-tab ${categoryId === selectedCategory ? 'active' : ''}`;
+                tab.textContent = category.name;
+                tab.onclick = () => selectCategory(categoryId);
+                categoryTabs.appendChild(tab);
+            });
+        }
+
+        function selectCategory(categoryId) {
+            selectedCategory = categoryId;
+            
+            // Update tab highlighting
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event?.target?.classList.add('active');
+            
+            console.log(`Selected category: ${categoryId}`);
+        }
+
         function setupFileUpload() {
             const fileUpload = document.getElementById('fileUpload');
             const fileInput = document.getElementById('fileInput');
 
-            // Click to browse
+            if (!fileUpload || !fileInput) return;
+
             fileUpload.addEventListener('click', () => fileInput.click());
 
-            // Drag and drop
             fileUpload.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 fileUpload.classList.add('dragover');
@@ -647,32 +1476,29 @@
             fileUpload.addEventListener('drop', (e) => {
                 e.preventDefault();
                 fileUpload.classList.remove('dragover');
-                const files = e.dataTransfer.files;
-                handleFileUpload(files);
+                handleFileUpload(e.dataTransfer.files);
             });
 
-            // File input change
             fileInput.addEventListener('change', (e) => {
                 handleFileUpload(e.target.files);
             });
         }
 
-        // Handle file upload
         async function handleFileUpload(files) {
             const uploadLoading = document.getElementById('uploadLoading');
             const uploadSuccess = document.getElementById('uploadSuccess');
             const uploadError = document.getElementById('uploadError');
             
-            // Hide previous messages
-            uploadSuccess.style.display = 'none';
-            uploadError.style.display = 'none';
+            if (uploadSuccess) uploadSuccess.style.display = 'none';
+            if (uploadError) uploadError.style.display = 'none';
             
             for (let file of files) {
-                uploadLoading.style.display = 'block';
+                if (uploadLoading) uploadLoading.style.display = 'block';
                 
                 const formData = new FormData();
                 formData.append('file', file);
-
+                formData.append('category', selectedCategory);
+                formData.append('website_id', currentWebsiteId);
 
                 try {
                     const response = await fetch('/api/upload', {
@@ -683,26 +1509,28 @@
                     const result = await response.json();
                     
                     if (response.ok) {
-                        uploadSuccess.textContent = result.message;
-                        uploadSuccess.style.display = 'block';
-                        // Reload stats after successful upload
+                        if (uploadSuccess) {
+                            uploadSuccess.textContent = result.message;
+                            uploadSuccess.style.display = 'block';
+                        }
                         setTimeout(loadStats, 1000);
                     } else {
                         throw new Error(result.error);
                     }
                     
                 } catch (error) {
-                    uploadError.textContent = `Failed to upload ${file.name}: ${error.message}`;
-                    uploadError.style.display = 'block';
+                    if (uploadError) {
+                        uploadError.textContent = `Failed to upload ${file.name}: ${error.message}`;
+                        uploadError.style.display = 'block';
+                    }
                 }
             }
             
-            uploadLoading.style.display = 'none';
-            // Clear file input
-            document.getElementById('fileInput').value = '';
+            if (uploadLoading) uploadLoading.style.display = 'none';
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput) fileInput.value = '';
         }
 
-        // Crawl URL
         async function crawlUrl() {
             const urlInput = document.getElementById('urlInput');
             const maxPages = document.getElementById('maxPages');
@@ -711,366 +1539,450 @@
             const crawlSuccess = document.getElementById('crawlSuccess');
             const crawlError = document.getElementById('crawlError');
             
+            if (!urlInput) return;
+            
             const url = urlInput.value.trim();
-            const maxPagesValue = parseInt(maxPages.value) || 10;
+            const maxPagesValue = parseInt(maxPages?.value) || 10;
             
             if (!url) {
-                crawlError.textContent = 'Please enter a valid URL';
-                crawlError.style.display = 'block';
+                if (crawlError) {
+                    crawlError.textContent = 'Please enter a valid URL';
+                    crawlError.style.display = 'block';
+                }
                 return;
             }
             
-            // Hide previous messages
-            crawlSuccess.style.display = 'none';
-            crawlError.style.display = 'none';
+            if (crawlSuccess) crawlSuccess.style.display = 'none';
+            if (crawlError) crawlError.style.display = 'none';
             
-            crawlBtn.disabled = true;
-            crawlLoading.style.display = 'block';
+            if (crawlBtn) crawlBtn.disabled = true;
+            if (crawlLoading) crawlLoading.style.display = 'block';
             
             try {
                 const response = await fetch('/api/crawl', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        url: url,
-                        max_pages: maxPagesValue
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        url, 
+                        max_pages: maxPagesValue,
+                        website_id: currentWebsiteId
                     })
                 });
                 
                 const result = await response.json();
                 
                 if (response.ok) {
-                    crawlSuccess.textContent = result.message;
-                    crawlSuccess.style.display = 'block';
+                    if (crawlSuccess) {
+                        crawlSuccess.textContent = result.message;
+                        crawlSuccess.style.display = 'block';
+                    }
                     urlInput.value = '';
-                    // Reload stats after successful crawl
                     setTimeout(loadStats, 1000);
                 } else {
                     throw new Error(result.error);
                 }
                 
             } catch (error) {
-                crawlError.textContent = `Failed to crawl URL: ${error.message}`;
-                crawlError.style.display = 'block';
+                if (crawlError) {
+                    crawlError.textContent = `Failed to crawl URL: ${error.message}`;
+                    crawlError.style.display = 'block';
+                }
             }
             
-            crawlBtn.disabled = false;
-            crawlLoading.style.display = 'none';
+            if (crawlBtn) crawlBtn.disabled = false;
+            if (crawlLoading) crawlLoading.style.display = 'none';
         }
 
-        // Load current prompt
+        // ===========================
+        // PROMPT MANAGEMENT
+        // ===========================
+
         async function loadPrompt() {
             try {
                 const response = await fetch('/api/prompt');
                 const result = await response.json();
-                document.getElementById('promptEditor').value = result.prompt || '';
+                const editor = document.getElementById('promptEditor');
+                if (editor) {
+                    editor.value = result.prompt || '';
+                }
             } catch (error) {
                 console.error('Failed to load prompt:', error);
             }
         }
 
-        // Save prompt
         async function savePrompt() {
             const promptEditor = document.getElementById('promptEditor');
             const savePromptBtn = document.getElementById('savePromptBtn');
             const promptLoading = document.getElementById('promptLoading');
-            const promptSuccess = document.getElementById('promptSuccess');
-            const promptError = document.getElementById('promptError');
+            
+            if (!promptEditor || !savePromptBtn) return;
             
             const prompt = promptEditor.value.trim();
             
             if (!prompt) {
-                promptError.textContent = 'Prompt cannot be empty';
-                promptError.style.display = 'block';
+                showAlert('promptError', 'Prompt cannot be empty');
                 return;
             }
             
-            // Hide previous messages
-            promptSuccess.style.display = 'none';
-            promptError.style.display = 'none';
+            hideAlert('promptSuccess');
+            hideAlert('promptError');
             
             savePromptBtn.disabled = true;
-            promptLoading.style.display = 'block';
+            if (promptLoading) promptLoading.style.display = 'block';
             
             try {
                 const response = await fetch('/api/prompt', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ prompt: prompt })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt })
                 });
                 
                 const result = await response.json();
                 
                 if (response.ok) {
-                    promptSuccess.textContent = result.message;
-                    promptSuccess.style.display = 'block';
+                    showAlert('promptSuccess', result.message);
+                    setTimeout(() => hideAlert('promptSuccess'), 3000);
                 } else {
                     throw new Error(result.error);
                 }
                 
             } catch (error) {
-                promptError.textContent = `Failed to save prompt: ${error.message}`;
-                promptError.style.display = 'block';
+                showAlert('promptError', `Failed to save prompt: ${error.message}`);
             }
             
             savePromptBtn.disabled = false;
-            promptLoading.style.display = 'none';
+            if (promptLoading) promptLoading.style.display = 'none';
         }
 
-        // Reset prompt to default
         function resetPrompt() {
-            const defaultPrompt = `You are Bob AI, a helpful and friendly assistant for SourceSelect.ca.
+            const defaultPrompt = `You are Bob, a real human virtual assistant for SourceSelect.ca.
+
+Your job is to help users with their questions about SourceSelect.ca and its services. Always be polite, helpful, and conversational—just like a friendly and attentive human agent.
 
 INSTRUCTIONS:
-- Use ONLY the information provided in the "Relevant Info" section below
-- If the context doesn't contain relevant information, say "I'm not sure about that, but I'd be happy to help you find the right person to contact."
-- Always respond in HTML format (use <br> for line breaks, <ul><li> for lists, <strong> for emphasis)
-- Be conversational and helpful
-- Always end your response with a relevant follow-up question
-- Keep responses concise but informative
+- Vary your greetings and responses to avoid sounding repetitive or robotic.
+- Reference the user's specific question in your answer.
+- Use ONLY the information provided in the "Relevant Info" section below.
+- If you don't know the answer or the information isn't available, respond with a polite and varied fallback such as:
+  "That's a great question! I don't have the details on that right now, but I can help connect you to the right person."
+  or
+  "I'm not sure about that, but I can help you get in touch with someone who knows more!"
+- Only ask follow-up questions if they make sense and feel natural.
+- Respond in HTML format (use <br> for line breaks, <ul><li> for lists, <strong> for emphasis).
+- Keep your tone friendly and concise.
+- Always finish with a relevant, human-sounding follow-up or offer to help further.
 
 Relevant Info:
 {context}
 
 User Question: {question}
 
-Bob AI Response:`;
+Bob's Response:`;
             
-            document.getElementById('promptEditor').value = defaultPrompt;
+            const promptEditor = document.getElementById('promptEditor');
+            if (promptEditor) {
+                promptEditor.value = defaultPrompt;
+            }
         }
 
-        // Test prompt (opens chat in new tab)
         function testPrompt() {
             window.open('/', '_blank');
         }
 
-        // Auto-refresh stats every 30 seconds
-        setInterval(loadStats, 30000);
-
-        // Handle Enter key in URL input
-        document.getElementById('urlInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                crawlUrl();
-            }
-        });
-
-        // Handle Ctrl+S to save prompt
-        document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.key === 's') {
-                e.preventDefault();
-                savePrompt();
-            }
-        });
-
+        // ===========================
+        // SYSTEM MANAGEMENT
+        // ===========================
 
         async function resetKnowledgeBase() {
-    if (confirm("⚠️ WARNING: This will delete ALL uploaded files and AI knowledge! Are you sure?")) {
-        if (confirm("🚨 FINAL WARNING: This action cannot be undone! Proceed?")) {
-            // ✅ FIXED: Ask for "RESET KNOWLEDGE" confirmation
+            if (!confirm("⚠️ This will delete ALL uploaded files and AI knowledge. Continue?")) return;
+            if (!confirm("🚨 FINAL WARNING: This action cannot be undone! Proceed?")) return;
+            
             const confirmText = prompt("Type 'RESET KNOWLEDGE' to confirm this action:");
-            if (confirmText === "RESET KNOWLEDGE") {
-                try {
-                    const resetBtn = document.getElementById('resetKnowledgeBtn');
-                    const systemLoading = document.getElementById('systemLoading');
-                    const systemSuccess = document.getElementById('systemSuccess');
-                    const systemError = document.getElementById('systemError');
-                    
-                    systemSuccess.style.display = 'none';
-                    systemError.style.display = 'none';
-                    
-                    resetBtn.innerHTML = '⏳ Resetting Knowledge...';
-                    resetBtn.disabled = true;
-                    systemLoading.style.display = 'block';
-                    
-                    const response = await fetch('/api/reset-knowledge', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ confirmation: confirmText }) // ✅ Send confirmation
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (data.status === 'success') {
-                        systemSuccess.textContent = data.message;
-                        systemSuccess.style.display = 'block';
-                        setTimeout(loadStats, 1000);
-                    } else {
-                        throw new Error(data.message);
-                    }
-                    
-                } catch (error) {
-                    const systemError = document.getElementById('systemError');
-                    systemError.textContent = 'Failed to reset knowledge base: ' + error.message;
-                    systemError.style.display = 'block';
-                } finally {
-                    const resetBtn = document.getElementById('resetKnowledgeBtn');
-                    resetBtn.innerHTML = '🗑️ Reset Knowledge Base';
-                    resetBtn.disabled = false;
-                    document.getElementById('systemLoading').style.display = 'none';
-                }
-            } else {
-                alert("Reset cancelled - confirmation phrase did not match. You typed: '" + confirmText + "'");
+            if (confirmText !== "RESET KNOWLEDGE") {
+                alert("Reset cancelled - confirmation phrase did not match.");
+                return;
             }
-        }
-    }
-}
 
-// 2. FIXED clearChatLogs function
-async function clearChatLogs() {
-    if (confirm("⚠️ This will delete ALL chat logs and conversation history. Continue?")) {
-        // ✅ FIXED: Ask for "CLEAR LOGS" confirmation
-        const confirmText = prompt("Type 'CLEAR LOGS' to confirm this action:");
-        if (confirmText === "CLEAR LOGS") {
+            const resetBtn = document.getElementById('resetKnowledgeBtn');
+            const systemLoading = document.getElementById('systemLoading');
+            
+            if (resetBtn) {
+                resetBtn.innerHTML = '⏳ Resetting Knowledge...';
+                resetBtn.disabled = true;
+            }
+            if (systemLoading) systemLoading.style.display = 'block';
+            
             try {
-                const clearBtn = document.getElementById('clearLogsBtn');
-                const systemLoading = document.getElementById('systemLoading');
-                const systemSuccess = document.getElementById('systemSuccess');
-                const systemError = document.getElementById('systemError');
-                
-                systemSuccess.style.display = 'none';
-                systemError.style.display = 'none';
-                
-                clearBtn.innerHTML = '⏳ Clearing Logs...';
-                clearBtn.disabled = true;
-                systemLoading.style.display = 'block';
-                
-                const response = await fetch('/api/clear-logs', {
+                const response = await fetch('/api/reset-knowledge', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ confirmation: confirmText }) // ✅ Send confirmation
+                    body: JSON.stringify({ confirmation: confirmText })
                 });
                 
                 const data = await response.json();
                 
                 if (data.status === 'success') {
-                    systemSuccess.textContent = data.message;
-                    systemSuccess.style.display = 'block';
+                    showAlert('systemSuccess', data.message);
+                    setTimeout(loadStats, 1000);
                 } else {
                     throw new Error(data.message);
                 }
+                
             } catch (error) {
-                const systemError = document.getElementById('systemError');
-                systemError.textContent = 'Failed to clear logs: ' + error.message;
-                systemError.style.display = 'block';
+                showAlert('systemError', 'Failed to reset knowledge base: ' + error.message);
             } finally {
-                const clearBtn = document.getElementById('clearLogsBtn');
-                clearBtn.innerHTML = '📝 Clear Chat Logs';
-                clearBtn.disabled = false;
-                document.getElementById('systemLoading').style.display = 'none';
-            }
-        } else {
-            alert("Action cancelled - confirmation phrase did not match. You typed: '" + confirmText + "'");
-        }
-    }
-}
-
-// 3. FIXED fullSystemReset function
-async function fullSystemReset() {
-    if (confirm("💀 NUCLEAR OPTION: This will delete EVERYTHING! Are you absolutely sure?")) {
-        if (confirm("🚨 LAST CHANCE: This will wipe all files, knowledge, logs, and data! Continue?")) {
-            // ✅ FIXED: Ask for "RESET ALL KNOWLEDGE" confirmation (matches backend)
-            const confirmText = prompt("Type 'RESET ALL KNOWLEDGE' to confirm this destructive action:");
-            if (confirmText === "RESET ALL KNOWLEDGE") {
-                try {
-                    const fullResetBtn = document.getElementById('fullResetBtn');
-                    const systemLoading = document.getElementById('systemLoading');
-                    const systemSuccess = document.getElementById('systemSuccess');
-                    const systemError = document.getElementById('systemError');
-                    
-                    systemSuccess.style.display = 'none';
-                    systemError.style.display = 'none';
-                    
-                    fullResetBtn.innerHTML = '💀 Destroying Everything...';
-                    fullResetBtn.disabled = true;
-                    systemLoading.style.display = 'block';
-                    
-                    const response = await fetch('/reset-all', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ confirmation: confirmText }) // ✅ Send confirmation
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (data.status === 'success') {
-                        systemSuccess.textContent = '💀 ' + data.message;
-                        systemSuccess.style.display = 'block';
-                        setTimeout(loadStats, 2000);
-                    } else {
-                        throw new Error(data.message);
-                    }
-                } catch (error) {
-                    const systemError = document.getElementById('systemError');
-                    systemError.textContent = 'Failed to reset system: ' + error.message;
-                    systemError.style.display = 'block';
-                } finally {
-                    const fullResetBtn = document.getElementById('fullResetBtn');
-                    fullResetBtn.innerHTML = '💀 Full System Reset';
-                    fullResetBtn.disabled = false;
-                    document.getElementById('systemLoading').style.display = 'none';
+                if (resetBtn) {
+                    resetBtn.innerHTML = '🗑️ Reset Knowledge Base';
+                    resetBtn.disabled = false;
                 }
-            } else {
-                alert("Reset cancelled - confirmation phrase did not match. You typed: '" + confirmText + "'");
+                if (systemLoading) systemLoading.style.display = 'none';
             }
         }
-    }
-}
 
+        async function clearChatLogs() {
+            if (!confirm("⚠️ This will delete ALL chat logs and conversation history. Continue?")) return;
+            
+            const clearBtn = document.getElementById('clearLogsBtn');
+            const systemLoading = document.getElementById('systemLoading');
+            
+            if (clearBtn) {
+                clearBtn.innerHTML = '⏳ Clearing Logs...';
+                clearBtn.disabled = true;
+            }
+            if (systemLoading) systemLoading.style.display = 'block';
+            
+            try {
+                const response = await fetch('/api/clear-logs', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    showAlert('systemSuccess', data.message);
+                } else {
+                    throw new Error(data.message);
+                }
+                
+            } catch (error) {
+                showAlert('systemError', 'Failed to clear logs: ' + error.message);
+            } finally {
+                if (clearBtn) {
+                    clearBtn.innerHTML = '📝 Clear Chat Logs';
+                    clearBtn.disabled = false;
+                }
+                if (systemLoading) systemLoading.style.display = 'none';
+            }
+        }
 
-async function refreshChat() {
-    if (confirm("Refresh conversation? (Files and AI knowledge will be preserved)")) {
-        try {
+        async function createBackup() {
+            const backupBtn = document.getElementById('backupBtn');
+            const systemLoading = document.getElementById('systemLoading');
+            
+            if (backupBtn) {
+                backupBtn.innerHTML = '⏳ Creating Backup...';
+                backupBtn.disabled = true;
+            }
+            if (systemLoading) systemLoading.style.display = 'block';
+            
+            try {
+                const response = await fetch('/api/backup-knowledge', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    showAlert('systemSuccess', `Backup created successfully at ${data.backup_path}`);
+                } else {
+                    throw new Error(data.message);
+                }
+                
+            } catch (error) {
+                showAlert('systemError', 'Failed to create backup: ' + error.message);
+            } finally {
+                if (backupBtn) {
+                    backupBtn.innerHTML = '💾 Create Backup';
+                    backupBtn.disabled = false;
+                }
+                if (systemLoading) systemLoading.style.display = 'none';
+            }
+        }
+
+        async function refreshSession() {
             const refreshBtn = document.getElementById('refreshBtn');
-            refreshBtn.innerHTML = '⏳';
-            refreshBtn.disabled = true;
             
-            // ✅ FIXED: Add empty JSON object in body
-            const response = await fetch('/refresh', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({})  // ✅ ADD THIS LINE
-            });
+            if (refreshBtn) {
+                refreshBtn.innerHTML = '⏳ Refreshing...';
+                refreshBtn.disabled = true;
+            }
             
-            const data = await response.json();
+            try {
+                const response = await fetch('/api/refresh-session', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    showAlert('systemSuccess', data.message);
+                } else {
+                    throw new Error(data.message);
+                }
+                
+            } catch (error) {
+                showAlert('systemError', 'Failed to refresh session: ' + error.message);
+            } finally {
+                if (refreshBtn) {
+                    refreshBtn.innerHTML = '🔄 Refresh Session';
+                    refreshBtn.disabled = false;
+                }
+            }
+        }
+
+        async function fullSystemReset() {
+            if (!confirm("💀 NUCLEAR OPTION: This will delete EVERYTHING. Continue?")) return;
+            if (!confirm("🚨 ABSOLUTE FINAL WARNING: ALL DATA WILL BE LOST! Proceed?")) return;
             
-            if (data.status === 'success') {
-                document.getElementById('chatMessages').innerHTML = `
-                    <div class="message bot">
-                        <div class="message-content">
-                            👋 Hi there! I'm Bobot AI, your helpful assistant for SourceSelect.ca. How can I help you today?
+            const confirmText = prompt("Type 'RESET EVERYTHING' to confirm this action:");
+            if (confirmText !== "RESET EVERYTHING") {
+                alert("Reset cancelled - confirmation phrase did not match.");
+                return;
+            }
+
+            const resetBtn = document.getElementById('fullResetBtn');
+            const systemLoading = document.getElementById('systemLoading');
+            
+            if (resetBtn) {
+                resetBtn.innerHTML = '⏳ Resetting Everything...';
+                resetBtn.disabled = true;
+            }
+            if (systemLoading) systemLoading.style.display = 'block';
+            
+            try {
+                // Reset knowledge base
+                await fetch('/api/reset-knowledge', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                // Clear logs
+                await fetch('/api/clear-logs', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                showAlert('systemSuccess', 'Full system reset completed successfully!');
+                setTimeout(() => {
+                    loadStats();
+                    loadPrompt();
+                }, 2000);
+                
+            } catch (error) {
+                showAlert('systemError', 'Failed to perform full reset: ' + error.message);
+            } finally {
+                if (resetBtn) {
+                    resetBtn.innerHTML = '💀 Full System Reset';
+                    resetBtn.disabled = false;
+                }
+                if (systemLoading) systemLoading.style.display = 'none';
+            }
+        }
+
+        // ===========================
+        // STATISTICS AND UTILITIES
+        // ===========================
+
+        async function loadStats() {
+            try {
+                const response = await fetch(`/api/knowledge-stats?website_id=${currentWebsiteId}`);
+                const stats = await response.json();
+                
+                // Update overview stats
+                const totalDocs = document.getElementById('totalDocs');
+                const totalFiles = document.getElementById('totalFiles');
+                const llmModel = document.getElementById('llmModel');
+                const currentWebsite = document.getElementById('currentWebsite');
+                
+                if (totalDocs) totalDocs.textContent = stats.total_documents || 0;
+                if (totalFiles) totalFiles.textContent = stats.uploaded_files?.length || 0;
+                if (llmModel) llmModel.textContent = stats.llm_model || 'Unknown';
+                if (currentWebsite) currentWebsite.textContent = websites[currentWebsiteId]?.name || currentWebsiteId;
+                
+                // Update system management stats
+                const vectorCount = document.getElementById('vectorCount');
+                const fileCount = document.getElementById('fileCount');
+                
+                if (vectorCount) vectorCount.textContent = stats.total_documents || 0;
+                if (fileCount) fileCount.textContent = stats.uploaded_files?.length || 0;
+                
+                updateFileList(stats.uploaded_files || []);
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+
+        function updateFileList(files) {
+            const fileLists = ['fileList', 'overviewFileList'];
+            
+            fileLists.forEach(listId => {
+                const fileList = document.getElementById(listId);
+                if (!fileList) return;
+                
+                if (files.length === 0) {
+                    fileList.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">No files uploaded yet</p>';
+                    return;
+                }
+                
+                fileList.innerHTML = files.map(file => `
+                    <div class="file-item">
+                        <div class="file-info">
+                            <div class="file-name">${file.name}</div>
+                            <div class="file-size">${formatFileSize(file.size)} • ${file.category || 'Unknown'} • ${file.modified}</div>
                         </div>
                     </div>
-                `;
-                document.getElementById('messageInput').value = '';
-                addMessage('✅ ' + data.message, false);
-            } else {
-                addMessage('❌ Failed to refresh: ' + data.message, false);
-            }
-        } catch (error) {
-            addMessage('❌ Error refreshing chat: ' + error.message, false);
-        } finally {
-            const refreshBtn = document.getElementById('refreshBtn');
-            refreshBtn.innerHTML = '🔄';
-            refreshBtn.disabled = false;
+                `).join('');
+            });
         }
-    }
-}
 
-// Show confirmation dialog with custom message
-function showConfirmDialog(title, message, confirmText = 'DELETE', callback) {
-    if (confirm(`${title}\n\n${message}\n\nType '${confirmText}' to confirm.`)) {
-        const userInput = prompt(`Type '${confirmText}' to confirm:`);
-        if (userInput === confirmText) {
-            callback();
-        } else {
-            alert('Cancelled - confirmation text did not match.');
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
-    }
-}
+
+        function showAlert(alertId, message) {
+            const alertElement = document.getElementById(alertId);
+            if (alertElement) {
+                alertElement.textContent = message;
+                alertElement.style.display = 'block';
+            }
+        }
+
+        function hideAlert(alertId) {
+            const alertElement = document.getElementById(alertId);
+            if (alertElement) {
+                alertElement.style.display = 'none';
+            }
+        }
+
+        // Auto-refresh stats every 30 seconds
+        setInterval(loadStats, 30000);
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                if (currentTab === 'prompt') {
+                    savePrompt();
+                }
+            }
+        });
     </script>
 </body>
 </html>

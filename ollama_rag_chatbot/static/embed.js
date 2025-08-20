@@ -25,6 +25,9 @@
     }
 
     init() {
+      const urlParams = new URLSearchParams(window.location.search);
+      this.websiteId = urlParams.get("website_id") || "default";
+
       this.createStyles();
       this.createTriggerButton();
       this.createWidget();
@@ -404,6 +407,10 @@
     }
 
     createWidget() {
+      // Extract website_id from URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const websiteId = urlParams.get("website_id") || "default";
+
       this.widget = document.createElement("div");
       this.widget.className = "bobot-widget-container";
 
@@ -415,13 +422,22 @@
 
       this.iframe = document.createElement("iframe");
       this.iframe.className = "bobot-widget-iframe";
-      this.iframe.src = WIDGET_CONFIG.apiBaseUrl + WIDGET_CONFIG.widgetUrl;
+
+      // Add website_id to the iframe URL
+      const widgetUrl = `${WIDGET_CONFIG.apiBaseUrl}${
+        WIDGET_CONFIG.widgetUrl
+      }?website_id=${encodeURIComponent(websiteId)}`;
+      this.iframe.src = widgetUrl;
+
       this.iframe.allow = "microphone; camera";
       this.iframe.setAttribute("title", "Bob AI Chat Widget");
 
       this.widget.appendChild(closeButton);
       this.widget.appendChild(this.iframe);
       document.body.appendChild(this.widget);
+
+      // Store websiteId for later use
+      this.websiteId = websiteId;
     }
 
     attachEventListeners() {

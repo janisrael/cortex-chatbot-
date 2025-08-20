@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+
+        /* STEP 3B: Add these CSS styles to the dashboard.html <style> section */
+/* Find the existing styles in dashboard.html and add these new rules */
+
+.management-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.management-item {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e1e5e9;
+}
+
+.management-item h3 {
+    color: #667eea;
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.management-item p {
+    color: #666;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.management-item ul {
+    color: #666;
+    font-size: 13px;
+    margin: 10px 0 20px 20px;
+}
+
+.management-item ul li {
+    margin-bottom: 5px;
+}
+
+.btn-danger {
+    background: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+    border-color: #bd2130;
+}
+
+.btn-danger:disabled {
+    background: #f5c6cb;
+    border-color: #f1b0b7;
+    cursor: not-allowed;
+}
+
+/* Override for danger buttons in management section */
+.management-item .btn {
+    width: 100%;
+    font-weight: 600;
+    padding: 12px 20px;
+}
+
+@media (max-width: 768px) {
+    .management-grid {
+        grid-template-columns: 1fr;
+    }
+}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e1e5e9;
+        }
+
+        .card h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea.form-control {
+            height: 120px;
+            resize: vertical;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+        }
+
+        .btn-danger:hover {
+            background: #c44133;
+        }
+
+        .file-upload {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 30px 20px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .file-upload.dragover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #ddd;
+            margin-bottom: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .prompt-editor {
+            height: 200px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .url-input-group {
+            display: flex;
+            gap: 12px;
+            align-items: end;
+        }
+
+        .url-input-group .form-control {
+            flex: 1;
+        }
+
+        .url-input-group .form-group {
+            margin-bottom: 0;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .file-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            background: #f8f9fa;
+        }
+
+        .file-info {
+            font-size: 13px;
+        }
+
+        .file-name {
+            font-weight: 500;
+        }
+
+        .file-size {
+            color: #666;
+            font-size: 11px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .url-input-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>AI Dashboard</h1>
+            <div class="nav-links">
+                <a href="/">Chat Interface</a>
+                <a href="/widget">Widget Preview</a>
+                <a href="/health">System Health</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Statistics Section -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalDocs">-</div>
+                <div class="stat-label">Documents</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalFiles">-</div>
+                <div class="stat-label">Uploaded Files</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="llmModel">-</div>
+                <!-- <div class="stat-label">LLM Model</div> -->
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="llmOption">-</div>
+                <!-- <div class="stat-label">LLM Type</div> -->
+            </div>
+        </div>
+
+        <!-- Main Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- File Upload Section -->
+            <div class="card">
+                <h2> Upload Documents</h2>
+                
+                <div class="alert alert-success" id="uploadSuccess"></div>
+                <div class="alert alert-error" id="uploadError"></div>
+                
+                <div class="file-upload" id="fileUpload">
+                    <div class="upload-icon">📁</div>
+                    <p><strong>Drop files here or click to browse</strong></p>
+                    <p>Supported: PDF, TXT, DOC, DOCX, CSV (Max 16MB)</p>
+                    <input type="file" id="fileInput" multiple accept=".pdf,.txt,.doc,.docx,.csv">
+                </div>
+                
+                <div class="loading" id="uploadLoading">
+                    <div class="spinner"></div>
+                    Processing file...
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <h3>Uploaded Files</h3>
+                    <div class="file-list" id="fileList">
+                        Loading files...
+                    </div>
+                </div>
+            </div>
+
+            <!-- URL Crawling Section -->
+            <div class="card">
+                <h2> Crawl Websites</h2>
+                
+                <div class="alert alert-success" id="crawlSuccess"></div>
+                <div class="alert alert-error" id="crawlError"></div>
+                
+                <div class="form-group">
+                    <label for="urlInput">Website URL</label>
+                    <div class="url-input-group">
+                        <div class="form-group" style="flex: 1;">
+                            <input type="url" id="urlInput" class="form-control" placeholder="https://example.com">
+                        </div>
+                        <div class="form-group">
+                            <input type="number" id="maxPages" class="form-control" value="10" min="1" max="50" style="width: 80px;" title="Max pages">
+                        </div>
+                        <button class="btn" onclick="crawlUrl()" id="crawlBtn">
+                             Crawl
+                        </button>
+                    </div>
+                </div>
+
+                <div class="loading" id="crawlLoading">
+                    <div class="spinner"></div>
+                    Crawling website...
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <p><strong>Tips:</strong></p>
+                    <ul style="margin-left: 20px; color: #666; font-size: 14px;">
+                        <li>Enter the full URL including https://</li>
+                        <li>The system will extract text content from web pages</li>
+                        <li>Start with a small number of pages for testing</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prompt Editor Section -->
+        <div class="card full-width">
+            <h2> Edit System Prompt</h2>
+            
+            <div class="alert alert-success" id="promptSuccess"></div>
+            <div class="alert alert-error" id="promptError"></div>
+            
+            <div class="form-group">
+                <label for="promptEditor">System Prompt Template</label>
+                <textarea id="promptEditor" class="form-control prompt-editor" placeholder="Loading prompt..."></textarea>
+                <small style="color: #666; margin-top: 5px; display: block;">
+                    Use {context} for retrieved information and {question} for user input. HTML formatting supported.
+                </small>
+            </div>
+            
+            <div style="display: flex; gap: 12px;">
+                <button class="btn" onclick="savePrompt()" id="savePromptBtn">
+                     Save Prompt
+                </button>
+                <button class="btn" onclick="resetPrompt()" style="background: #6c757d;">
+                     Reset to Default
+                </button>
+                <button class="btn" onclick="testPrompt()" style="background: #28a745;">
+                     Test Prompt
+                </button>
+            </div>
+
+            <div class="loading" id="promptLoading">
+                <div class="spinner"></div>
+                Updating prompt...
+            </div>
+        </div>
+
+        <div class="card full-width">
+            <h2>🔧 System Management</h2>
+            
+            <div class="alert alert-success" id="systemSuccess"></div>
+            <div class="alert alert-error" id="systemError"></div>
+            
+            <div class="management-grid">
+                <div class="management-item">
+                    <h3>Reset Knowledge Base</h3>
+                    <p>Clear all uploaded files and AI knowledge. This will remove:</p>
+                    <ul>
+                        <li>All uploaded documents</li>
+                        <li>Vector database</li>
+                        <li>Learned conversations</li>
+                        <li>Knowledge base content</li>
+                    </ul>
+                    <button class="btn btn-danger" onclick="resetKnowledgeBase()" id="resetKnowledgeBtn">
+                        🗑️ Reset Knowledge Base
+                    </button>
+                </div>
+                
+                <div class="management-item">
+                    <h3>Clear Chat Logs</h3>
+                    <p>Remove all chat history and conversation logs:</p>
+                    <ul>
+                        <li>Chat logs database</li>
+                        <li>Conversation history</li>
+                        <li>User session data</li>
+                    </ul>
+                    <button class="btn btn-danger" onclick="clearChatLogs()" id="clearLogsBtn">
+                        📝 Clear Chat Logs
+                    </button>
+                </div>
+                
+                <div class="management-item">
+                    <h3>Full System Reset</h3>
+                    <p>⚠️ NUCLEAR OPTION: Reset everything to factory settings:</p>
+                    <ul>
+                        <li>All files and knowledge</li>
+                        <li>All chat logs</li>
+                        <li>All user data</li>
+                        <li>System configuration</li>
+                    </ul>
+                    <button class="btn btn-danger" onclick="fullSystemReset()" id="fullResetBtn">
+                        💀 Full System Reset
+                    </button>
+                </div>
+            </div>
+
+            <div class="loading" id="systemLoading">
+                <div class="spinner"></div>
+                Processing system operation...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStats();
+            loadPrompt();
+            setupFileUpload();
+        });
+
+        // Load knowledge base statistics
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/knowledge-stats');
+                const stats = await response.json();
+                
+                document.getElementById('totalDocs').textContent = stats.total_documents || 0;
+                document.getElementById('totalFiles').textContent = stats.uploaded_files?.length || 0;
+                document.getElementById('llmModel').textContent = stats.llm_model || 'Unknown';
+                document.getElementById('llmOption').textContent = stats.llm_option || 'Unknown';
+                
+                // Update file list
+                updateFileList(stats.uploaded_files || []);
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+
+        // Update file list display
+        function updateFileList(files) {
+            const fileList = document.getElementById('fileList');
+            
+            if (files.length === 0) {
+                fileList.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">No files uploaded yet</p>';
+                return;
+            }
+            
+            fileList.innerHTML = files.map(file => `
+                <div class="file-item">
+                    <div class="file-info">
+                        <div class="file-name">${file.name}</div>
+                        <div class="file-size">${formatFileSize(file.size)} • ${file.modified}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Setup file upload drag and drop
+        function setupFileUpload() {
+            const fileUpload = document.getElementById('fileUpload');
+            const fileInput = document.getElementById('fileInput');
+
+            // Click to browse
+            fileUpload.addEventListener('click', () => fileInput.click());
+
+            // Drag and drop
+            fileUpload.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                fileUpload.classList.add('dragover');
+            });
+
+            fileUpload.addEventListener('dragleave', () => {
+                fileUpload.classList.remove('dragover');
+            });
+
+            fileUpload.addEventListener('drop', (e) => {
+                e.preventDefault();
+                fileUpload.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                handleFileUpload(files);
+            });
+
+            // File input change
+            fileInput.addEventListener('change', (e) => {
+                handleFileUpload(e.target.files);
+            });
+        }
+
+        // Handle file upload
+        async function handleFileUpload(files) {
+            const uploadLoading = document.getElementById('uploadLoading');
+            const uploadSuccess = document.getElementById('uploadSuccess');
+            const uploadError = document.getElementById('uploadError');
+            
+            // Hide previous messages
+            uploadSuccess.style.display = 'none';
+            uploadError.style.display = 'none';
+            
+            for (let file of files) {
+                uploadLoading.style.display = 'block';
+                
+                const formData = new FormData();
+                formData.append('file', file);
+
+
+                try {
+                    const response = await fetch('/api/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        uploadSuccess.textContent = result.message;
+                        uploadSuccess.style.display = 'block';
+                        // Reload stats after successful upload
+                        setTimeout(loadStats, 1000);
+                    } else {
+                        throw new Error(result.error);
+                    }
+                    
+                } catch (error) {
+                    uploadError.textContent = `Failed to upload ${file.name}: ${error.message}`;
+                    uploadError.style.display = 'block';
+                }
+            }
+            
+            uploadLoading.style.display = 'none';
+            // Clear file input
+            document.getElementById('fileInput').value = '';
+        }
+
+        // Crawl URL
+        async function crawlUrl() {
+            const urlInput = document.getElementById('urlInput');
+            const maxPages = document.getElementById('maxPages');
+            const crawlBtn = document.getElementById('crawlBtn');
+            const crawlLoading = document.getElementById('crawlLoading');
+            const crawlSuccess = document.getElementById('crawlSuccess');
+            const crawlError = document.getElementById('crawlError');
+            
+            const url = urlInput.value.trim();
+            const maxPagesValue = parseInt(maxPages.value) || 10;
+            
+            if (!url) {
+                crawlError.textContent = 'Please enter a valid URL';
+                crawlError.style.display = 'block';
+                return;
+            }
+            
+            // Hide previous messages
+            crawlSuccess.style.display = 'none';
+            crawlError.style.display = 'none';
+            
+            crawlBtn.disabled = true;
+            crawlLoading.style.display = 'block';
+            
+            try {
+                const response = await fetch('/api/crawl', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        url: url,
+                        max_pages: maxPagesValue
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    crawlSuccess.textContent = result.message;
+                    crawlSuccess.style.display = 'block';
+                    urlInput.value = '';
+                    // Reload stats after successful crawl
+                    setTimeout(loadStats, 1000);
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                crawlError.textContent = `Failed to crawl URL: ${error.message}`;
+                crawlError.style.display = 'block';
+            }
+            
+            crawlBtn.disabled = false;
+            crawlLoading.style.display = 'none';
+        }
+
+        // Load current prompt
+        async function loadPrompt() {
+            try {
+                const response = await fetch('/api/prompt');
+                const result = await response.json();
+                document.getElementById('promptEditor').value = result.prompt || '';
+            } catch (error) {
+                console.error('Failed to load prompt:', error);
+            }
+        }
+
+        // Save prompt
+        async function savePrompt() {
+            const promptEditor = document.getElementById('promptEditor');
+            const savePromptBtn = document.getElementById('savePromptBtn');
+            const promptLoading = document.getElementById('promptLoading');
+            const promptSuccess = document.getElementById('promptSuccess');
+            const promptError = document.getElementById('promptError');
+            
+            const prompt = promptEditor.value.trim();
+            
+            if (!prompt) {
+                promptError.textContent = 'Prompt cannot be empty';
+                promptError.style.display = 'block';
+                return;
+            }
+            
+            // Hide previous messages
+            promptSuccess.style.display = 'none';
+            promptError.style.display = 'none';
+            
+            savePromptBtn.disabled = true;
+            promptLoading.style.display = 'block';
+            
+            try {
+                const response = await fetch('/api/prompt', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ prompt: prompt })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    promptSuccess.textContent = result.message;
+                    promptSuccess.style.display = 'block';
+                } else {
+                    throw new Error(result.error);
+                }
+                
+            } catch (error) {
+                promptError.textContent = `Failed to save prompt: ${error.message}`;
+                promptError.style.display = 'block';
+            }
+            
+            savePromptBtn.disabled = false;
+            promptLoading.style.display = 'none';
+        }
+
+        // Reset prompt to default
+        function resetPrompt() {
+            const defaultPrompt = `You are Bob AI, a helpful and friendly assistant for SourceSelect.ca.
+
+INSTRUCTIONS:
+- Use ONLY the information provided in the "Relevant Info" section below
+- If the context doesn't contain relevant information, say "I'm not sure about that, but I'd be happy to help you find the right person to contact."
+- Always respond in HTML format (use <br> for line breaks, <ul><li> for lists, <strong> for emphasis)
+- Be conversational and helpful
+- Always end your response with a relevant follow-up question
+- Keep responses concise but informative
+
+Relevant Info:
+{context}
+
+User Question: {question}
+
+Bob AI Response:`;
+            
+            document.getElementById('promptEditor').value = defaultPrompt;
+        }
+
+        // Test prompt (opens chat in new tab)
+        function testPrompt() {
+            window.open('/', '_blank');
+        }
+
+        // Auto-refresh stats every 30 seconds
+        setInterval(loadStats, 30000);
+
+        // Handle Enter key in URL input
+        document.getElementById('urlInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                crawlUrl();
+            }
+        });
+
+        // Handle Ctrl+S to save prompt
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                savePrompt();
+            }
+        });
+
+
+        async function resetKnowledgeBase() {
+    if (confirm("⚠️ WARNING: This will delete ALL uploaded files and AI knowledge! Are you sure?")) {
+        if (confirm("🚨 FINAL WARNING: This action cannot be undone! Proceed?")) {
+            // ✅ FIXED: Ask for "RESET KNOWLEDGE" confirmation
+            const confirmText = prompt("Type 'RESET KNOWLEDGE' to confirm this action:");
+            if (confirmText === "RESET KNOWLEDGE") {
+                try {
+                    const resetBtn = document.getElementById('resetKnowledgeBtn');
+                    const systemLoading = document.getElementById('systemLoading');
+                    const systemSuccess = document.getElementById('systemSuccess');
+                    const systemError = document.getElementById('systemError');
+                    
+                    systemSuccess.style.display = 'none';
+                    systemError.style.display = 'none';
+                    
+                    resetBtn.innerHTML = '⏳ Resetting Knowledge...';
+                    resetBtn.disabled = true;
+                    systemLoading.style.display = 'block';
+                    
+                    const response = await fetch('/api/reset-knowledge', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ confirmation: confirmText }) // ✅ Send confirmation
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.status === 'success') {
+                        systemSuccess.textContent = data.message;
+                        systemSuccess.style.display = 'block';
+                        setTimeout(loadStats, 1000);
+                    } else {
+                        throw new Error(data.message);
+                    }
+                    
+                } catch (error) {
+                    const systemError = document.getElementById('systemError');
+                    systemError.textContent = 'Failed to reset knowledge base: ' + error.message;
+                    systemError.style.display = 'block';
+                } finally {
+                    const resetBtn = document.getElementById('resetKnowledgeBtn');
+                    resetBtn.innerHTML = '🗑️ Reset Knowledge Base';
+                    resetBtn.disabled = false;
+                    document.getElementById('systemLoading').style.display = 'none';
+                }
+            } else {
+                alert("Reset cancelled - confirmation phrase did not match. You typed: '" + confirmText + "'");
+            }
+        }
+    }
+}
+
+// 2. FIXED clearChatLogs function
+async function clearChatLogs() {
+    if (confirm("⚠️ This will delete ALL chat logs and conversation history. Continue?")) {
+        // ✅ FIXED: Ask for "CLEAR LOGS" confirmation
+        const confirmText = prompt("Type 'CLEAR LOGS' to confirm this action:");
+        if (confirmText === "CLEAR LOGS") {
+            try {
+                const clearBtn = document.getElementById('clearLogsBtn');
+                const systemLoading = document.getElementById('systemLoading');
+                const systemSuccess = document.getElementById('systemSuccess');
+                const systemError = document.getElementById('systemError');
+                
+                systemSuccess.style.display = 'none';
+                systemError.style.display = 'none';
+                
+                clearBtn.innerHTML = '⏳ Clearing Logs...';
+                clearBtn.disabled = true;
+                systemLoading.style.display = 'block';
+                
+                const response = await fetch('/api/clear-logs', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ confirmation: confirmText }) // ✅ Send confirmation
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    systemSuccess.textContent = data.message;
+                    systemSuccess.style.display = 'block';
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                const systemError = document.getElementById('systemError');
+                systemError.textContent = 'Failed to clear logs: ' + error.message;
+                systemError.style.display = 'block';
+            } finally {
+                const clearBtn = document.getElementById('clearLogsBtn');
+                clearBtn.innerHTML = '📝 Clear Chat Logs';
+                clearBtn.disabled = false;
+                document.getElementById('systemLoading').style.display = 'none';
+            }
+        } else {
+            alert("Action cancelled - confirmation phrase did not match. You typed: '" + confirmText + "'");
+        }
+    }
+}
+
+// 3. FIXED fullSystemReset function
+async function fullSystemReset() {
+    if (confirm("💀 NUCLEAR OPTION: This will delete EVERYTHING! Are you absolutely sure?")) {
+        if (confirm("🚨 LAST CHANCE: This will wipe all files, knowledge, logs, and data! Continue?")) {
+            // ✅ FIXED: Ask for "RESET ALL KNOWLEDGE" confirmation (matches backend)
+            const confirmText = prompt("Type 'RESET ALL KNOWLEDGE' to confirm this destructive action:");
+            if (confirmText === "RESET ALL KNOWLEDGE") {
+                try {
+                    const fullResetBtn = document.getElementById('fullResetBtn');
+                    const systemLoading = document.getElementById('systemLoading');
+                    const systemSuccess = document.getElementById('systemSuccess');
+                    const systemError = document.getElementById('systemError');
+                    
+                    systemSuccess.style.display = 'none';
+                    systemError.style.display = 'none';
+                    
+                    fullResetBtn.innerHTML = '💀 Destroying Everything...';
+                    fullResetBtn.disabled = true;
+                    systemLoading.style.display = 'block';
+                    
+                    const response = await fetch('/reset-all', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ confirmation: confirmText }) // ✅ Send confirmation
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.status === 'success') {
+                        systemSuccess.textContent = '💀 ' + data.message;
+                        systemSuccess.style.display = 'block';
+                        setTimeout(loadStats, 2000);
+                    } else {
+                        throw new Error(data.message);
+                    }
+                } catch (error) {
+                    const systemError = document.getElementById('systemError');
+                    systemError.textContent = 'Failed to reset system: ' + error.message;
+                    systemError.style.display = 'block';
+                } finally {
+                    const fullResetBtn = document.getElementById('fullResetBtn');
+                    fullResetBtn.innerHTML = '💀 Full System Reset';
+                    fullResetBtn.disabled = false;
+                    document.getElementById('systemLoading').style.display = 'none';
+                }
+            } else {
+                alert("Reset cancelled - confirmation phrase did not match. You typed: '" + confirmText + "'");
+            }
+        }
+    }
+}
+
+
+async function refreshChat() {
+    if (confirm("Refresh conversation? (Files and AI knowledge will be preserved)")) {
+        try {
+            const refreshBtn = document.getElementById('refreshBtn');
+            refreshBtn.innerHTML = '⏳';
+            refreshBtn.disabled = true;
+            
+            // ✅ FIXED: Add empty JSON object in body
+            const response = await fetch('/refresh', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({})  // ✅ ADD THIS LINE
+            });
+            
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                document.getElementById('chatMessages').innerHTML = `
+                    <div class="message bot">
+                        <div class="message-content">
+                            👋 Hi there! I'm Bobot AI, your helpful assistant for SourceSelect.ca. How can I help you today?
+                        </div>
+                    </div>
+                `;
+                document.getElementById('messageInput').value = '';
+                addMessage('✅ ' + data.message, false);
+            } else {
+                addMessage('❌ Failed to refresh: ' + data.message, false);
+            }
+        } catch (error) {
+            addMessage('❌ Error refreshing chat: ' + error.message, false);
+        } finally {
+            const refreshBtn = document.getElementById('refreshBtn');
+            refreshBtn.innerHTML = '🔄';
+            refreshBtn.disabled = false;
+        }
+    }
+}
+
+// Show confirmation dialog with custom message
+function showConfirmDialog(title, message, confirmText = 'DELETE', callback) {
+    if (confirm(`${title}\n\n${message}\n\nType '${confirmText}' to confirm.`)) {
+        const userInput = prompt(`Type '${confirmText}' to confirm:`);
+        if (userInput === confirmText) {
+            callback();
+        } else {
+            alert('Cancelled - confirmation text did not match.');
+        }
+    }
+}
+    </script>
+</body>
+</html>
