@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Chat Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            padding: 30px;
+            background: #f4f6f9;
+            color: #333;
+        }
+
+        h1, h2 {
+            color: #2c3e50;
+        }
+
+        #salesChart {
+            max-width: 100%;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            height: 600px !important;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background: #ecf0f1;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        tr.sales-row {
+            background-color: #e9fce9;
+        }
+
+        .success-flag-true {
+            color: green;
+            font-weight: bold;
+        }
+
+        .success-flag-false {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>📈 AI Learning Progress</h1>
+    <canvas id="salesChart" height="200"></canvas>
+
+    <h2>Recent Conversations</h2>
+    <table>
+        <tr>
+            <th>Timestamp</th>
+            <th>User ID</th>
+            <th>Sender</th>
+            <th>Message</th>
+            <th>Intent</th>
+            <th>Sales?</th>
+            <th>Success</th>
+        </tr>
+        {% for msg in messages %}
+        <tr class="{{ 'sales-row' if msg.sales_flag == 1 }}">
+            <td>{{ msg.timestamp }}</td>
+            <td>{{ msg.user_id }}</td>
+            <td>{{ msg.sender }}</td>
+            <td>{{ msg.message }}</td>
+            <td>{{ msg.intent or 'N/A' }}</td>
+            <td>{{ '✅' if msg.sales_flag else '❌' }}</td>
+            
+            <td class="success-flag-{{ 'true' if msg.success_flag else 'false' }}">
+                {{ 'Yes' if msg.success_flag else 'No' }}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <script>
+        fetch('/analytics_data')
+            .then(res => res.json())
+            .then(data => {
+                console.log(data);  // Log the response to check the structure
+
+                // Check if the data contains timestamps and sales_flags
+                if (data && data.timestamps && data.sales_flags) {
+                const ctx = document.getElementById('salesChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                    labels: data.timestamps,
+                    datasets: [{
+                        label: 'Sales Flags Over Time',
+                        data: data.sales_flags,
+                        borderColor: 'green',
+                        fill: false
+                    }]
+                    },
+                    options: {
+                    responsive: true,
+                    scales: {
+                        x: { title: { display: true, text: 'Timestamp' } },
+                        y: { title: { display: true, text: 'Sales Flag (1 = sales intent)' }, min: 0, max: 1 }
+                    }
+                    }
+                });
+                } else {
+                console.error("Missing or invalid data:", data);
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching data:", error);
+            });
+
+    </script>
+</body>
+</html>

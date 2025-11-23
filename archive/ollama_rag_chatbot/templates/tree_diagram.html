@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversation Tree</title>
+    <style>
+        #chartdiv {
+            width: 100%;
+            height: 80vh;
+        }
+    </style>
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/hierarchy.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+</head>
+<body>
+
+    <h1>Conversation Tree</h1>
+
+    <div id="chartdiv"></div>
+
+ <script>
+    am5.ready(function() {
+        // Create root element
+        var root = am5.Root.new("chartdiv");
+
+        // Set themes
+        root.setThemes([
+            am5themes_Animated.new(root)
+        ]);
+
+        var zoomableContainer = root.container.children.push(
+            am5.ZoomableContainer.new(root, {
+                width: am5.p100,
+                height: am5.p100,
+                wheelable: true,
+                pinchZoom: true
+            })
+        );
+
+        var zoomTools = zoomableContainer.children.push(am5.ZoomTools.new(root, {
+            target: zoomableContainer
+        }));
+
+        // Create series
+        var series = zoomableContainer.contents.children.push(am5hierarchy.Tree.new(root, {
+            singleBranchOnly: true,
+            downDepth: 10,
+            initialDepth: 10,
+            valueField: "value",
+            categoryField: "name",
+            childDataField: "children"
+        }));
+
+        series.labels.template.set("minScale", 0);
+
+        // Prepare data for the tree
+        var groupedData = {{ grouped_by_topic | tojson | safe }};
+        
+        // Recursively format data for AmCharts
+        function formatNode(node) {
+            return {
+                name: node.message,
+                children: node.children ? node.children.map(formatNode) : [],
+                value: node.sales_flag ? 1 : 0
+            };
+        }
+
+        function formatTopicNode(topic, convoMap) {
+            let topicNode = {
+                name: topic,
+                children: []
+            };
+
+            // Check the structure of convoMap[convoId]
+            for (let convoId in convoMap) {
+                let convoNode = {
+                    name: "Convo ID: " + convoId,
+                    children: []
+                };
+
+                console.log("Checking convoMap for", convoId, ":", convoMap[convoId]);
+
+                // Ensure that convoMap[convoId] is an array before using forEach
+                if (Array.isArray(convoMap[convoId])) {
+                    convoMap[convoId].forEach(function(node) {
+                        convoNode.children.push(formatNode(node));
+                    });
+                } else {
+                    console.warn("Expected an array but got", typeof convoMap[convoId], convoMap[convoId]);
+                }
+
+                topicNode.children.push(convoNode);
+            }
+
+            return topicNode;
+        }
+
+        // Format the root node (topics) and set the data
+        let formattedData = [];
+        for (let topic in groupedData) {
+            formattedData.push(formatTopicNode(topic, groupedData[topic]));
+        }
+
+        // Set the tree data
+        series.data.setAll(formattedData);
+        series.circles.template.setAll({
+            fillOpacity: 0.7,
+            strokeWidth: 1,
+            strokeOpacity: 1
+        });
+        // Animate tree
+        series.appear(1000, 100);
+
+    }); 
+</script>
+
+</body>
+</html>

@@ -1,39 +1,42 @@
-# SourceSelect.ca FAQ
+# Cortex AI - Frequently Asked Questions
 
-## What is SourceSelect.ca?
-SourceSelect.ca is a leading platform that helps businesses find and connect with reliable suppliers and service providers across Canada.
+## What is Cortex AI?
+Cortex AI is an intelligent conversational assistant powered by advanced language models and RAG (Retrieval Augmented Generation) technology. We help businesses provide instant, accurate support to their customers 24/7.
 
-## What services do we offer?
-- Supplier matching and vetting
-- Request for proposal (RFP) management
-- Vendor relationship management
-- Supply chain optimization consulting
-- Market research and analysis
+## What can Cortex AI help with?
+- Answer customer questions instantly
+- Provide product information and recommendations
+- Handle common support inquiries
+- Collect and qualify leads
+- Schedule appointments
+- And much more!
 
-## Business Hours
-Monday to Friday: 9:00 AM - 6:00 PM EST
-Saturday: 10:00 AM - 4:00 PM EST
-Sunday: Closed
+## How does Cortex AI work?
+Cortex uses your business knowledge base to provide accurate, contextual responses. Simply upload your documents (FAQs, product guides, policies) and Cortex learns from them to assist your customers intelligently.
 
-## Contact Information
-Email: support@sourceselect.ca
-Phone: 1-800-SOURCE-1
-Address: 123 Business Street, Toronto, ON M5V 3A1
+## Is Cortex AI available 24/7?
+Yes! Cortex AI is available around the clock to assist your customers whenever they need help.
 
-## How to Get Started
-1. Create an account on our platform
-2. Submit your requirements
-3. Get matched with pre-vetted suppliers
-4. Review proposals and select the best fit
-5. Manage your projects through our dashboard
+## Can I customize Cortex?
+Absolutely! You can customize:
+- Bot name and personality
+- Color scheme and branding
+- Knowledge base content
+- Custom prompts and responses
+- And more through the dashboard
+
+## How do I get started?
+1. Sign up for a Cortex account
+2. Upload your business documents
+3. Customize your bot settings
+4. Add the widget to your website
+5. Start helping customers instantly!
 
 ## Pricing
-We offer flexible pricing plans:
-- Starter: $99/month - Up to 5 supplier connections
-- Professional: $299/month - Up to 20 supplier connections
-- Enterprise: Custom pricing - Unlimited connections
+We offer flexible pricing plans to suit businesses of all sizes. Contact us for custom pricing tailored to your needs.
 
 ## Support
-For technical support, email: tech@sourceselect.ca
-For billing questions, email: billing@sourceselect.ca
-For partnerships, email: partnerships@sourceselect.ca
+Need help? We're here for you!
+- Email: support@cortex.ai
+- Documentation: docs.cortex.ai
+- Live chat available on our website

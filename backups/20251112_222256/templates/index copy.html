@@ -1,0 +1,276 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat Widget Styles</title>
+  <style>
+    :root {
+      --primary-color: #0d6efd;
+      --bot-bg: #e8f5e9;
+      --user-bg: #e3f2fd;
+      --bot-text: #2e7d32;
+      --user-text: #0d6efd;
+      --font-stack: 'Segoe UI', Roboto, sans-serif;
+    }
+
+    #chat-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--primary-color);
+      color: white;
+      font-size: 22px;
+      padding: 16px;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 1000;
+      transition: background 0.3s;
+    }
+
+    #chat-button:hover {
+      background: #084298;
+    }
+
+    #chat {
+      display: none;
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 350px;
+      max-height: 600px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      overflow: hidden;
+      font-family: var(--font-stack);
+      display: flex;
+      flex-direction: column;
+      z-index: 999;
+    }
+
+    #chat-window {
+      padding: 1rem;
+      overflow-y: auto;
+      flex-grow: 1;
+      background: #f9f9f9;
+      scrollbar-width: thin;
+    }
+
+    .msg {
+      margin-bottom: 1rem;
+      display: flex;
+      flex-direction: column;
+      animation: fadeIn 0.4s ease-in-out;
+    }
+
+    .bot .user-msg-wrapper {
+      background: var(--bot-bg);
+      color: var(--bot-text);
+      padding: 12px 16px;
+      border-radius: 12px;
+      max-width: 80%;
+      text-align: left;
+    }
+
+    .user .user-msg-wrapper {
+      background: var(--user-bg);
+      color: var(--user-text);
+      padding: 12px 16px;
+      border-radius: 12px;
+      align-self: flex-end;
+      max-width: 80%;
+      text-align: right;
+    }
+
+    .bot-msg-wrapper {
+      display: flex;
+      align-items: center;
+      margin-bottom: 4px;
+      gap: 6px;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .bot-msg-wrapper img {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+    }
+
+    .typing-indicator {
+      display: flex;
+      gap: 4px;
+      padding: 6px 0;
+      margin-left: 4px;
+    }
+
+    .typing-indicator span {
+      width: 6px;
+      height: 6px;
+      background-color: #ccc;
+      border-radius: 50%;
+      animation: bounce 1s infinite ease-in-out;
+    }
+
+    .typing-indicator span:nth-child(2) {
+      animation-delay: 0.1s;
+    }
+
+    .typing-indicator span:nth-child(3) {
+      animation-delay: 0.2s;
+    }
+
+    @keyframes bounce {
+      0%, 80%, 100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+      }
+      40% {
+        transform: scale(1.2);
+        opacity: 1;
+      }
+    }
+
+    #msg {
+      border: none;
+      border-top: 1px solid #ddd;
+      padding: 12px;
+      font-size: 16px;
+      flex-grow: 1;
+      outline: none;
+    }
+
+    #sendBtn {
+      border: none;
+      background: var(--primary-color);
+      color: white;
+      padding: 12px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    #sendBtn:hover {
+      background: #084298;
+    }
+
+    form#inline-user-info-form {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    form#inline-user-info-form input {
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    form#inline-user-info-form button {
+      background: var(--primary-color);
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <h1>SourceSelect Chatbot</h1>
+
+  <!-- Lead form -->
+  <div id="lead-form">
+    <h3>Tell us a bit about you</h3>
+    <input type="text" id="name" placeholder="Your Name" />
+    <input type="tel" id="phone" placeholder="Phone Number" />
+    <button onclick="submitLead()">Start Chat</button>
+  </div>
+
+  <!-- Chat UI -->
+  <div id="chat"></div>
+
+  <div class="suggested">
+    <strong>Suggested:</strong><br />
+    {% for msg in suggested %}
+      <button class="suggest-btn" onclick="send('{{ msg }}')">{{ msg }}</button>
+    {% endfor %}
+  </div>
+
+  <div id="chat-input-area">
+    <input id="msg" placeholder="Ask me something..." />
+    <button class="btncus" onclick="send()">Send</button>
+  </div>
+
+  <script>
+    let userData = {};
+
+    function submitLead() {
+      const name = document.getElementById('name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+
+      if (!name || !phone) {
+        alert("Please fill in both name and phone number.");
+        return;
+      }
+
+      userData = { name, phone };
+
+      document.getElementById('lead-form').style.display = 'none';
+      document.getElementById('chat').style.display = 'flex';
+      document.getElementById('chat-input-area').style.display = 'block';
+      document.querySelector('.suggested').style.display = 'block';
+
+      fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ initial: true, name, phone })
+      })
+      .then(resp => resp.json())
+      .then(data => {
+        appendMessage("bot", data.response);
+      });
+    }
+
+    async function send(msg = null) {
+      const input = document.getElementById('msg');
+      const message = msg || input.value.trim();
+      if (!message) return;
+
+      appendMessage("user", message);
+      input.value = '';
+
+      let res = await fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message,
+          name: userData.name,
+          phone: userData.phone
+        })
+      });
+
+      let data = await res.json();
+      appendMessage("bot", data.response);
+    }
+
+    function appendMessage(type, content) {
+      const chat = document.getElementById('chat');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `msg ${type}`;
+      msgDiv.innerHTML = `<b>${type === 'user' ? 'You' : 'Bobot'}:</b><br>${content}`;
+      chat.appendChild(msgDiv);
+      chat.scrollTop = chat.scrollHeight;
+    }
+  </script>
+</body>
+</html>

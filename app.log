@@ -1,1321 +1,387 @@
-2025-07-16 18:24:28,101 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 18:24:28,101 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 18:24:29,787 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 18:24:29,789 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 18:24:38,205 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 18:24:38,206 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 18:24:38,207 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 18:24:38,216 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 18:24:38,236 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 18:24:38,236 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-16 18:24:38,610 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
-2025-07-16 18:24:48,145 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 18:24:48,155 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 18:24:48] "POST /chat HTTP/1.1" 200 -
-2025-07-16 18:25:06,715 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-16 18:25:06,732 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-16 18:25:06,733 - __main__ - INFO - this is the intent inquiry, sales_flag: 1
-2025-07-16 18:25:19,730 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 18:25:19,741 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 18:25:19] "POST /chat HTTP/1.1" 200 -
-2025-07-16 18:25:50,398 - sales_intent_classifier - INFO - flag and label objection
-2025-07-16 18:25:50,409 - sales_intent_classifier - INFO - flag and label objection
-2025-07-16 18:25:50,409 - __main__ - INFO - this is the intent objection, sales_flag: 1
-2025-07-16 18:25:50,414 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 18:25:50] "POST /chat HTTP/1.1" 200 -
-2025-07-16 18:29:19,627 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/db_model.py', reloading
-2025-07-16 18:29:20,654 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 18:29:23,811 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 18:29:23,811 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 18:29:25,641 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 18:29:25,644 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 18:29:57,896 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 18:29:57,897 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 18:29:57,897 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 18:29:57,903 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 18:29:57,903 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-16 18:29:58,148 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
-2025-07-16 18:30:06,390 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 18:30:06] "POST /chat HTTP/1.1" 200 -
-2025-07-16 18:30:13,966 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/db_model.py', reloading
-2025-07-16 18:30:14,808 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 18:30:17,901 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 18:30:17,901 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 18:30:19,633 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 18:30:19,637 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 18:30:19,708 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 18:30:19,708 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 18:30:19,709 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 18:30:19,721 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 18:30:19,722 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-16 18:30:20,170 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
-2025-07-16 18:30:26,309 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 18:30:26] "POST /chat HTTP/1.1" 200 -
-2025-07-16 18:32:32,726 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/db_model.py', reloading
-2025-07-16 18:32:33,872 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 18:32:38,807 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 18:32:38,807 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 18:32:40,576 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:5000
-2025-07-16 18:32:40,576 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
-2025-07-16 18:32:40,577 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 18:32:43,757 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 18:32:43,757 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 18:32:45,487 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 18:32:45,492 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 18:32:45,565 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 18:32:45,565 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 18:32:45,566 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 18:32:45,578 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 18:32:45,578 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-16 18:32:45,886 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
-2025-07-16 18:33:00,895 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 18:33:00] "POST /chat HTTP/1.1" 200 -
-2025-07-16 18:34:08,963 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/db_model.py', reloading
-2025-07-16 18:34:10,004 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 18:34:13,265 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 18:34:13,265 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 18:34:14,968 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 18:34:14,971 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 18:34:28,907 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 18:34:28,907 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 18:34:28,908 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 18:34:28,911 - db_model - INFO - this is the succes flag after None
-2025-07-16 18:34:28,916 - sales_intent_classifier - INFO - flag and label objection
-2025-07-16 18:34:28,916 - __main__ - INFO - this is the intent objection, sales_flag: 1
-2025-07-16 18:34:28,917 - db_model - INFO - this is the succes flag after None
-2025-07-16 18:34:28,923 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 18:34:28] "POST /chat HTTP/1.1" 200 -
-2025-07-16 18:35:13,953 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/db_model.py', reloading
-2025-07-16 18:35:14,673 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 18:35:17,770 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 18:35:17,770 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 18:35:19,494 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 18:35:19,497 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 18:35:23,950 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 18:35:23,951 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 18:35:23,951 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 18:35:23,954 - db_model - INFO - this is the succes flag after None
-2025-07-16 18:35:23,957 - sales_intent_classifier - INFO - flag and label objection
-2025-07-16 18:35:23,957 - __main__ - INFO - this is the intent objection, sales_flag: 1
-2025-07-16 18:35:23,958 - db_model - INFO - this is the succes flag after None
-2025-07-16 18:35:23,962 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 18:35:23] "POST /chat HTTP/1.1" 200 -
-2025-07-16 18:35:38,930 - db_model - INFO - this is the succes flag after None
-2025-07-16 18:35:38,932 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-16 18:35:38,933 - __main__ - INFO - this is the intent inquiry, sales_flag: 1
-2025-07-16 18:35:39,218 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
-2025-07-16 18:35:51,171 - db_model - INFO - this is the succes flag after None
-2025-07-16 18:35:51,173 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 18:35:51] "POST /chat HTTP/1.1" 200 -
-2025-07-16 18:36:05,565 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/db_model.py', reloading
-2025-07-16 18:36:06,283 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 18:36:09,528 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 18:36:09,528 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 18:36:11,200 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 18:36:11,204 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 18:36:15,891 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 18:36:15,892 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 18:36:15,892 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 18:36:15,897 - db_model - INFO - this is the succes flag after None
-2025-07-16 18:36:15,916 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 18:36:15,916 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-16 18:36:16,187 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
-2025-07-16 18:36:25,860 - db_model - INFO - this is the succes flag after None
-2025-07-16 18:36:25,871 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 18:36:25] "POST /chat HTTP/1.1" 200 -
-2025-07-16 18:36:34,554 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 18:36:34] "GET /analytics HTTP/1.1" 200 -
-2025-07-16 18:36:34,623 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 18:36:34] "GET /analytics_data HTTP/1.1" 200 -
-2025-07-16 19:17:28,663 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:17:28] "GET /analytics HTTP/1.1" 200 -
-2025-07-16 19:17:28,745 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:17:28] "GET /analytics_data HTTP/1.1" 200 -
-2025-07-16 19:18:58,654 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:18:58] "GET /analytics HTTP/1.1" 200 -
-2025-07-16 19:18:58,737 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:18:58] "GET /analytics_data HTTP/1.1" 200 -
-2025-07-16 19:18:59,688 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:18:59] "GET /analytics HTTP/1.1" 200 -
-2025-07-16 19:18:59,757 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:18:59] "GET /analytics_data HTTP/1.1" 200 -
-2025-07-16 19:19:36,656 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:19:36] "GET /analytics HTTP/1.1" 200 -
-2025-07-16 19:19:36,990 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:19:36] "GET /analytics_data HTTP/1.1" 200 -
-2025-07-16 19:19:39,120 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:19:39] "GET /analytics HTTP/1.1" 200 -
-2025-07-16 19:19:39,205 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:19:39] "GET /analytics_data HTTP/1.1" 200 -
-2025-07-16 19:19:52,731 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:19:52] "GET /analytics HTTP/1.1" 200 -
-2025-07-16 19:19:52,787 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:19:52] "GET /analytics_data HTTP/1.1" 200 -
-2025-07-16 19:24:22,292 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:24:22] "GET /analytics HTTP/1.1" 200 -
-2025-07-16 19:24:22,377 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:24:22] "GET /analytics_data HTTP/1.1" 200 -
-2025-07-16 19:24:23,924 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:24:23] "GET /analytics HTTP/1.1" 200 -
-2025-07-16 19:24:24,008 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:24:24] "GET /analytics_data HTTP/1.1" 200 -
-2025-07-16 19:24:43,191 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:24:43] "GET /analytics HTTP/1.1" 200 -
-2025-07-16 19:24:43,249 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:24:43] "GET /analytics_data HTTP/1.1" 200 -
-2025-07-16 19:32:30,598 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/setup_db.py', reloading
-2025-07-16 19:32:31,641 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 19:32:35,068 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 19:32:35,068 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 19:32:36,842 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 19:32:36,845 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 19:32:51,628 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/setup_db.py', reloading
-2025-07-16 19:32:52,326 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 19:32:55,543 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 19:32:55,544 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 19:32:57,389 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 19:32:57,394 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 19:46:42,462 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/db_model.py', reloading
-2025-07-16 19:46:43,131 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 19:46:46,353 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 19:46:46,353 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 19:46:48,030 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 19:46:48,033 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 19:48:01,633 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-16 19:48:02,577 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 19:48:05,587 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 19:48:05,587 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 19:48:07,520 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 19:48:07,523 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 19:48:12,920 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/db_model.py', reloading
-2025-07-16 19:48:13,667 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 19:48:16,936 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 19:48:16,936 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 19:48:18,692 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 19:48:18,695 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 19:48:37,801 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:48:37] "GET /widget HTTP/1.1" 200 -
-2025-07-16 19:48:37,872 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:48:37] "[36mGET /embed.js HTTP/1.1[0m" 304 -
-2025-07-16 19:48:38,950 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:48:38] "GET /static/chat-widget.css HTTP/1.1" 200 -
-2025-07-16 19:48:52,660 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 19:48:52,661 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 19:48:52,661 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 19:48:52,665 - db_model - INFO - this is the succes flag after None
-2025-07-16 19:48:52,696 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:48:52] "[35m[1mPOST /chat HTTP/1.1[0m" 500 -
-2025-07-16 19:49:56,040 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-16 19:49:56,746 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 19:50:03,829 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 19:50:03,829 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 19:50:05,632 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:5000
-2025-07-16 19:50:05,632 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
-2025-07-16 19:50:05,633 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 19:50:08,619 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 19:50:08,619 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 19:50:10,515 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 19:50:10,520 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 19:50:10,597 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 19:50:10,597 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 19:50:10,598 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 19:50:10,604 - db_model - INFO - this is the succes flag after None
-2025-07-16 19:50:10,642 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:50:10] "[35m[1mPOST /chat HTTP/1.1[0m" 500 -
-2025-07-16 19:53:39,080 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/db_model.py', reloading
-2025-07-16 19:53:39,786 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 19:53:42,799 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 19:53:42,799 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 19:53:44,561 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 19:53:44,567 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 19:54:57,102 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/db_model.py', reloading
-2025-07-16 19:54:57,866 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 19:55:01,065 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 19:55:01,065 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 19:55:02,738 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 19:55:02,741 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 19:55:15,428 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/db_model.py', reloading
-2025-07-16 19:55:16,208 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 19:55:26,852 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 19:55:26,852 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 19:55:28,518 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:5000
-2025-07-16 19:55:28,518 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
-2025-07-16 19:55:28,519 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 19:55:31,992 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 19:55:31,992 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 19:55:33,655 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 19:55:33,659 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 19:55:33,716 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:55:33] "GET /widget HTTP/1.1" 200 -
-2025-07-16 19:55:33,717 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:55:33] "GET /widget HTTP/1.1" 200 -
-2025-07-16 19:55:33,767 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:55:33] "[36mGET /embed.js HTTP/1.1[0m" 304 -
-2025-07-16 19:55:34,002 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:55:34] "[36mGET /static/chat-widget.css HTTP/1.1[0m" 304 -
-2025-07-16 19:55:51,645 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 19:55:51,645 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 19:55:51,646 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 19:55:51,650 - db_model - INFO - this is the succes flag after None
-2025-07-16 19:55:51,670 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:55:51] "[35m[1mPOST /chat HTTP/1.1[0m" 500 -
-2025-07-16 19:56:41,933 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/db_model.py', reloading
-2025-07-16 19:56:42,607 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 19:56:45,727 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 19:56:45,727 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 19:56:47,454 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 19:56:47,457 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 19:57:11,447 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 19:57:11,447 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 19:57:11,448 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 19:57:11,450 - db_model - INFO - this is the succes flag after None
-2025-07-16 19:57:11,483 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:57:11] "[35m[1mPOST /chat HTTP/1.1[0m" 500 -
-2025-07-16 19:59:31,045 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-16 19:59:31,761 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 19:59:35,117 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 19:59:35,117 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 19:59:36,850 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 19:59:36,853 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 19:59:39,288 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 19:59:39,289 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 19:59:39,289 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 19:59:39,292 - db_model - INFO - this is the succes flag after None
-2025-07-16 19:59:39,314 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 19:59:39] "[35m[1mPOST /chat HTTP/1.1[0m" 500 -
-2025-07-16 19:59:47,405 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 19:59:47,405 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 19:59:49,095 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:5000
-2025-07-16 19:59:49,095 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
-2025-07-16 19:59:49,096 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 19:59:52,628 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 19:59:52,628 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 19:59:54,333 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 19:59:54,337 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 20:00:00,341 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 20:00:00,341 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 20:00:00,342 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 20:00:00,344 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:00:00,367 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:00:00] "[35m[1mPOST /chat HTTP/1.1[0m" 500 -
-2025-07-16 20:03:52,750 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-16 20:03:53,519 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 20:03:56,789 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 20:03:56,790 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 20:03:58,505 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 20:03:58,509 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 20:04:01,228 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:04:01] "GET /widget HTTP/1.1" 200 -
-2025-07-16 20:04:01,274 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:04:01] "[36mGET /embed.js HTTP/1.1[0m" 304 -
-2025-07-16 20:04:01,708 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:04:01] "[36mGET /static/chat-widget.css HTTP/1.1[0m" 304 -
-2025-07-16 20:04:14,912 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 20:04:14,912 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 20:04:14,913 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 20:04:14,916 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:04:14,934 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:04:14,949 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:04:14] "POST /chat HTTP/1.1" 200 -
-2025-07-16 20:04:21,011 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:04:21,037 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 20:04:21,038 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-16 20:04:22,229 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:04:22,260 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:04:22] "[35m[1mPOST /chat HTTP/1.1[0m" 500 -
-2025-07-16 20:06:41,110 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/db_model.py', reloading
-2025-07-16 20:06:41,916 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 20:06:45,177 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 20:06:45,177 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 20:06:46,947 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 20:06:46,952 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 20:07:47,008 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/db_model.py', reloading
-2025-07-16 20:07:47,724 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 20:07:50,942 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 20:07:50,942 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 20:07:52,614 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 20:07:52,617 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 20:07:52,673 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:07:52] "GET /widget HTTP/1.1" 200 -
-2025-07-16 20:07:52,715 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:07:52] "[36mGET /embed.js HTTP/1.1[0m" 304 -
-2025-07-16 20:07:53,754 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:07:53] "[36mGET /static/chat-widget.css HTTP/1.1[0m" 304 -
-2025-07-16 20:08:02,984 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 20:08:02,985 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 20:08:02,985 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 20:08:02,988 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:08:02,995 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:08:03,006 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:08:03] "POST /chat HTTP/1.1" 200 -
-2025-07-16 20:08:06,185 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:08:06,209 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 20:08:06,209 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-16 20:08:08,363 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:08:08,382 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:08:08] "POST /chat HTTP/1.1" 200 -
-2025-07-16 20:08:10,543 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:08:10,564 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:08:10] "POST /chat HTTP/1.1" 200 -
-2025-07-16 20:08:20,116 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:08:20,144 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-16 20:08:20,144 - __main__ - INFO - this is the intent inquiry, sales_flag: 1
-2025-07-16 20:08:20,144 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:08:20,156 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:08:20] "POST /chat HTTP/1.1" 200 -
-2025-07-16 20:08:23,771 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:08:23,795 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 20:08:23,795 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-16 20:08:24,086 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
-2025-07-16 20:08:35,001 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:08:35,013 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:08:35] "POST /chat HTTP/1.1" 200 -
-2025-07-16 20:09:22,053 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:09:22,075 - sales_intent_classifier - INFO - flag and label objection
-2025-07-16 20:09:22,075 - __main__ - INFO - this is the intent objection, sales_flag: 1
-2025-07-16 20:09:22,075 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:09:22,090 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:09:22] "POST /chat HTTP/1.1" 200 -
-2025-07-16 20:09:27,978 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:09:28,004 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 20:09:28,005 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-16 20:09:34,404 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:09:34,415 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:09:34] "POST /chat HTTP/1.1" 200 -
-2025-07-16 20:10:14,408 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:10:14,432 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 20:10:14,432 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-16 20:10:27,600 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:10:27,613 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:10:27] "POST /chat HTTP/1.1" 200 -
-2025-07-16 20:10:59,595 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:10:59,618 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 20:10:59,618 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-16 20:11:08,641 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:11:08,653 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:11:08] "POST /chat HTTP/1.1" 200 -
-2025-07-16 20:12:17,094 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-16 20:12:18,209 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 20:12:21,363 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 20:12:21,363 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 20:12:23,440 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 20:12:23,444 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 20:12:24,303 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 20:12:24,303 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 20:12:24,304 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 20:12:24,305 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:12:24,320 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 20:12:24,320 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-16 20:12:24,565 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
-2025-07-16 20:12:35,317 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:12:35,330 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:12:35] "POST /chat HTTP/1.1" 200 -
-2025-07-16 20:13:06,725 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:13:06,749 - sales_intent_classifier - INFO - flag and label objection
-2025-07-16 20:13:06,749 - __main__ - INFO - this is the intent objection, sales_flag: 1
-2025-07-16 20:13:06,750 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:13:06,762 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:13:06] "POST /chat HTTP/1.1" 200 -
-2025-07-16 20:13:15,193 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:13:15,219 - sales_intent_classifier - INFO - flag and label objection
-2025-07-16 20:13:15,220 - __main__ - INFO - this is the intent objection, sales_flag: 1
-2025-07-16 20:13:15,220 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:13:15,234 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:13:15] "POST /chat HTTP/1.1" 200 -
-2025-07-16 20:13:16,891 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:13:16,919 - sales_intent_classifier - INFO - flag and label objection
-2025-07-16 20:13:16,920 - __main__ - INFO - this is the intent objection, sales_flag: 1
-2025-07-16 20:13:16,920 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:13:16,933 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:13:16] "POST /chat HTTP/1.1" 200 -
-2025-07-16 20:13:18,401 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:13:18,420 - sales_intent_classifier - INFO - flag and label objection
-2025-07-16 20:13:18,420 - __main__ - INFO - this is the intent objection, sales_flag: 1
-2025-07-16 20:13:18,420 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:13:18,427 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:13:18] "POST /chat HTTP/1.1" 200 -
-2025-07-16 20:13:30,846 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:13:30,871 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-16 20:13:30,871 - __main__ - INFO - this is the intent inquiry, sales_flag: 1
-2025-07-16 20:13:44,804 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:13:44,813 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:13:44] "POST /chat HTTP/1.1" 200 -
-2025-07-16 20:13:56,110 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:13:56,131 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 20:13:56,132 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-16 20:14:25,478 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:14:25,489 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:14:25] "POST /chat HTTP/1.1" 200 -
-2025-07-16 20:14:35,466 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-16 20:14:36,545 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 20:14:39,567 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 20:14:39,568 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 20:14:41,684 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 20:14:41,687 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 20:16:58,004 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-16 20:16:58,695 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 20:17:01,958 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 20:17:01,958 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 20:17:03,758 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 20:17:03,764 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 20:17:07,018 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-16 20:17:07,758 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 20:17:09,743 - torch._subclasses.fake_tensor - INFO - FakeTensor cache stats:
-2025-07-16 20:17:09,743 - torch._subclasses.fake_tensor - INFO -   cache_hits: 0
-2025-07-16 20:17:09,743 - torch._subclasses.fake_tensor - INFO -   cache_misses: 0
-2025-07-16 20:17:14,651 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 20:17:14,651 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 20:17:16,350 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:5000
-2025-07-16 20:17:16,350 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
-2025-07-16 20:17:16,351 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 20:17:19,752 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 20:17:19,752 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 20:17:21,436 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 20:17:21,440 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 20:17:21,507 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:17:21] "GET /widget HTTP/1.1" 200 -
-2025-07-16 20:17:21,508 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:17:21] "GET /widget HTTP/1.1" 200 -
-2025-07-16 20:17:21,512 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:17:21] "GET /widget HTTP/1.1" 200 -
-2025-07-16 20:17:21,565 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:17:21] "[36mGET /embed.js HTTP/1.1[0m" 304 -
-2025-07-16 20:17:22,567 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:17:22] "[36mGET /static/chat-widget.css HTTP/1.1[0m" 304 -
-2025-07-16 20:17:32,509 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 20:17:32,509 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 20:17:32,510 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 20:17:32,514 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:17:32,525 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:17:32,541 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:17:32] "POST /chat HTTP/1.1" 200 -
-2025-07-16 20:17:45,036 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:17:45,057 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-16 20:17:45,057 - __main__ - INFO - this is the intent inquiry, sales_flag: 1
-2025-07-16 20:17:45,057 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:17:45,069 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:17:45] "POST /chat HTTP/1.1" 200 -
-2025-07-16 20:17:52,229 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:17:52,252 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 20:17:52,253 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-16 20:17:53,617 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:17:53,638 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:17:53] "POST /chat HTTP/1.1" 200 -
-2025-07-16 20:17:55,992 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:17:56,004 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:17:56] "POST /chat HTTP/1.1" 200 -
-2025-07-16 20:18:03,390 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:18:03,412 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 20:18:03,413 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-16 20:18:03,826 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
-2025-07-16 20:18:16,639 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:18:16,651 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:18:16] "POST /chat HTTP/1.1" 200 -
-2025-07-16 20:19:05,032 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:19:05,053 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 20:19:05,053 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-16 20:19:17,097 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:19:17,101 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:19:17] "POST /chat HTTP/1.1" 200 -
-2025-07-16 20:21:18,441 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-16 20:21:19,280 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 20:21:22,446 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 20:21:22,446 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 20:21:24,200 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 20:21:24,204 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 20:21:44,302 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 20:21:44,302 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 20:21:44,303 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 20:21:44,309 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 20:21:44,309 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:21:44,331 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 20:21:44,331 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-16 20:21:44,586 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
-2025-07-16 20:21:57,631 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:21:57,635 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:21:57] "POST /chat HTTP/1.1" 200 -
-2025-07-16 20:25:53,562 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 20:25:53,562 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 20:25:55,340 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:5000
-2025-07-16 20:25:55,340 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
-2025-07-16 20:25:55,342 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 20:25:58,794 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 20:25:58,794 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 20:26:00,549 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 20:26:00,555 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 20:26:00,640 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:26:00] "GET /widget HTTP/1.1" 200 -
-2025-07-16 20:26:00,645 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:26:00] "GET /widget HTTP/1.1" 200 -
-2025-07-16 20:26:00,692 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:26:00] "[36mGET /embed.js HTTP/1.1[0m" 304 -
-2025-07-16 20:26:01,105 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:26:01] "[36mGET /static/chat-widget.css HTTP/1.1[0m" 304 -
-2025-07-16 20:26:10,945 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 20:26:10,945 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 20:26:10,946 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 20:26:10,955 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-16 20:26:10,955 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:26:10,974 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:26:10,987 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:26:10] "POST /chat HTTP/1.1" 200 -
-2025-07-16 20:26:20,742 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 20:26:20,742 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:26:20,764 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 20:26:20,764 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-16 20:26:22,024 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:26:22,044 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:26:22] "POST /chat HTTP/1.1" 200 -
-2025-07-16 20:26:24,106 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 20:26:24,106 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:26:24,123 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:26:24] "POST /chat HTTP/1.1" 200 -
-2025-07-16 20:26:28,819 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 20:26:28,819 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:26:28,845 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 20:26:28,846 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-16 20:26:29,305 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
-2025-07-16 20:26:42,879 - db_model - INFO - this is the succes flag after None
-2025-07-16 20:26:42,883 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:26:42] "POST /chat HTTP/1.1" 200 -
-2025-07-16 20:46:04,078 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:46:04] "[33mGET /tree_diagram/74a87eaa-b1e8-4a91-a34f-9cde3b2a384a HTTP/1.1[0m" 404 -
-2025-07-16 20:46:27,309 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:46:27] "[33mGET /tree_diagram/ HTTP/1.1[0m" 404 -
-2025-07-16 20:46:46,038 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-16 20:46:46,953 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 20:46:50,176 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 20:46:50,177 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 20:46:51,914 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 20:46:51,918 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 20:46:51,977 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:46:51] "[33mGET /tree_diagram/ HTTP/1.1[0m" 404 -
-2025-07-16 20:46:57,724 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:46:57] "[33mGET /tree_diagram/ HTTP/1.1[0m" 404 -
-2025-07-16 20:47:01,442 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:47:01] "[33mGET /tree_diagram/ HTTP/1.1[0m" 404 -
-2025-07-16 20:47:04,747 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-16 20:47:05,601 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 20:47:08,662 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 20:47:08,662 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 20:47:10,393 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 20:47:10,397 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 20:47:10,447 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 20:47:10,447 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 20:47:10,448 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 20:47:10,458 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:47:10] "GET /tree_diagram/74a87eaa-b1e8-4a91-a34f-9cde3b2a384a HTTP/1.1" 200 -
-2025-07-16 20:53:46,649 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-16 20:53:47,326 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 20:53:50,530 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 20:53:50,530 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 20:53:52,278 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 20:53:52,282 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 20:55:42,826 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-16 20:55:43,600 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 20:55:46,951 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 20:55:46,951 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 20:55:49,082 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 20:55:49,086 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 20:56:05,291 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:56:05] "[33mGET /tree_diagram/ HTTP/1.1[0m" 404 -
-2025-07-16 20:56:23,641 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 20:56:23,641 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 20:56:23,642 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 20:56:23,650 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:56:23] "GET /tree_diagram HTTP/1.1" 200 -
-2025-07-16 20:57:54,832 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-16 20:57:55,492 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 20:57:58,680 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 20:57:58,680 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 20:58:00,492 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 20:58:00,497 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 20:58:05,008 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 20:58:05,008 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 20:58:05,009 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 20:58:05,024 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:58:05] "GET /tree_diagram HTTP/1.1" 200 -
-2025-07-16 20:58:55,206 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 20:58:55] "GET /tree_diagram HTTP/1.1" 200 -
-2025-07-16 21:00:39,110 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-16 21:00:39,851 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 21:00:43,179 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 21:00:43,179 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 21:00:44,941 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 21:00:44,947 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 21:00:55,977 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 21:00:55,977 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 21:00:55,978 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 21:00:55,994 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:00:55] "GET /tree_diagram HTTP/1.1" 200 -
-2025-07-16 21:00:59,680 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:00:59] "GET /tree_diagram HTTP/1.1" 200 -
-2025-07-16 21:01:26,270 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-16 21:01:26,918 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 21:01:30,186 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 21:01:30,187 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 21:01:31,955 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 21:01:31,960 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 21:01:57,610 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 21:01:57,610 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 21:01:57,611 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 21:01:57,627 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:01:57] "GET /tree_diagram HTTP/1.1" 200 -
-2025-07-16 21:03:13,012 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-16 21:03:13,901 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 21:03:17,043 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 21:03:17,043 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 21:03:18,823 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 21:03:18,826 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 21:03:23,902 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 21:03:23,903 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 21:03:23,903 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 21:03:23,918 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:03:23] "GET /tree_diagram HTTP/1.1" 200 -
-2025-07-16 21:03:25,762 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:03:25] "GET /tree_diagram HTTP/1.1" 200 -
-2025-07-16 21:03:27,381 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:03:27] "GET /tree_diagram HTTP/1.1" 200 -
-2025-07-16 21:03:37,238 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:03:37] "GET /tree_diagram HTTP/1.1" 200 -
-2025-07-16 21:04:05,416 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-16 21:04:06,137 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 21:04:09,391 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 21:04:09,391 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 21:04:11,209 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 21:04:11,212 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 21:05:40,567 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-16 21:05:41,534 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 21:05:44,836 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 21:05:44,836 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 21:05:46,839 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 21:05:46,844 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 21:05:46,896 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 21:05:46,896 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 21:05:46,896 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 21:05:46,902 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:05:46] "GET /tree_diagram HTTP/1.1" 200 -
-2025-07-16 21:05:53,257 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-16 21:05:53,977 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 21:05:57,656 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 21:05:57,656 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 21:05:59,369 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 21:05:59,372 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 21:06:00,510 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-16 21:06:01,202 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 21:06:04,500 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 21:06:04,500 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 21:06:06,234 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 21:06:06,237 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 21:06:12,260 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 21:06:12,260 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 21:06:12,261 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 21:06:12,276 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:06:12] "GET /tree_diagram HTTP/1.1" 200 -
-2025-07-16 21:06:13,996 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:06:13] "GET /tree_diagram HTTP/1.1" 200 -
-2025-07-16 21:06:29,408 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-16 21:06:30,173 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 21:06:33,173 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 21:06:33,173 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 21:06:34,964 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 21:06:34,967 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 21:06:35,018 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 21:06:35,018 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 21:06:35,019 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 21:06:35,032 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:06:35] "GET /tree_diagram HTTP/1.1" 200 -
-2025-07-16 21:06:42,407 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-16 21:06:43,208 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 21:06:46,542 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 21:06:46,542 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 21:06:48,372 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 21:06:48,376 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 21:06:48,426 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 21:06:48,426 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 21:06:48,427 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 21:06:48,441 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:06:48] "GET /tree_diagram HTTP/1.1" 200 -
-2025-07-16 21:06:57,905 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-16 21:06:58,836 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 21:07:02,001 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 21:07:02,001 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 21:07:03,730 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 21:07:03,733 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 21:07:03,784 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 21:07:03,784 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 21:07:03,785 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 21:07:03,798 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:07:03] "GET /tree_diagram HTTP/1.1" 200 -
-2025-07-16 21:07:55,931 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:07:55] "GET /tree_diagram HTTP/1.1" 200 -
-2025-07-16 21:08:15,377 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:08:15] "GET /tree_diagram HTTP/1.1" 200 -
-2025-07-16 21:08:24,818 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:08:24] "GET /tree_diagram HTTP/1.1" 200 -
-2025-07-16 21:13:26,755 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:13:26] "GET /tree_diagram HTTP/1.1" 200 -
-2025-07-16 21:13:28,881 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:13:28] "GET /tree_diagram HTTP/1.1" 200 -
-2025-07-16 21:15:53,001 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:15:53] "GET /tree_diagram HTTP/1.1" 200 -
-2025-07-16 21:16:33,274 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:16:33] "GET /tree_diagram HTTP/1.1" 200 -
-2025-07-16 21:19:55,528 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:19:55] "GET /analytics HTTP/1.1" 200 -
-2025-07-16 21:19:55,603 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:19:55] "GET /analytics_data HTTP/1.1" 200 -
-2025-07-16 21:39:20,232 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:39:20] "GET /widget HTTP/1.1" 200 -
-2025-07-16 21:39:20,284 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:39:20] "[36mGET /embed.js HTTP/1.1[0m" 304 -
-2025-07-16 21:39:20,697 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:39:20] "[36mGET /static/chat-widget.css HTTP/1.1[0m" 304 -
-2025-07-16 21:41:26,156 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:41:26] "GET /widget HTTP/1.1" 200 -
-2025-07-16 21:41:26,198 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:41:26] "[36mGET /embed.js HTTP/1.1[0m" 304 -
-2025-07-16 21:41:26,543 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:41:26] "[36mGET /static/chat-widget.css HTTP/1.1[0m" 304 -
-2025-07-16 21:43:35,600 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-16 21:43:36,264 - werkzeug - INFO -  * Restarting with stat
-2025-07-16 21:43:39,394 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-16 21:43:39,394 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-16 21:43:41,332 - werkzeug - WARNING -  * Debugger is active!
-2025-07-16 21:43:41,335 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-16 21:52:24,521 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:52:24] "GET /widget HTTP/1.1" 200 -
-2025-07-16 21:52:24,567 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:52:24] "[36mGET /embed.js HTTP/1.1[0m" 304 -
-2025-07-16 21:52:24,917 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:52:24] "[36mGET /static/chat-widget.css HTTP/1.1[0m" 304 -
-2025-07-16 21:52:39,805 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-16 21:52:39,805 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-16 21:52:39,805 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-16 21:52:39,813 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-16 21:52:39,813 - db_model - INFO - this is the succes flag after None
-2025-07-16 21:52:39,824 - db_model - INFO - this is the succes flag after None
-2025-07-16 21:52:39,837 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:52:39] "POST /chat HTTP/1.1" 200 -
-2025-07-16 21:53:00,004 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 21:53:00,005 - db_model - INFO - this is the succes flag after None
-2025-07-16 21:53:00,030 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 21:53:00,030 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-16 21:53:01,723 - db_model - INFO - this is the succes flag after None
-2025-07-16 21:53:01,741 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:53:01] "POST /chat HTTP/1.1" 200 -
-2025-07-16 21:53:05,097 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 21:53:05,097 - db_model - INFO - this is the succes flag after None
-2025-07-16 21:53:05,108 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:53:05] "POST /chat HTTP/1.1" 200 -
-2025-07-16 21:53:13,543 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 21:53:13,543 - db_model - INFO - this is the succes flag after None
-2025-07-16 21:53:13,559 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 21:53:13,560 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-16 21:53:13,785 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
-2025-07-16 21:53:23,010 - db_model - INFO - this is the succes flag after None
-2025-07-16 21:53:23,023 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:53:23] "POST /chat HTTP/1.1" 200 -
-2025-07-16 21:53:49,747 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 21:53:49,747 - db_model - INFO - this is the succes flag after None
-2025-07-16 21:53:49,774 - sales_intent_classifier - INFO - flag and label interest
-2025-07-16 21:53:49,774 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-16 21:53:59,894 - db_model - INFO - this is the succes flag after None
-2025-07-16 21:53:59,909 - werkzeug - INFO - 127.0.0.1 - - [16/Jul/2025 21:53:59] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:04:04,616 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-17 19:04:05,492 - werkzeug - INFO -  * Restarting with stat
-2025-07-17 19:04:08,792 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-17 19:04:08,792 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-17 19:04:10,513 - werkzeug - WARNING -  * Debugger is active!
-2025-07-17 19:04:10,518 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-17 19:15:39,870 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:15:39] "[33mPOST /api/generate HTTP/1.1[0m" 404 -
-2025-07-17 19:15:59,024 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:15:59] "[31m[1mPOST /chat HTTP/1.1[0m" 400 -
-2025-07-17 19:17:38,818 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-17 19:17:38,819 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-17 19:17:38,819 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-17 19:17:38,836 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:17:38,836 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:17:38,844 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:17:38] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:27:51,632 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:27:51] "GET /embed.js HTTP/1.1" 200 -
-2025-07-17 19:27:51,854 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:27:51] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
-2025-07-17 19:27:55,333 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:27:55] "GET /embed.js HTTP/1.1" 200 -
-2025-07-17 19:30:09,056 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:30:09] "[36mGET /embed.js HTTP/1.1[0m" 304 -
-2025-07-17 19:31:20,477 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:31:20] "[31m[1mGET /chat HTTP/1.1[0m" 405 -
-2025-07-17 19:31:45,511 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:31:45] "[36mGET /embed.js HTTP/1.1[0m" 304 -
-2025-07-17 19:34:43,190 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:34:43] "OPTIONS /chat HTTP/1.1" 200 -
-2025-07-17 19:34:43,330 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-17 19:34:43,331 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:34:43,352 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:34:43,365 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:34:43] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:34:54,611 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:34:54] "OPTIONS /chat HTTP/1.1" 200 -
-2025-07-17 19:34:54,750 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:34:54,751 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:34:54,773 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:34:54,773 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 19:34:56,203 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:34:56,225 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:34:56] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:34:59,372 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:34:59,372 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:34:59,391 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:34:59,391 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 19:35:00,489 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:35:00,505 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:35:00] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:35:04,257 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:35:04] "OPTIONS /chat HTTP/1.1" 200 -
-2025-07-17 19:35:04,386 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:35:04,386 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:35:04,408 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:35:04,408 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 19:35:05,543 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:35:05,561 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:35:05] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:35:07,325 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:35:07,325 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:35:07,348 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:35:07,348 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 19:35:08,419 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:35:08,442 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:35:08] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:35:15,227 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:35:15] "OPTIONS /chat HTTP/1.1" 200 -
-2025-07-17 19:35:15,361 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:35:15,362 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:35:15,380 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:35:15,381 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 19:35:16,487 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:35:16,503 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:35:16] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:35:19,680 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:35:19,680 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:35:19,700 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:35:19,700 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 19:35:20,768 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:35:20,790 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:35:20] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:35:26,403 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:35:26] "OPTIONS /chat HTTP/1.1" 200 -
-2025-07-17 19:35:26,544 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:35:26,544 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:35:26,567 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:35:26,568 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 19:35:27,735 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:35:27,761 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:35:27] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:35:28,466 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:35:28,466 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:35:28,488 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:35:28,489 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 19:35:29,596 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:35:29,608 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:35:29] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:35:30,869 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:35:30,869 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:35:30,890 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:35:30,890 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 19:35:31,925 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:35:31,940 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:35:31] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:35:51,156 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:35:51] "OPTIONS /chat HTTP/1.1" 200 -
-2025-07-17 19:35:51,287 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-17 19:35:51,288 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:35:51,314 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-17 19:35:51,315 - __main__ - INFO - this is the intent inquiry, sales_flag: 1
-2025-07-17 19:35:51,315 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:35:51,330 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:35:51] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:35:54,106 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:35:54,106 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:35:54,126 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:35:54,126 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 19:35:55,181 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:35:55,202 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:35:55] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:36:29,937 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-17 19:36:30,618 - werkzeug - INFO -  * Restarting with stat
-2025-07-17 19:36:33,985 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-17 19:36:33,985 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-17 19:36:35,832 - werkzeug - WARNING -  * Debugger is active!
-2025-07-17 19:36:35,837 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-17 19:36:35,912 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:36:35] "OPTIONS /chat HTTP/1.1" 200 -
-2025-07-17 19:36:36,041 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-17 19:36:36,041 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-17 19:36:36,042 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-17 19:36:36,052 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-17 19:36:36,052 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:36:36,079 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-17 19:36:36,080 - __main__ - INFO - this is the intent inquiry, sales_flag: 1
-2025-07-17 19:36:36,080 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:36:36,095 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:36:36] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:36:38,413 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:36:38,413 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:36:38,435 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:36:38,435 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 19:36:39,545 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:36:39,571 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:36:39] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:37:06,906 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:37:06] "OPTIONS /chat HTTP/1.1" 200 -
-2025-07-17 19:37:07,037 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:37:07,038 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:37:07,066 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:37:07,066 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 19:37:08,115 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:37:08,136 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:37:08] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:37:24,492 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:37:24] "OPTIONS /chat HTTP/1.1" 200 -
-2025-07-17 19:37:24,624 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-17 19:37:24,624 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:37:24,643 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:37:24,658 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:37:24] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:37:28,595 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:37:28,595 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:37:28,616 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:37:28,616 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 19:37:29,702 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:37:29,726 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:37:29] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:37:34,164 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:37:34] "GET /widget HTTP/1.1" 200 -
-2025-07-17 19:37:34,214 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:37:34] "GET /embed.js HTTP/1.1" 200 -
-2025-07-17 19:37:34,337 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:37:34] "[36mGET /static/chat-widget.css HTTP/1.1[0m" 304 -
-2025-07-17 19:37:43,259 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-17 19:37:43,259 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:37:43,277 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:37:43,291 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:37:43] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:37:50,998 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:37:50,998 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:37:51,015 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:37:51,015 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 19:37:52,432 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:37:52,454 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:37:52] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:37:55,860 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:37:55,860 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:37:55,880 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:37:55] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:37:59,610 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:37:59,610 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:37:59,630 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:37:59,630 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 19:37:59,877 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
-2025-07-17 19:38:09,033 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:38:09,045 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:38:09] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:38:21,805 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:38:21] "OPTIONS /chat HTTP/1.1" 200 -
-2025-07-17 19:38:21,938 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:38:21,938 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:38:21,963 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:38:21,963 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 19:38:23,051 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:38:23,066 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:38:23] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:39:09,698 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:39:09] "OPTIONS /chat HTTP/1.1" 200 -
-2025-07-17 19:39:09,831 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:39:09,831 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:39:09,856 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:39:09,857 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 19:39:10,870 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:39:10,894 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:39:10] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:39:11,582 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:39:11,583 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:39:11,605 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:39:11,605 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 19:39:12,632 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:39:12,656 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:39:12] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:39:13,323 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:39:13,323 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:39:13,344 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:39:13,345 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 19:39:14,433 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:39:14,454 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:39:14] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:39:47,146 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-17 19:39:48,029 - werkzeug - INFO -  * Restarting with stat
-2025-07-17 19:39:51,303 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-17 19:39:51,303 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-17 19:39:53,090 - werkzeug - WARNING -  * Debugger is active!
-2025-07-17 19:39:53,094 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-17 19:39:53,161 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:39:53] "OPTIONS /chat HTTP/1.1" 200 -
-2025-07-17 19:39:53,288 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-17 19:39:53,288 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-17 19:39:53,289 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-17 19:39:53,298 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:39:53,299 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:39:53,322 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:39:53,322 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 19:39:53,602 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
-2025-07-17 19:40:00,678 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:40:00,691 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:40:00] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:40:08,241 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:40:08] "OPTIONS /chat HTTP/1.1" 200 -
-2025-07-17 19:40:08,377 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:40:08,377 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:40:08,398 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:40:08,399 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 19:40:14,350 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:40:14,360 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:40:14] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:40:29,306 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:40:29] "OPTIONS /chat HTTP/1.1" 200 -
-2025-07-17 19:40:29,433 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:40:29,434 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:40:29,456 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:40:29,456 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 19:40:35,150 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:40:35,161 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:40:35] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:40:48,433 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:40:48] "OPTIONS /chat HTTP/1.1" 200 -
-2025-07-17 19:40:48,569 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:40:48,569 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:40:48,592 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:40:48,593 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 19:40:55,133 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:40:55,143 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:40:55] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:41:08,102 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:41:08] "OPTIONS /chat HTTP/1.1" 200 -
-2025-07-17 19:41:08,229 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:41:08,229 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:41:08,252 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 19:41:08,252 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 19:41:15,295 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:41:15,306 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:41:15] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:41:27,971 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:41:27] "OPTIONS /chat HTTP/1.1" 200 -
-2025-07-17 19:41:28,107 - sales_intent_classifier - INFO - flag and label objection
-2025-07-17 19:41:28,107 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:41:28,124 - sales_intent_classifier - INFO - flag and label objection
-2025-07-17 19:41:28,124 - __main__ - INFO - this is the intent objection, sales_flag: 1
-2025-07-17 19:41:28,124 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:41:28,137 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:41:28] "POST /chat HTTP/1.1" 200 -
-2025-07-17 19:41:35,655 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:41:35] "OPTIONS /chat HTTP/1.1" 200 -
-2025-07-17 19:41:35,787 - sales_intent_classifier - INFO - flag and label objection
-2025-07-17 19:41:35,787 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:41:35,815 - sales_intent_classifier - INFO - flag and label objection
-2025-07-17 19:41:35,815 - __main__ - INFO - this is the intent objection, sales_flag: 1
-2025-07-17 19:41:35,815 - db_model - INFO - this is the succes flag after None
-2025-07-17 19:41:35,828 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 19:41:35] "POST /chat HTTP/1.1" 200 -
-2025-07-17 21:17:15,135 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:17:15] "OPTIONS /chat HTTP/1.1" 200 -
-2025-07-17 21:17:15,265 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-17 21:17:15,265 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:17:15,289 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-17 21:17:15,290 - __main__ - INFO - this is the intent inquiry, sales_flag: 1
-2025-07-17 21:17:15,290 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:17:15,303 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:17:15] "POST /chat HTTP/1.1" 200 -
-2025-07-17 21:17:22,315 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:17:22] "OPTIONS /chat HTTP/1.1" 200 -
-2025-07-17 21:17:22,441 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:17:22,442 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:17:22,467 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:17:22,467 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 21:17:22,510 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:17:22] "[35m[1mPOST /chat HTTP/1.1[0m" 500 -
-2025-07-17 21:18:46,000 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:18:45] "OPTIONS /chat HTTP/1.1" 200 -
-2025-07-17 21:18:46,123 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-17 21:18:46,124 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:18:46,141 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:18:46,157 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:18:46] "POST /chat HTTP/1.1" 200 -
-2025-07-17 21:18:49,981 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:18:49,982 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:18:50,000 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:18:50,001 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 21:18:50,044 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:18:50] "[35m[1mPOST /chat HTTP/1.1[0m" 500 -
-2025-07-17 21:19:02,332 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:19:02] "OPTIONS /chat HTTP/1.1" 200 -
-2025-07-17 21:19:02,462 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:19:02,463 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:19:02,492 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:19:02,492 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 21:19:02,536 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:19:02] "[35m[1mPOST /chat HTTP/1.1[0m" 500 -
-2025-07-17 21:20:42,419 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-17 21:20:43,451 - werkzeug - INFO -  * Restarting with stat
-2025-07-17 21:20:48,334 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-17 21:20:48,334 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-17 21:20:50,126 - werkzeug - WARNING -  * Debugger is active!
-2025-07-17 21:20:50,130 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-17 21:20:57,408 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:20:57] "OPTIONS /chat HTTP/1.1" 200 -
-2025-07-17 21:20:57,529 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-17 21:20:57,529 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-17 21:20:57,530 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-17 21:20:57,541 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-17 21:20:57,541 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:20:57,566 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-17 21:20:57,566 - __main__ - INFO - this is the intent inquiry, sales_flag: 1
-2025-07-17 21:20:57,567 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:20:57,584 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:20:57] "POST /chat HTTP/1.1" 200 -
-2025-07-17 21:21:01,662 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:21:01,662 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:21:01,678 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:21:01,678 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 21:21:02,908 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:21:02,929 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:21:02] "POST /chat HTTP/1.1" 200 -
-2025-07-17 21:21:06,290 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:21:06] "OPTIONS /chat HTTP/1.1" 200 -
-2025-07-17 21:21:06,416 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:21:06,416 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:21:06,440 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:21:06,440 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 21:21:07,473 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:21:07,493 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:21:07] "POST /chat HTTP/1.1" 200 -
-2025-07-17 21:21:09,308 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:21:09,309 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:21:09,330 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:21:09,330 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 21:21:10,337 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:21:10,361 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:21:10] "POST /chat HTTP/1.1" 200 -
-2025-07-17 21:21:11,098 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:21:11,099 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:21:11,124 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:21:11,124 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 21:21:12,137 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:21:12,160 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:21:12] "POST /chat HTTP/1.1" 200 -
-2025-07-17 21:21:41,071 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:21:41,071 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:21:41,097 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:21:41,098 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 21:21:41,340 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
-2025-07-17 21:21:41,595 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:21:41] "[35m[1mPOST /chat HTTP/1.1[0m" 500 -
-2025-07-17 21:21:44,756 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-17 21:21:44,756 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:21:44,778 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-17 21:21:44,779 - __main__ - INFO - this is the intent inquiry, sales_flag: 1
-2025-07-17 21:21:44,779 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:21:44,794 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:21:44] "POST /chat HTTP/1.1" 200 -
-2025-07-17 21:21:50,314 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-17 21:21:51,769 - werkzeug - INFO -  * Restarting with stat
-2025-07-17 21:21:56,342 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-17 21:21:56,342 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-17 21:21:58,083 - werkzeug - WARNING -  * Debugger is active!
-2025-07-17 21:21:58,088 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-17 21:21:58,163 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-17 21:21:58,164 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-17 21:21:58,166 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-17 21:21:58,176 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:21:58,177 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:21:58,200 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:21:58,200 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 21:21:58,806 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
-2025-07-17 21:21:59,121 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:21:59] "[35m[1mPOST /chat HTTP/1.1[0m" 500 -
-2025-07-17 21:23:17,756 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-17 21:23:19,008 - werkzeug - INFO -  * Restarting with stat
-2025-07-17 21:23:23,713 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-17 21:23:23,713 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-17 21:23:26,390 - werkzeug - WARNING -  * Debugger is active!
-2025-07-17 21:23:26,395 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-17 21:23:26,463 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-17 21:23:26,464 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-17 21:23:26,464 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-17 21:23:26,473 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:23:26,473 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:23:26,501 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:23:26,501 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 21:23:26,884 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
-2025-07-17 21:23:27,150 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:23:27] "[35m[1mPOST /chat HTTP/1.1[0m" 500 -
-2025-07-17 21:23:42,885 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-17 21:23:42,885 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-17 21:23:44,616 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:5000
-2025-07-17 21:23:44,616 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
-2025-07-17 21:23:44,617 - werkzeug - INFO -  * Restarting with stat
-2025-07-17 21:23:47,804 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-17 21:23:47,804 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-17 21:23:49,507 - werkzeug - WARNING -  * Debugger is active!
-2025-07-17 21:23:49,511 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-17 21:23:49,972 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-17 21:23:49,972 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-17 21:23:49,973 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-17 21:23:49,980 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:23:49,981 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:23:50,005 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:23:50,006 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 21:23:50,200 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
-2025-07-17 21:23:50,384 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:23:50] "[35m[1mPOST /chat HTTP/1.1[0m" 500 -
-2025-07-17 21:26:12,287 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-17 21:26:13,314 - werkzeug - INFO -  * Restarting with stat
-2025-07-17 21:26:18,148 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
-2025-07-17 21:26:18,149 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-17 21:26:19,919 - werkzeug - WARNING -  * Debugger is active!
-2025-07-17 21:26:19,925 - werkzeug - INFO -  * Debugger PIN: 104-592-653
-2025-07-17 21:26:19,998 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-17 21:26:19,999 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-17 21:26:20,000 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-17 21:26:20,010 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:26:20,010 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:26:20,036 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:26:20,037 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 21:26:20,472 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
-2025-07-17 21:26:31,351 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:26:31,363 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:26:31] "POST /chat HTTP/1.1" 200 -
-2025-07-17 21:26:36,834 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:26:36,835 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:26:36,859 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:26:36,860 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 21:26:46,540 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:26:46,543 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:26:46] "POST /chat HTTP/1.1" 200 -
-2025-07-17 21:43:21,257 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:43:21,258 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:43:21,285 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:43:21,285 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 21:43:24,096 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:43:24] "OPTIONS /chat HTTP/1.1" 200 -
-2025-07-17 21:43:24,212 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:43:24,212 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:43:24,224 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:43:24,224 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 21:43:25,414 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:43:25,432 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:43:25] "POST /chat HTTP/1.1" 200 -
-2025-07-17 21:43:28,381 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:43:28,381 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:43:28,395 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:43:28,395 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 21:43:29,514 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:43:29,528 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:43:29] "POST /chat HTTP/1.1" 200 -
-2025-07-17 21:44:04,548 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:44:04,557 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:44:04] "POST /chat HTTP/1.1" 200 -
-2025-07-17 21:45:00,565 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:45:00] "GET /tree_diagram HTTP/1.1" 200 -
-2025-07-17 21:48:01,069 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:48:01] "OPTIONS /chat HTTP/1.1" 200 -
-2025-07-17 21:48:01,192 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-17 21:48:01,192 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:48:01,211 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:48:01,227 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:48:01] "POST /chat HTTP/1.1" 200 -
-2025-07-17 21:48:06,136 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:48:06,136 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:48:06,158 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:48:06,158 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 21:48:07,250 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:48:07,268 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:48:07] "POST /chat HTTP/1.1" 200 -
-2025-07-17 21:48:09,088 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:48:09] "OPTIONS /chat HTTP/1.1" 200 -
-2025-07-17 21:48:09,215 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:48:09,215 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:48:09,240 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:48:09,240 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 21:48:10,304 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:48:10,315 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:48:10] "POST /chat HTTP/1.1" 200 -
-2025-07-17 21:48:12,134 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:48:12,134 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:48:12,155 - sales_intent_classifier - INFO - flag and label interest
-2025-07-17 21:48:12,155 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-17 21:48:13,122 - db_model - INFO - this is the succes flag after None
-2025-07-17 21:48:13,146 - werkzeug - INFO - 127.0.0.1 - - [17/Jul/2025 21:48:13] "POST /chat HTTP/1.1" 200 -
-2025-07-18 07:48:22,959 - werkzeug - INFO - 127.0.0.1 - - [18/Jul/2025 07:48:22] "GET /widget HTTP/1.1" 200 -
-2025-07-18 07:48:23,002 - werkzeug - INFO - 127.0.0.1 - - [18/Jul/2025 07:48:23] "[36mGET /embed.js HTTP/1.1[0m" 304 -
-2025-07-18 07:48:23,257 - werkzeug - INFO - 127.0.0.1 - - [18/Jul/2025 07:48:23] "[36mGET /static/chat-widget.css HTTP/1.1[0m" 304 -
-2025-07-18 17:37:14,361 - werkzeug - INFO - 127.0.0.1 - - [18/Jul/2025 17:37:14] "GET /tree_diagram HTTP/1.1" 200 -
-2025-07-19 11:07:11,402 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cuda:0
-2025-07-19 11:07:11,403 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-19 11:07:14,253 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
- * Running on http://127.0.0.1:5000
-2025-07-19 11:07:14,253 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
-2025-07-19 11:07:14,255 - werkzeug - INFO -  * Restarting with stat
-2025-07-19 11:07:17,984 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cuda:0
-2025-07-19 11:07:17,984 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: sentence-transformers/all-MiniLM-L6-v2
-2025-07-19 11:07:19,997 - werkzeug - WARNING -  * Debugger is active!
-2025-07-19 11:07:19,999 - werkzeug - INFO -  * Debugger PIN: 105-476-973
-2025-07-19 11:07:49,209 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 11:07:49] "GET /widget HTTP/1.1" 200 -
-2025-07-19 11:07:49,253 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 11:07:49] "GET /embed.js HTTP/1.1" 200 -
-2025-07-19 11:07:49,744 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 11:07:49] "GET /static/chat-widget.css HTTP/1.1" 200 -
-2025-07-19 11:07:51,376 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 11:07:51] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
-2025-07-19 11:08:25,242 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 11:08:25] "GET / HTTP/1.1" 200 -
-2025-07-19 11:08:25,400 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 11:08:25] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
-2025-07-19 11:08:30,890 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 11:08:30] "GET /widget HTTP/1.1" 200 -
-2025-07-19 11:08:30,955 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 11:08:30] "OPTIONS /embed.js HTTP/1.1" 200 -
-2025-07-19 11:08:30,961 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 11:08:30] "GET /embed.js HTTP/1.1" 200 -
-2025-07-19 11:08:31,415 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 11:08:31] "GET /static/chat-widget.css HTTP/1.1" 200 -
-2025-07-19 11:08:42,971 - mysql.connector - INFO - package: mysql.connector.plugins
-2025-07-19 11:08:42,971 - mysql.connector - INFO - plugin_name: mysql_native_password
-2025-07-19 11:08:42,973 - mysql.connector - INFO - AUTHENTICATION_PLUGIN_CLASS: MySQLNativePasswordAuthPlugin
-2025-07-19 11:08:42,982 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-19 11:08:42,982 - db_model - INFO - this is the succes flag after None
-2025-07-19 11:08:42,994 - db_model - INFO - this is the succes flag after None
-2025-07-19 11:08:43,006 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 11:08:43] "POST /chat HTTP/1.1" 200 -
-2025-07-19 11:08:54,683 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-19 11:08:54,684 - db_model - INFO - this is the succes flag after None
-2025-07-19 11:08:54,706 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-19 11:08:54,706 - __main__ - INFO - this is the intent inquiry, sales_flag: 1
-2025-07-19 11:08:54,706 - db_model - INFO - this is the succes flag after None
-2025-07-19 11:08:54,719 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 11:08:54] "POST /chat HTTP/1.1" 200 -
-2025-07-19 11:08:58,035 - sales_intent_classifier - INFO - flag and label interest
-2025-07-19 11:08:58,035 - db_model - INFO - this is the succes flag after None
-2025-07-19 11:08:58,059 - sales_intent_classifier - INFO - flag and label interest
-2025-07-19 11:08:58,060 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-19 11:08:59,402 - db_model - INFO - this is the succes flag after None
-2025-07-19 11:08:59,423 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 11:08:59] "POST /chat HTTP/1.1" 200 -
-2025-07-19 11:09:02,323 - sales_intent_classifier - INFO - flag and label interest
-2025-07-19 11:09:02,323 - db_model - INFO - this is the succes flag after None
-2025-07-19 11:09:02,342 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 11:09:02] "POST /chat HTTP/1.1" 200 -
-2025-07-19 11:09:10,851 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-19 11:09:10,852 - db_model - INFO - this is the succes flag after None
-2025-07-19 11:09:10,873 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-19 11:09:10,873 - __main__ - INFO - this is the intent inquiry, sales_flag: 1
-2025-07-19 11:09:11,413 - chromadb.telemetry.product.posthog - INFO - Anonymized telemetry enabled. See                     https://docs.trychroma.com/telemetry for more information.
-2025-07-19 11:09:52,535 - db_model - INFO - this is the succes flag after None
-2025-07-19 11:09:52,550 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 11:09:52] "POST /chat HTTP/1.1" 200 -
-2025-07-19 11:10:01,219 - sales_intent_classifier - INFO - flag and label interest
-2025-07-19 11:10:01,220 - db_model - INFO - this is the succes flag after None
-2025-07-19 11:10:01,239 - sales_intent_classifier - INFO - flag and label interest
-2025-07-19 11:10:01,240 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-19 11:10:32,156 - db_model - INFO - this is the succes flag after None
-2025-07-19 11:10:32,168 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 11:10:32] "POST /chat HTTP/1.1" 200 -
-2025-07-19 12:08:07,013 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 12:08:07] "GET /widget HTTP/1.1" 200 -
-2025-07-19 12:08:07,095 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 12:08:07] "OPTIONS /embed.js HTTP/1.1" 200 -
-2025-07-19 12:08:07,100 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 12:08:07] "[36mGET /embed.js HTTP/1.1[0m" 304 -
-2025-07-19 13:56:19,776 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 13:56:19] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
-2025-07-19 13:57:30,650 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 13:57:30] "GET / HTTP/1.1" 200 -
-2025-07-19 13:57:36,480 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 13:57:36] "GET /widget HTTP/1.1" 200 -
-2025-07-19 13:57:36,553 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 13:57:36] "OPTIONS /embed.js HTTP/1.1" 200 -
-2025-07-19 13:57:36,558 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 13:57:36] "[36mGET /embed.js HTTP/1.1[0m" 304 -
-2025-07-19 13:57:48,258 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-19 13:57:48,258 - db_model - INFO - this is the succes flag after None
-2025-07-19 13:57:48,279 - db_model - INFO - this is the succes flag after None
-2025-07-19 13:57:48,288 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 13:57:48] "POST /chat HTTP/1.1" 200 -
-2025-07-19 13:57:56,399 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-19 13:57:56,400 - db_model - INFO - this is the succes flag after None
-2025-07-19 13:57:56,415 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-19 13:57:56,415 - __main__ - INFO - this is the intent inquiry, sales_flag: 1
-2025-07-19 13:57:56,415 - db_model - INFO - this is the succes flag after None
-2025-07-19 13:57:56,428 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 13:57:56] "POST /chat HTTP/1.1" 200 -
-2025-07-19 13:57:58,867 - sales_intent_classifier - INFO - flag and label interest
-2025-07-19 13:57:58,867 - db_model - INFO - this is the succes flag after None
-2025-07-19 13:57:58,890 - sales_intent_classifier - INFO - flag and label interest
-2025-07-19 13:57:58,890 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-19 13:58:00,513 - db_model - INFO - this is the succes flag after None
-2025-07-19 13:58:00,530 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 13:58:00] "POST /chat HTTP/1.1" 200 -
-2025-07-19 13:58:03,073 - sales_intent_classifier - INFO - flag and label interest
-2025-07-19 13:58:03,073 - db_model - INFO - this is the succes flag after None
-2025-07-19 13:58:03,094 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 13:58:03] "POST /chat HTTP/1.1" 200 -
-2025-07-19 13:58:07,488 - sales_intent_classifier - INFO - flag and label interest
-2025-07-19 13:58:07,488 - db_model - INFO - this is the succes flag after None
-2025-07-19 13:58:07,509 - sales_intent_classifier - INFO - flag and label interest
-2025-07-19 13:58:07,509 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-19 13:58:13,358 - db_model - INFO - this is the succes flag after None
-2025-07-19 13:58:13,375 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 13:58:13] "POST /chat HTTP/1.1" 200 -
-2025-07-19 13:58:20,562 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 13:58:20] "GET /widget HTTP/1.1" 200 -
-2025-07-19 13:58:20,600 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 13:58:20] "[36mGET /embed.js HTTP/1.1[0m" 304 -
-2025-07-19 13:58:21,516 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 13:58:21] "[36mGET /static/chat-widget.css HTTP/1.1[0m" 304 -
-2025-07-19 13:58:21,782 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 13:58:21] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
-2025-07-19 13:58:26,176 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 13:58:26] "[36mGET /static/chat-widget.css HTTP/1.1[0m" 304 -
-2025-07-19 13:58:31,563 - sales_intent_classifier - INFO - flag and label inquiry
-2025-07-19 13:58:31,563 - db_model - INFO - this is the succes flag after None
-2025-07-19 13:58:31,580 - db_model - INFO - this is the succes flag after None
-2025-07-19 13:58:31,593 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 13:58:31] "POST /chat HTTP/1.1" 200 -
-2025-07-19 13:58:36,292 - sales_intent_classifier - INFO - flag and label interest
-2025-07-19 13:58:36,292 - db_model - INFO - this is the succes flag after None
-2025-07-19 13:58:36,314 - sales_intent_classifier - INFO - flag and label interest
-2025-07-19 13:58:36,314 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-19 13:58:37,469 - db_model - INFO - this is the succes flag after None
-2025-07-19 13:58:37,488 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 13:58:37] "POST /chat HTTP/1.1" 200 -
-2025-07-19 13:58:39,743 - sales_intent_classifier - INFO - flag and label interest
-2025-07-19 13:58:39,744 - db_model - INFO - this is the succes flag after None
-2025-07-19 13:58:39,766 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 13:58:39] "POST /chat HTTP/1.1" 200 -
-2025-07-19 13:58:42,483 - sales_intent_classifier - INFO - flag and label interest
-2025-07-19 13:58:42,483 - db_model - INFO - this is the succes flag after None
-2025-07-19 13:58:42,507 - sales_intent_classifier - INFO - flag and label interest
-2025-07-19 13:58:42,508 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-19 13:58:46,098 - db_model - INFO - this is the succes flag after None
-2025-07-19 13:58:46,109 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 13:58:46] "POST /chat HTTP/1.1" 200 -
-2025-07-19 13:58:55,005 - sales_intent_classifier - INFO - flag and label objection
-2025-07-19 13:58:55,006 - db_model - INFO - this is the succes flag after None
-2025-07-19 13:58:55,026 - sales_intent_classifier - INFO - flag and label objection
-2025-07-19 13:58:55,027 - __main__ - INFO - this is the intent objection, sales_flag: 1
-2025-07-19 13:58:55,027 - db_model - INFO - this is the succes flag after None
-2025-07-19 13:58:55,039 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 13:58:55] "POST /chat HTTP/1.1" 200 -
-2025-07-19 13:59:00,057 - sales_intent_classifier - INFO - flag and label objection
-2025-07-19 13:59:00,058 - db_model - INFO - this is the succes flag after None
-2025-07-19 13:59:00,080 - sales_intent_classifier - INFO - flag and label objection
-2025-07-19 13:59:00,081 - __main__ - INFO - this is the intent objection, sales_flag: 1
-2025-07-19 13:59:00,081 - db_model - INFO - this is the succes flag after None
-2025-07-19 13:59:00,098 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 13:59:00] "POST /chat HTTP/1.1" 200 -
-2025-07-19 13:59:07,768 - sales_intent_classifier - INFO - flag and label interest
-2025-07-19 13:59:07,769 - db_model - INFO - this is the succes flag after None
-2025-07-19 13:59:07,791 - sales_intent_classifier - INFO - flag and label interest
-2025-07-19 13:59:07,791 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-19 13:59:13,148 - db_model - INFO - this is the succes flag after None
-2025-07-19 13:59:13,151 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 13:59:13] "POST /chat HTTP/1.1" 200 -
-2025-07-19 13:59:23,251 - sales_intent_classifier - INFO - flag and label interest
-2025-07-19 13:59:23,251 - db_model - INFO - this is the succes flag after None
-2025-07-19 13:59:23,273 - sales_intent_classifier - INFO - flag and label interest
-2025-07-19 13:59:23,274 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-19 13:59:28,966 - db_model - INFO - this is the succes flag after None
-2025-07-19 13:59:28,981 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 13:59:28] "POST /chat HTTP/1.1" 200 -
-2025-07-19 13:59:38,310 - sales_intent_classifier - INFO - flag and label interest
-2025-07-19 13:59:38,310 - db_model - INFO - this is the succes flag after None
-2025-07-19 13:59:38,323 - sales_intent_classifier - INFO - flag and label interest
-2025-07-19 13:59:38,323 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-19 13:59:45,791 - db_model - INFO - this is the succes flag after None
-2025-07-19 13:59:45,807 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 13:59:45] "POST /chat HTTP/1.1" 200 -
-2025-07-19 14:00:25,360 - sales_intent_classifier - INFO - flag and label objection
-2025-07-19 14:00:25,360 - db_model - INFO - this is the succes flag after None
-2025-07-19 14:00:25,378 - sales_intent_classifier - INFO - flag and label objection
-2025-07-19 14:00:25,379 - __main__ - INFO - this is the intent objection, sales_flag: 1
-2025-07-19 14:00:25,379 - db_model - INFO - this is the succes flag after None
-2025-07-19 14:00:25,393 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 14:00:25] "POST /chat HTTP/1.1" 200 -
-2025-07-19 14:00:31,481 - sales_intent_classifier - INFO - flag and label objection
-2025-07-19 14:00:31,482 - db_model - INFO - this is the succes flag after None
-2025-07-19 14:00:31,500 - sales_intent_classifier - INFO - flag and label objection
-2025-07-19 14:00:31,500 - __main__ - INFO - this is the intent objection, sales_flag: 1
-2025-07-19 14:00:31,501 - db_model - INFO - this is the succes flag after None
-2025-07-19 14:00:31,519 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 14:00:31] "POST /chat HTTP/1.1" 200 -
-2025-07-19 14:00:32,728 - sales_intent_classifier - INFO - flag and label objection
-2025-07-19 14:00:32,728 - db_model - INFO - this is the succes flag after None
-2025-07-19 14:00:32,754 - sales_intent_classifier - INFO - flag and label objection
-2025-07-19 14:00:32,754 - __main__ - INFO - this is the intent objection, sales_flag: 1
-2025-07-19 14:00:32,754 - db_model - INFO - this is the succes flag after None
-2025-07-19 14:00:32,765 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 14:00:32] "POST /chat HTTP/1.1" 200 -
-2025-07-19 14:00:37,850 - sales_intent_classifier - INFO - flag and label objection
-2025-07-19 14:00:37,850 - db_model - INFO - this is the succes flag after None
-2025-07-19 14:00:37,875 - sales_intent_classifier - INFO - flag and label objection
-2025-07-19 14:00:37,875 - __main__ - INFO - this is the intent objection, sales_flag: 1
-2025-07-19 14:00:37,876 - db_model - INFO - this is the succes flag after None
-2025-07-19 14:00:37,893 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 14:00:37] "POST /chat HTTP/1.1" 200 -
-2025-07-19 14:00:46,706 - sales_intent_classifier - INFO - flag and label interest
-2025-07-19 14:00:46,706 - db_model - INFO - this is the succes flag after None
-2025-07-19 14:00:46,728 - sales_intent_classifier - INFO - flag and label interest
-2025-07-19 14:00:46,729 - __main__ - INFO - this is the intent interest, sales_flag: 1
-2025-07-19 14:00:50,495 - db_model - INFO - this is the succes flag after None
-2025-07-19 14:00:50,505 - werkzeug - INFO - 127.0.0.1 - - [19/Jul/2025 14:00:50] "POST /chat HTTP/1.1" 200 -
-2025-07-19 14:03:37,978 - werkzeug - INFO -  * Detected change in '/home/jan-israel/dev/chatbot/ollama_rag_chatbot/app.py', reloading
-2025-07-19 14:03:39,291 - werkzeug - INFO -  * Restarting with stat
-2025-07-19 14:05:48,428 - werkzeug - INFO -  * Restarting with stat
-2025-07-19 14:17:46,842 - werkzeug - INFO -  * Restarting with stat
-2025-07-20 22:08:07,851 - werkzeug - INFO -  * Restarting with stat
-2025-07-20 22:10:38,279 - werkzeug - INFO -  * Restarting with stat
+nohup: ignoring input
+/run/media/swordfish/Projects/development/chatbot/app.py:161: LangChainDeprecationWarning: The class `HuggingFaceEmbeddings` was deprecated in LangChain 0.2.2 and will be removed in 1.0. An updated version of the class exists in the :class:`~langchain-huggingface package and should be used instead. To use it run `pip install -U :class:`~langchain-huggingface` and import as `from :class:`~langchain_huggingface import HuggingFaceEmbeddings``.
+  embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+/run/media/swordfish/Projects/development/chatbot/app.py:164: LangChainDeprecationWarning: The class `Chroma` was deprecated in LangChain 0.2.9 and will be removed in 1.0. An updated version of the class exists in the :class:`~langchain-chroma package and should be used instead. To use it run `pip install -U :class:`~langchain-chroma` and import as `from :class:`~langchain_chroma import Chroma``.
+  vectorstore = Chroma(
+🤖 Using OpenAI model: gpt-4o-mini
+✅ Vector store loaded successfully
+📊 Vector store contains 95 documents
+✅ QA Chain created successfully
+🤖 Starting Flask RAG Chatbot...
+📊 Vector store location: ./chroma_db
+📝 FAQ file expected at: ./data/faq.txt
+📋 Logs will be saved to: ./logs/chat_logs.csv
+ * Serving Flask app 'app'
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:6001
+ * Running on http://10.0.0.8:6001
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+/run/media/swordfish/Projects/development/chatbot/app.py:161: LangChainDeprecationWarning: The class `HuggingFaceEmbeddings` was deprecated in LangChain 0.2.2 and will be removed in 1.0. An updated version of the class exists in the :class:`~langchain-huggingface package and should be used instead. To use it run `pip install -U :class:`~langchain-huggingface` and import as `from :class:`~langchain_huggingface import HuggingFaceEmbeddings``.
+  embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+/run/media/swordfish/Projects/development/chatbot/app.py:164: LangChainDeprecationWarning: The class `Chroma` was deprecated in LangChain 0.2.9 and will be removed in 1.0. An updated version of the class exists in the :class:`~langchain-chroma package and should be used instead. To use it run `pip install -U :class:`~langchain-chroma` and import as `from :class:`~langchain_chroma import Chroma``.
+  vectorstore = Chroma(
+ * Debugger is active!
+ * Debugger PIN: 189-860-339
+127.0.0.1 - - [13/Nov/2025 00:23:20] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:23:28] "GET /api/knowledge-stats HTTP/1.1" 200 -
+ * Detected change in '/run/media/swordfish/Projects/development/chatbot/app.py', reloading
+🤖 Using OpenAI model: gpt-4o-mini
+✅ Vector store loaded successfully
+📊 Vector store contains 95 documents
+✅ QA Chain created successfully
+🤖 Starting Flask RAG Chatbot...
+📊 Vector store location: ./chroma_db
+📝 FAQ file expected at: ./data/faq.txt
+📋 Logs will be saved to: ./logs/chat_logs.csv
+ * Restarting with stat
+/run/media/swordfish/Projects/development/chatbot/app.py:161: LangChainDeprecationWarning: The class `HuggingFaceEmbeddings` was deprecated in LangChain 0.2.2 and will be removed in 1.0. An updated version of the class exists in the :class:`~langchain-huggingface package and should be used instead. To use it run `pip install -U :class:`~langchain-huggingface` and import as `from :class:`~langchain_huggingface import HuggingFaceEmbeddings``.
+  embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+/run/media/swordfish/Projects/development/chatbot/app.py:164: LangChainDeprecationWarning: The class `Chroma` was deprecated in LangChain 0.2.9 and will be removed in 1.0. An updated version of the class exists in the :class:`~langchain-chroma package and should be used instead. To use it run `pip install -U :class:`~langchain-chroma` and import as `from :class:`~langchain_chroma import Chroma``.
+  vectorstore = Chroma(
+ * Debugger is active!
+ * Debugger PIN: 189-860-339
+127.0.0.1 - - [13/Nov/2025 00:24:05] "GET /dashboard HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:24:05] "[36mGET /static/v2/css/dashboard.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 00:24:05] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+127.0.0.1 - - [13/Nov/2025 00:24:05] "[36mGET /static/v2/js/dashboard-core.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 00:24:05] "[36mGET /static/v2/js/dashboard-utils.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 00:24:05] "[36mGET /static/v2/js/dashboard-overview.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 00:24:05] "[36mGET /static/v2/js/dashboard-llm.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 00:24:05] "[36mGET /static/v2/js/dashboard-prompt.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 00:24:05] "[36mGET /static/v2/js/dashboard-system.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 00:24:05] "GET /dashboard HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:24:05] "GET /api/llm-config HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:24:05] "GET /api/llm-config HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:24:05] "GET /static/v2/css/dashboard.css HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:24:05] "GET /static/v2/js/dashboard-core.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:24:05] "GET /static/v2/js/dashboard-utils.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:24:05] "GET /static/v2/js/dashboard-overview.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:24:05] "GET /static/v2/js/dashboard-llm.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:24:05] "GET /static/v2/js/dashboard-prompt.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:24:05] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+127.0.0.1 - - [13/Nov/2025 00:24:05] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+127.0.0.1 - - [13/Nov/2025 00:24:05] "GET /static/v2/js/dashboard-system.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:24:06] "GET /api/llm-config HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:24:06] "GET /api/llm-config HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:24:06] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:24:06] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:24:06] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:24:06] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:24:06] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:24:06] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+127.0.0.1 - - [13/Nov/2025 00:24:28] "[35m[1mPOST /api/upload HTTP/1.1[0m" 500 -
+127.0.0.1 - - [13/Nov/2025 00:24:36] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:25:06] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:25:36] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:06] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:36] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:40] "GET /dashboard HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:40] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+127.0.0.1 - - [13/Nov/2025 00:26:40] "GET /static/v2/js/dashboard-core.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:40] "GET /static/v2/css/dashboard.css HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:40] "GET /static/v2/js/dashboard-utils.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:40] "GET /static/v2/js/dashboard-llm.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:40] "GET /static/v2/js/dashboard-overview.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:40] "GET /static/v2/js/dashboard-prompt.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:40] "GET /static/v2/js/dashboard-system.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:40] "GET /api/llm-config HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:40] "GET /api/llm-config HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:40] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:40] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:41] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+127.0.0.1 - - [13/Nov/2025 00:26:46] "POST /api/upload HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:46] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:46] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:59] "GET /dashboard HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:59] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+127.0.0.1 - - [13/Nov/2025 00:26:59] "GET /static/v2/css/dashboard.css HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:59] "GET /static/v2/js/dashboard-utils.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:59] "GET /static/v2/js/dashboard-overview.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:59] "GET /static/v2/js/dashboard-llm.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:59] "GET /static/v2/js/dashboard-core.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:59] "GET /static/v2/js/dashboard-prompt.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:59] "GET /static/v2/js/dashboard-system.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:59] "GET /api/llm-config HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:59] "GET /api/llm-config HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:59] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:59] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:26:59] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+127.0.0.1 - - [13/Nov/2025 00:27:08] "POST /api/upload HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:27:08] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:27:08] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:27:29] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:27:50] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:27:59] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:28:29] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:28:59] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:15] "GET /dashboard HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:15] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+127.0.0.1 - - [13/Nov/2025 00:29:15] "[36mGET /static/v2/css/dashboard.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 00:29:15] "[36mGET /static/v2/js/dashboard-core.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 00:29:15] "[36mGET /static/v2/js/dashboard-utils.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 00:29:15] "[36mGET /static/v2/js/dashboard-overview.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 00:29:15] "[36mGET /static/v2/js/dashboard-llm.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 00:29:15] "GET /static/v2/js/dashboard-prompt.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:15] "[36mGET /static/v2/js/dashboard-system.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 00:29:16] "GET /api/llm-config HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:16] "GET /api/llm-config HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:16] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:16] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:21] "POST /api/upload HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:23] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:36] "GET /dashboard HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:36] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+127.0.0.1 - - [13/Nov/2025 00:29:36] "GET /static/v2/css/dashboard.css HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:36] "GET /static/v2/js/dashboard-utils.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:36] "GET /static/v2/js/dashboard-core.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:36] "GET /static/v2/js/dashboard-overview.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:36] "GET /static/v2/js/dashboard-llm.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:36] "GET /static/v2/js/dashboard-prompt.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:36] "GET /static/v2/js/dashboard-system.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:36] "GET /api/llm-config HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:36] "GET /api/llm-config HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:36] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:36] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:37] "GET /dashboard HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:37] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+127.0.0.1 - - [13/Nov/2025 00:29:37] "GET /static/v2/css/dashboard.css HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:37] "GET /static/v2/js/dashboard-core.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:37] "GET /static/v2/js/dashboard-utils.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:37] "GET /static/v2/js/dashboard-llm.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:37] "GET /static/v2/js/dashboard-prompt.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:37] "GET /static/v2/js/dashboard-overview.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:37] "GET /static/v2/js/dashboard-system.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:37] "GET /api/llm-config HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:37] "GET /api/llm-config HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:37] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:37] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:37] "GET /dashboard HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:37] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+127.0.0.1 - - [13/Nov/2025 00:29:37] "GET /static/v2/css/dashboard.css HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:37] "GET /static/v2/js/dashboard-core.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:37] "GET /static/v2/js/dashboard-utils.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:37] "GET /static/v2/js/dashboard-overview.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:37] "GET /static/v2/js/dashboard-prompt.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:37] "GET /static/v2/js/dashboard-llm.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:37] "GET /static/v2/js/dashboard-system.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:37] "GET /api/llm-config HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:37] "GET /api/llm-config HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:37] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:37] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:29:37] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+127.0.0.1 - - [13/Nov/2025 00:30:07] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:30:37] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:30:53] "GET /dashboard HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:30:53] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+127.0.0.1 - - [13/Nov/2025 00:30:53] "[36mGET /static/v2/css/dashboard.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 00:30:53] "[36mGET /static/v2/js/dashboard-overview.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 00:30:53] "[36mGET /static/v2/js/dashboard-core.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 00:30:53] "[36mGET /static/v2/js/dashboard-utils.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 00:30:53] "GET /static/v2/js/dashboard-prompt.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:30:53] "[36mGET /static/v2/js/dashboard-llm.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 00:30:53] "[36mGET /static/v2/js/dashboard-system.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 00:30:53] "GET /api/llm-config HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:30:53] "GET /api/llm-config HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:30:53] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:30:53] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:31:16] "POST /api/upload HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:31:18] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:31:23] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:31:53] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:32:23] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:32:53] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:33:07] "GET /dashboard HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:33:07] "GET /static/v2/css/dashboard.css HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:33:07] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+127.0.0.1 - - [13/Nov/2025 00:33:07] "[36mGET /static/v2/js/dashboard-utils.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 00:33:07] "[36mGET /static/v2/js/dashboard-core.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 00:33:07] "[36mGET /static/v2/js/dashboard-overview.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 00:33:07] "[36mGET /static/v2/js/dashboard-llm.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 00:33:07] "GET /static/v2/js/dashboard-prompt.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:33:07] "[36mGET /static/v2/js/dashboard-system.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 00:33:07] "GET /api/llm-config HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:33:07] "GET /api/llm-config HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:33:07] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:33:08] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:33:37] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:34:08] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:34:38] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:35:08] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:35:38] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:36:08] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:36:38] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:37:39] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:38:40] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:39:41] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:40:42] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:41:43] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:42:44] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:43:45] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:44:46] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:45:47] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:46:48] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:47:49] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:48:50] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:49:51] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:50:52] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:51:53] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:52:54] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:53:55] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:54:56] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:55:57] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:56:58] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:57:59] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 00:59:00] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:00:01] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:01:02] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:02:03] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:03:04] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:03:53] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:03:55] "GET /dashboard HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:03:55] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+127.0.0.1 - - [13/Nov/2025 01:03:55] "[36mGET /static/v2/css/dashboard.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 01:03:55] "[36mGET /static/v2/js/dashboard-overview.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 01:03:55] "[36mGET /static/v2/js/dashboard-core.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 01:03:55] "[36mGET /static/v2/js/dashboard-llm.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 01:03:55] "[36mGET /static/v2/js/dashboard-utils.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 01:03:55] "[36mGET /static/v2/js/dashboard-prompt.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 01:03:55] "[36mGET /static/v2/js/dashboard-system.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 01:03:55] "GET /api/llm-config HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:03:55] "GET /api/llm-config HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:03:55] "GET /static/favicon.svg HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:03:55] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:03:55] "GET /api/knowledge-stats HTTP/1.1" 200 -
+/run/media/swordfish/Projects/development/chatbot/app.py:1712: LangChainDeprecationWarning: The method `BaseRetriever.get_relevant_documents` was deprecated in langchain-core 0.1.46 and will be removed in 1.0. Use :meth:`~invoke` instead.
+  test_docs = retriever.get_relevant_documents("test")
+127.0.0.1 - - [13/Nov/2025 01:04:02] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:04:02] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+127.0.0.1 - - [13/Nov/2025 01:04:05] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+127.0.0.1 - - [13/Nov/2025 01:04:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:04:12] "[33mGET /widget-preview HTTP/1.1[0m" 404 -
+127.0.0.1 - - [13/Nov/2025 01:04:27] "GET /chat-interface HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:04:27] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+127.0.0.1 - - [13/Nov/2025 01:04:30] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+127.0.0.1 - - [13/Nov/2025 01:04:30] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:04:44] "GET /chat-interface HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:04:44] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+127.0.0.1 - - [13/Nov/2025 01:04:45] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+127.0.0.1 - - [13/Nov/2025 01:04:45] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:04:49] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:04:54] "GET /chat-interface HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:04:54] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+127.0.0.1 - - [13/Nov/2025 01:04:55] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+127.0.0.1 - - [13/Nov/2025 01:04:55] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:04:57] "[36mGET /demo HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 01:04:57] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+127.0.0.1 - - [13/Nov/2025 01:04:57] "[36mGET /static/embed.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [13/Nov/2025 01:04:57] "GET /widget?website_id=default HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:04:58] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+127.0.0.1 - - [13/Nov/2025 01:04:58] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:05:28] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:05:58] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:06:28] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:06:58] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:07:28] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:07:58] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:08:28] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:09:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:10:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:11:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:12:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:13:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:14:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:15:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:16:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:17:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:18:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:19:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:20:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:21:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:22:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:23:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:24:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:25:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:26:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:27:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:28:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:29:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:30:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:31:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:32:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:33:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:34:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:35:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:36:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:37:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:38:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:39:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:40:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:41:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:42:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:43:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:44:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:45:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:46:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:47:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:48:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:49:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:50:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:51:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:52:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:53:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:54:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:55:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:56:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:57:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:58:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 01:59:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:00:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:01:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:02:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:03:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:04:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:05:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:06:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:07:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:08:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:09:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:10:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:11:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:12:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:13:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:14:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:15:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:16:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:17:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:18:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:19:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:20:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:21:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:22:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:23:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:24:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:25:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:26:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:27:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:28:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:28:48] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:28:58] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:29:28] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:30:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:31:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:32:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:33:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:34:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:35:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:36:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:37:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:38:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:39:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:40:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:41:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:42:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:43:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
+127.0.0.1 - - [13/Nov/2025 02:44:05] "GET /api/knowledge-stats HTTP/1.1" 200 -
