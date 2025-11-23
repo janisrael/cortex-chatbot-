@@ -8,6 +8,8 @@ attrs==25.3.0
 backoff==2.2.1
 bcrypt==4.3.0
 beautifulsoup4==4.13.4
+trafilatura==2.0.0
+html2text==2025.4.15
 blinker==1.9.0
 bs4==0.0.2
 build==1.2.2.post1

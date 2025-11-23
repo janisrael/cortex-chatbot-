@@ -536,78 +536,306 @@ def knowledge_stats_detailed():
         }), 500
 
 
-@api_bp.route("/api/crawl", methods=["POST"])
+@api_bp.route("/api/crawl-preview", methods=["POST"])
 @login_required
-def crawl_url():
-    """Crawl a website and add to knowledge base"""
+def crawl_url_preview():
+    """Crawl URL, extract clean text, save to crawled_urls table (preview status)"""
     try:
         if not current_user.is_authenticated:
             return jsonify({"error": "Authentication required"}), 401
         
         data = request.json
         url = data.get('url')
-        max_pages = data.get('max_pages', 10)
         category = data.get('category', 'company_details')
+        use_ai_cleaning = data.get('use_ai_cleaning', True)  # Default to True
         
         if not url:
             return jsonify({"error": "No URL provided"}), 400
         
         user_id = current_user.id
         
-        # Process URL using WebBaseLoader
+        # Check if URL already crawled
+        from models.crawled_url import CrawledUrl
+        existing = CrawledUrl.get_by_url(user_id, url)
+        if existing and existing['status'] != 'deleted':
+            return jsonify({
+                "error": "URL already crawled",
+                "crawled_id": existing['id'],
+                "url": existing['url']
+            }), 400
+        
+        # Extract clean text
+        from services.text_cleaning_service import extract_clean_text_from_url
+        from services.ai_text_cleaning import clean_text_with_ai
+        
         try:
-            from langchain_community.document_loaders import WebBaseLoader
-            from langchain.text_splitter import RecursiveCharacterTextSplitter
-            from services.knowledge_service import get_user_vectorstore, embeddings
-            
-            if not embeddings:
-                return jsonify({"error": "Embeddings not available"}), 500
-            
-            # Load web pages
-            loader = WebBaseLoader([url])
-            documents = loader.load()
-            
-            if not documents:
-                return jsonify({"error": "No content found at URL"}), 400
-            
-            # Split into chunks
-            text_splitter = RecursiveCharacterTextSplitter(
-                chunk_size=1000,
-                chunk_overlap=200,
-                length_function=len
-            )
-            chunks = text_splitter.split_documents(documents)
-            
-            # Add metadata
-            for chunk in chunks:
-                chunk.metadata.update({
-                    'source_file': url,
-                    'upload_time': datetime.now().isoformat(),
-                    'category': category,
-                    'user_id': str(user_id),
-                    'source_type': 'web_crawl'
-                })
-            
-            # Add to user's vectorstore
-            user_vectorstore = get_user_vectorstore(user_id)
-            if user_vectorstore:
-                user_vectorstore.add_documents(chunks)
-                return jsonify({
-                    "message": f"URL {url} crawled successfully. Added {len(chunks)} chunks to knowledge base.",
-                    "chunks_added": len(chunks)
-                })
-            else:
-                return jsonify({"error": "Failed to access knowledge base"}), 500
-                
-        except ImportError:
-            return jsonify({"error": "WebBaseLoader not available. Install required dependencies."}), 500
+            text = extract_clean_text_from_url(url)
         except Exception as e:
-            print(f"❌ Crawl error: {e}")
+            print(f"❌ Error in extract_clean_text_from_url: {e}")
             import traceback
             traceback.print_exc()
-            return jsonify({"error": f"Failed to crawl URL: {str(e)}"}), 500
+            return jsonify({"error": f"Failed to extract content from URL: {str(e)}"}), 400
+        
+        if not text:
+            return jsonify({"error": "Failed to extract content from URL. The URL may be inaccessible, require authentication, or contain no extractable text."}), 400
+        
+        # Apply AI cleaning to extract only essential content (if enabled)
+        # Uses system OpenAI credentials for AI-powered features
+        if use_ai_cleaning:
+            try:
+                print("🤖 Applying AI cleaning using system OpenAI...")
+                text = clean_text_with_ai(text)
+            except Exception as e:
+                print(f"⚠️ AI cleaning failed, using original text: {e}")
+                import traceback
+                traceback.print_exc()
+                # Continue with original text if AI cleaning fails
+        else:
+            print("ℹ️ AI cleaning disabled by user")
+        
+        # Get text stats
+        word_count = len(text.split())
+        char_count = len(text)
+        
+        # Extract title from URL or text
+        title = url.split('/')[-1] or url
+        if len(text) > 100:
+            # Try to get title from first line
+            first_line = text.split('\n')[0][:100]
+            if first_line:
+                title = first_line.strip()
+        
+        # Save to crawled_urls table (status='preview')
+        crawled_id = CrawledUrl.create(
+            user_id=user_id,
+            url=url,
+            title=title,
+            extracted_text=text,
+            word_count=word_count,
+            char_count=char_count,
+            category=category,
+            status='preview'
+        )
+        
+        if not crawled_id:
+            return jsonify({"error": "Failed to save crawled URL"}), 500
+        
+        return jsonify({
+            "id": crawled_id,
+            "url": url,
+            "title": title,
+            "preview": text[:2000],  # First 2000 chars for preview
+            "full_text": text,  # Full text for editing
+            "word_count": word_count,
+            "char_count": char_count,
+            "status": "preview",
+            "message": "URL crawled successfully. Review the extracted text before ingesting."
+        })
+    except Exception as e:
+        print(f"❌ Crawl preview error: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+
+@api_bp.route("/api/crawled-urls", methods=["GET"])
+@login_required
+def list_crawled_urls():
+    """List all crawled URLs for current user"""
+    try:
+        if not current_user.is_authenticated:
+            return jsonify({"error": "Authentication required"}), 401
+        
+        user_id = current_user.id
+        from models.crawled_url import CrawledUrl
+        
+        urls = CrawledUrl.get_all_by_user(user_id)
+        
+        # Convert datetime objects to strings for JSON
+        for url in urls:
+            if 'crawled_at' in url and url['crawled_at']:
+                if hasattr(url['crawled_at'], 'isoformat'):
+                    url['crawled_at'] = url['crawled_at'].isoformat()
+            if 'ingested_at' in url and url['ingested_at']:
+                if hasattr(url['ingested_at'], 'isoformat'):
+                    url['ingested_at'] = url['ingested_at'].isoformat()
+            if 'created_at' in url and url['created_at']:
+                if hasattr(url['created_at'], 'isoformat'):
+                    url['created_at'] = url['created_at'].isoformat()
+            if 'updated_at' in url and url['updated_at']:
+                if hasattr(url['updated_at'], 'isoformat'):
+                    url['updated_at'] = url['updated_at'].isoformat()
+        
+        return jsonify({
+            "urls": urls,
+            "total": len(urls)
+        })
+    except Exception as e:
+        print(f"❌ List crawled URLs error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@api_bp.route("/api/crawled-urls/<int:crawled_id>", methods=["GET"])
+@login_required
+def view_crawled_url(crawled_id):
+    """Get crawled URL details and extracted text"""
+    try:
+        if not current_user.is_authenticated:
+            return jsonify({"error": "Authentication required"}), 401
+        
+        user_id = current_user.id
+        from models.crawled_url import CrawledUrl
+        
+        crawled = CrawledUrl.get_by_id(user_id, crawled_id)
+        
+        if not crawled:
+            return jsonify({"error": "Crawled URL not found"}), 404
+        
+        # Convert datetime objects to strings
+        if 'crawled_at' in crawled and crawled['crawled_at']:
+            if hasattr(crawled['crawled_at'], 'isoformat'):
+                crawled['crawled_at'] = crawled['crawled_at'].isoformat()
+        if 'ingested_at' in crawled and crawled['ingested_at']:
+            if hasattr(crawled['ingested_at'], 'isoformat'):
+                crawled['ingested_at'] = crawled['ingested_at'].isoformat()
+        if 'created_at' in crawled and crawled['created_at']:
+            if hasattr(crawled['created_at'], 'isoformat'):
+                crawled['created_at'] = crawled['created_at'].isoformat()
+        if 'updated_at' in crawled and crawled['updated_at']:
+            if hasattr(crawled['updated_at'], 'isoformat'):
+                crawled['updated_at'] = crawled['updated_at'].isoformat()
+        
+        # Add full_text alias for consistency with crawl-preview endpoint
+        if 'extracted_text' in crawled:
+            crawled['full_text'] = crawled['extracted_text']
+        
+        return jsonify(crawled)
+    except Exception as e:
+        print(f"❌ View crawled URL error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@api_bp.route("/api/crawled-urls/<int:crawled_id>/ingest", methods=["POST"])
+@login_required
+def ingest_crawled_url(crawled_id):
+    """Ingest crawled URL to knowledge base (vectorstore)"""
+    try:
+        if not current_user.is_authenticated:
+            return jsonify({"error": "Authentication required"}), 401
+        
+        user_id = current_user.id
+        data = request.json
+        
+        from models.crawled_url import CrawledUrl
+        from services.knowledge_service import get_user_vectorstore, embeddings
+        from langchain.text_splitter import RecursiveCharacterTextSplitter
+        from langchain.schema import Document
+        
+        # Get crawled URL
+        crawled = CrawledUrl.get_by_id(user_id, crawled_id)
+        if not crawled:
+            return jsonify({"error": "Crawled URL not found"}), 404
+        
+        if crawled['status'] == 'ingested':
+            return jsonify({"error": "URL already ingested"}), 400
+        
+        # Get text (user may have edited it)
+        text = data.get('text', crawled['extracted_text'])
+        if not text:
+            return jsonify({"error": "No text to ingest"}), 400
+        
+        # Update text if edited
+        if text != crawled['extracted_text']:
+            CrawledUrl.update_text(crawled_id, text)
+        
+        # Split into chunks
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1000,
+            chunk_overlap=200,
+            length_function=len
+        )
+        
+        doc = Document(
+            page_content=text,
+            metadata={
+                'source_file': crawled['url'],
+                'upload_time': datetime.now().isoformat(),
+                'category': crawled['category'],
+                'user_id': str(user_id),
+                'source_type': 'web_crawl',
+                'crawled_id': crawled_id
+            }
+        )
+        
+        chunks = text_splitter.split_documents([doc])
+        
+        # Add to vectorstore
+        user_vectorstore = get_user_vectorstore(user_id)
+        if user_vectorstore is None:
+            print(f"❌ Failed to get vectorstore for user {user_id}")
+            return jsonify({"error": "Failed to access knowledge base. Please check embeddings and vectorstore initialization."}), 500
+        
+        try:
+            print(f"📝 Adding {len(chunks)} chunks to vectorstore...")
+            user_vectorstore.add_documents(chunks)
+            print(f"✅ Successfully added chunks to vectorstore")
+            
+            # Update status to 'ingested'
+            CrawledUrl.update_status(crawled_id, 'ingested')
+            
+            return jsonify({
+                "message": f"URL {crawled['url']} ingested successfully. Added {len(chunks)} chunks.",
+                "chunks_added": len(chunks),
+                "status": "ingested"
+            })
+        except Exception as e:
+            print(f"❌ Error adding documents to vectorstore: {e}")
+            import traceback
+            traceback.print_exc()
+            return jsonify({"error": f"Failed to add documents to knowledge base: {str(e)}"}), 500
             
     except Exception as e:
+        print(f"❌ Ingest crawled URL error: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+
+@api_bp.route("/api/crawled-urls/<int:crawled_id>", methods=["DELETE"])
+@login_required
+def delete_crawled_url(crawled_id):
+    """Delete crawled URL (and remove from vectorstore if ingested)"""
+    try:
+        if not current_user.is_authenticated:
+            return jsonify({"error": "Authentication required"}), 401
+        
+        user_id = current_user.id
+        from models.crawled_url import CrawledUrl
+        from services.knowledge_service import remove_file_from_vectorstore
+        
+        crawled = CrawledUrl.get_by_id(user_id, crawled_id)
+        if not crawled:
+            return jsonify({"error": "Crawled URL not found"}), 404
+        
+        # If ingested, remove from vectorstore
+        if crawled['status'] == 'ingested':
+            try:
+                remove_file_from_vectorstore(user_id, crawled['url'])
+            except Exception as e:
+                print(f"⚠️ Warning: Could not remove from vectorstore: {e}")
+        
+        # Delete from database
+        success = CrawledUrl.delete(crawled_id)
+        
+        if success:
+            return jsonify({
+                "message": f"URL {crawled['url']} deleted successfully"
+            })
+        else:
+            return jsonify({"error": "Failed to delete"}), 500
+            
+    except Exception as e:
+        print(f"❌ Delete crawled URL error: {e}")
         return jsonify({"error": str(e)}), 500
 
 
