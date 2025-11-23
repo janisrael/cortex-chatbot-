@@ -1,0 +1,27 @@
+<!-- Chat Messages Component -->
+<div class="chat-messages" id="chatMessages">
+    <div class="message bot">
+        <div class="message-content">
+            👋 Hi there! I'm Bob AI, your helpful assistant for SourceSelect.ca. How can I help you today?
+        </div>
+    </div>
+</div>
+
+<div class="suggested-messages">
+    <h3>Try asking:</h3>
+    <div class="suggested-buttons">
+        {% for suggestion in suggested %}
+        <button class="suggested-btn" onclick="sendSuggestion('{{ suggestion }}')">{{ suggestion }}</button>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="typing-indicator" id="typingIndicator">
+    <span>Bobot is typing</span>
+    <div class="typing-dots">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+    </div>
+</div>
+

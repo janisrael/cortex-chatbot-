@@ -1,0 +1,26 @@
+<div class="header">
+    <div class="header-content">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <h1>Cortex AI - Dashboard</h1>
+        </div>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div class="nav-links" id="navLinks">
+                <a href="/demo">Widget Preview</a>
+            </div>
+            <div class="user-info" style="background: rgba(255, 255, 255, 0.2); color: white; border: 1px solid rgba(255, 255, 255, 0.3); padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 14px; transition: all 0.2s; display: flex; align-items: center; gap: 6px;">
+                <span class="material-icons-round" style="font-size: 18px;">account_circle</span>
+                <span>{{ user.username if user else 'User' }}</span>
+            </div>
+            <a href="/logout" class="logout-btn" style="background: rgba(255, 255, 255, 0.2); color: white; border: 1px solid rgba(255, 255, 255, 0.3); padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 14px; transition: all 0.2s; display: flex; align-items: center; gap: 6px;">
+                <span class="material-icons-round" style="font-size: 18px;">logout</span>
+                Logout
+            </a>
+        </div>
+    </div>
+</div>
+

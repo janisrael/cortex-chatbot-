@@ -1,0 +1,52 @@
+<!-- Prompt Editor Tab -->
+<div id="prompt-tab" class="tab-content">
+    <div class="card">
+        <h2><span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">edit</span> Chatbot Configuration</h2>
+        
+        <div class="alert alert-success" id="promptSuccess"></div>
+        <div class="alert alert-error" id="promptError"></div>
+        
+        <div class="form-group">
+            <label for="chatbotName">Chatbot Name</label>
+            <input type="text" id="chatbotName" class="form-control" placeholder="Enter your chatbot name (e.g., SupportBot, HelpDesk)" maxlength="50">
+            <small style="color: #666; margin-top: 5px; display: block;">
+                This name will appear in the chat widget header and demo page.
+            </small>
+        </div>
+        
+        <!-- Prompt Presets -->
+        <div class="preset-selector-section">
+            <label class="section-label">Choose a Preset (Optional)</label>
+            <p class="section-description">Start with a pre-configured personality template, then customize as needed.</p>
+            <div class="preset-grid" id="presetGrid">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 30px;">
+            <label for="promptEditor">System Prompt Template</label>
+            <textarea id="promptEditor" class="form-control prompt-editor" placeholder="Loading prompt..."></textarea>
+            <small style="color: #666; margin-top: 5px; display: block;">
+                Use {context} for retrieved information and {question} for user input. HTML formatting supported.
+            </small>
+        </div>
+        
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <button class="btn" onclick="savePrompt()" id="savePromptBtn">
+                <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">save</span> Save Prompt
+            </button>
+            <button class="btn btn-secondary" onclick="resetPrompt()">
+                <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">refresh</span> Reset to Default
+            </button>
+            <button class="btn btn-success" onclick="testPrompt()">
+                <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">science</span> Test in Chat
+            </button>
+        </div>
+
+        <div class="loading" id="promptLoading">
+            <div class="spinner"></div>
+            Updating prompt...
+        </div>
+    </div>
+</div>
+

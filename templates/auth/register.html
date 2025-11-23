@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Chatbot Dashboard</title>
+    <link rel="stylesheet" href="/static/css/auth.css?v=1.0.2">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo-container">
+                    <span class="material-symbols-outlined logo-icon">smart_toy</span>
+                </div>
+                <h1>Create Account</h1>
+                <p class="subtitle">Sign up to access the dashboard</p>
+            </div>
+
+            <form id="registerForm" class="login-form" method="POST" action="/register">
+                <div id="errorMessage" class="error-message" style="display: none;"></div>
+                
+                <div class="form-group">
+                    <label for="username">
+                        <span class="material-symbols-outlined">person</span>
+                        Username
+                    </label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        required 
+                        autocomplete="username"
+                        placeholder="Choose a username"
+                        minlength="3"
+                        maxlength="50"
+                        autofocus
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="email">
+                        <span class="material-symbols-outlined">email</span>
+                        Email Address
+                    </label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        required 
+                        autocomplete="email"
+                        placeholder="Enter your email"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password">
+                        <span class="material-symbols-outlined">lock</span>
+                        Password
+                    </label>
+                    <div class="password-input-wrapper">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            required 
+                            autocomplete="new-password"
+                            placeholder="Create a password"
+                            minlength="6"
+                        >
+                        <button type="button" class="password-toggle" id="passwordToggle" aria-label="Toggle password visibility">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm_password">
+                        <span class="material-symbols-outlined">lock</span>
+                        Confirm Password
+                    </label>
+                    <div class="password-input-wrapper">
+                        <input 
+                            type="password" 
+                            id="confirm_password" 
+                            name="confirm_password" 
+                            required 
+                            autocomplete="new-password"
+                            placeholder="Confirm your password"
+                            minlength="6"
+                        >
+                        <button type="button" class="password-toggle" id="confirmPasswordToggle" aria-label="Toggle password visibility">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-login" id="registerBtn">
+                    <span class="btn-text">Create Account</span>
+                    <span class="btn-loader" style="display: none;">
+                        <span class="spinner"></span>
+                    </span>
+                </button>
+            </form>
+
+            <div class="login-footer">
+                <p>Already have an account? <a href="/login">Sign in</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Password toggles
+        const passwordToggle = document.getElementById('passwordToggle');
+        const passwordInput = document.getElementById('password');
+        const passwordIcon = passwordToggle.querySelector('.material-symbols-outlined');
+
+        passwordToggle.addEventListener('click', () => {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            passwordIcon.textContent = type === 'password' ? 'visibility' : 'visibility_off';
+        });
+
+        const confirmPasswordToggle = document.getElementById('confirmPasswordToggle');
+        const confirmPasswordInput = document.getElementById('confirm_password');
+        const confirmPasswordIcon = confirmPasswordToggle.querySelector('.material-symbols-outlined');
+
+        confirmPasswordToggle.addEventListener('click', () => {
+            const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            confirmPasswordInput.setAttribute('type', type);
+            confirmPasswordIcon.textContent = type === 'password' ? 'visibility' : 'visibility_off';
+        });
+
+        // Form validation
+        const registerForm = document.getElementById('registerForm');
+        const registerBtn = document.getElementById('registerBtn');
+        const btnText = registerBtn.querySelector('.btn-text');
+        const btnLoader = registerBtn.querySelector('.btn-loader');
+        const errorMessage = document.getElementById('errorMessage');
+
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Validate passwords match
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            
+            if (password !== confirmPassword) {
+                errorMessage.textContent = 'Passwords do not match';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            if (password.length < 6) {
+                errorMessage.textContent = 'Password must be at least 6 characters';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            // Show loading state
+            registerBtn.disabled = true;
+            btnText.style.display = 'none';
+            btnLoader.style.display = 'inline-flex';
+            errorMessage.style.display = 'none';
+
+            // Send as JSON instead of FormData for better compatibility
+            const formData = {
+                username: document.getElementById('username').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            };
+            
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.status === 'success') {
+                    // Redirect to login (as per v1 behavior)
+                    window.location.href = '/login?registered=1';
+                } else {
+                    // Show error
+                    errorMessage.textContent = data.message || data.error || 'Registration failed. Please try again.';
+                    errorMessage.style.display = 'block';
+                    registerBtn.disabled = false;
+                    btnText.style.display = 'inline';
+                    btnLoader.style.display = 'none';
+                }
+            } catch (error) {
+                errorMessage.textContent = 'An error occurred. Please try again.';
+                errorMessage.style.display = 'block';
+                registerBtn.disabled = false;
+                btnText.style.display = 'inline';
+                btnLoader.style.display = 'none';
+            }
+        });
+
+        // Check for error in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get('error');
+        if (error) {
+            errorMessage.textContent = decodeURIComponent(error);
+            errorMessage.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
+

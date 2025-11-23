@@ -1,0 +1,80 @@
+<!-- Knowledge Management Tab -->
+<div id="knowledge-tab" class="tab-content">
+    <div class="dashboard-grid">
+        <!-- File Upload -->
+        <div class="card">
+            <h2><span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">upload_file</span> Upload Documents</h2>
+            
+            <div class="alert alert-success" id="uploadSuccess"></div>
+            <div class="alert alert-error" id="uploadError"></div>
+
+            <!-- Category Selection -->
+            <div class="form-group">
+                <label>Document Category</label>
+                <div class="category-tabs" id="categoryTabs">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+            
+            <div class="file-upload" id="fileUpload">
+                <span class="material-icons-round upload-icon" style="font-size: 48px; color: #0891b2;">folder</span>
+                <p><strong>Drop files here or click to browse</strong></p>
+                <p>Supported: PDF, TXT, DOC, DOCX, CSV (Max 16MB)</p>
+                <input type="file" id="fileInput" multiple accept=".pdf,.txt,.doc,.docx,.csv">
+            </div>
+            
+            <div class="loading" id="uploadLoading">
+                <div class="spinner"></div>
+                Processing file...
+            </div>
+        </div>
+
+        <!-- URL Crawling -->
+        <div class="card">
+            <h2><span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">language</span> Crawl Websites</h2>
+            
+            <div class="alert alert-success" id="crawlSuccess"></div>
+            <div class="alert alert-error" id="crawlError"></div>
+            
+            <div class="form-group">
+                <label for="urlInput">Website URL</label>
+                <div style="display: flex; gap: 12px; align-items: end;">
+                    <input type="url" id="urlInput" class="form-control" placeholder="https://example.com" style="flex: 1;">
+                    <input type="number" id="maxPages" class="form-control" value="10" min="1" max="50" 
+                           style="width: 80px;" title="Max pages">
+                    <button class="btn" onclick="crawlUrl()" id="crawlBtn">
+                        <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">search</span> Crawl
+                    </button>
+                </div>
+            </div>
+
+            <div class="loading" id="crawlLoading">
+                <div class="spinner"></div>
+                Crawling website...
+            </div>
+
+            <div style="margin-top: 20px;">
+                <p><strong>Tips:</strong></p>
+                <ul style="margin-left: 20px; color: 666; font-size: 14px;">
+                    <li>Enter the full URL including https://</li>
+                    <li>The system will extract text content from web pages</li>
+                    <li>Start with a small number of pages for testing</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Uploaded Files -->
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h2 style="margin: 0;"><span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">folder_open</span> Uploaded Files</h2>
+            <button class="btn btn-secondary" onclick="refreshFileList()" style="padding: 6px 12px; font-size: 12px;">
+                <span class="material-icons-round" style="vertical-align: middle; font-size: 16px;">refresh</span> Refresh
+            </button>
+        </div>
+        <div class="file-list" id="fileList">
+            Loading files...
+        </div>
+    </div>
+</div>
+

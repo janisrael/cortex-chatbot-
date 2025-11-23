@@ -1,0 +1,28 @@
+<!-- Website Selector and Multi-Website Management -->
+<div class="container">
+    <div class="card" style="margin-bottom: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2 style="color: white; margin-bottom: 5px;">🌐 Multi-Website Management</h2>
+                <p style="margin: 0; opacity: 0.9;">Manage chatbots across multiple websites</p>
+            </div>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <div>
+                    <label style="display: block; margin-bottom: 5px; font-size: 12px; opacity: 0.8;">Active Website:</label>
+                    <select id="websiteSelector" style="padding: 8px 12px; border-radius: 6px; border: none; font-weight: 600; min-width: 200px;">
+                        <option value="default">Loading websites...</option>
+                    </select>
+                </div>
+                <button id="addWebsiteBtn" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 16px; border-radius: 6px; cursor: pointer;">
+                    ➕ Add Website
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Website Stats Overview -->
+    <div class="stats-grid" id="websiteStats" style="margin-bottom: 30px;">
+        <!-- Stats will be loaded dynamically -->
+    </div>
+</div>
+

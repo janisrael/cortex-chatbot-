@@ -3,6 +3,113 @@
 // Prompt Management & Editing
 // ===========================
 
+let currentPresetId = null;
+
+// Load and display prompt presets
+async function loadPresets() {
+    try {
+        const response = await fetch('/api/prompt-presets');
+        if (!response.ok) {
+            throw new Error('Failed to load presets');
+        }
+        
+        const data = await response.json();
+        const presets = data.presets || {};
+        const presetGrid = document.getElementById('presetGrid');
+        
+        if (!presetGrid) return;
+        
+        presetGrid.innerHTML = '';
+        
+        // Render each preset as a card with radio button
+        // Presets come as object with numeric keys, convert to array
+        const presetsArray = Object.values(presets);
+        
+        // Store presets globally for later use
+        globalPresets = presets;
+        
+        presetsArray.forEach(preset => {
+            const presetId = preset.id || preset['id']; // Handle both string and numeric IDs
+            const card = document.createElement('label');
+            card.className = 'preset-card';
+            card.dataset.presetId = presetId;
+            
+            card.innerHTML = `
+                <input type="radio" name="preset-select" value="${presetId}" class="preset-radio" id="preset-${presetId}">
+                <div class="preset-card-content">
+                    <span class="material-icons-round preset-card-icon">${preset.icon}</span>
+                    <div class="preset-card-name">${preset.name}</div>
+                    <div class="preset-card-description">${preset.description}</div>
+                </div>
+            `;
+            
+            // Add change handler for radio button
+            const radio = card.querySelector('.preset-radio');
+            radio.addEventListener('change', () => {
+                if (radio.checked) {
+                    applyPreset(presetId, presets);
+                }
+            });
+            
+            presetGrid.appendChild(card);
+        });
+    } catch (error) {
+        console.error('Failed to load presets:', error);
+    }
+}
+
+// Apply a preset to the prompt editor (does NOT save - only updates UI)
+function applyPreset(presetId, presets) {
+    // Handle both string and numeric IDs
+    const preset = presets[presetId] || presets[String(presetId)] || Object.values(presets).find(p => p.id == presetId);
+    if (!preset) return;
+    
+    const promptEditor = document.getElementById('promptEditor');
+    
+    if (!promptEditor) return;
+    
+    // Keep {bot_name} placeholder in the prompt - don't replace it
+    // It will be replaced at runtime when the prompt is used
+    promptEditor.value = preset.prompt;
+    
+    // Update currentPresetId but DON'T save yet - user must click "Save Prompt"
+    currentPresetId = presetId;
+    
+    // Update radio button state
+    document.querySelectorAll('.preset-radio').forEach(radio => {
+        radio.checked = false;
+    });
+    
+    const selectedRadio = document.getElementById(`preset-${presetId}`);
+    if (selectedRadio) {
+        selectedRadio.checked = true;
+        const selectedCard = selectedRadio.closest('.preset-card');
+        if (selectedCard) {
+            selectedCard.classList.add('active');
+        }
+    }
+    
+    // Remove active class from other cards
+    document.querySelectorAll('.preset-card').forEach(card => {
+        if (card.dataset.presetId !== presetId) {
+            card.classList.remove('active');
+        }
+    });
+    
+    currentPresetId = presetId;
+    
+    // Show success message
+    showAlert('promptSuccess', `"${preset.name}" preset applied! You can now customize it.`);
+    hideAlert('promptError');
+    
+    // Scroll to prompt editor
+    promptEditor.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// Store presets globally (for reference, but we keep {bot_name} placeholder)
+let globalPresets = {};
+let savedPrompt = null; // Store user's saved prompt for reset functionality
+
 async function loadPrompt() {
     try {
         // Load user's chatbot config from API
@@ -19,10 +126,57 @@ async function loadPrompt() {
             nameInput.value = config.bot_name || 'Cortex';
         }
         
-        // Load prompt
+        // Load presets first (needed to select default)
+        await loadPresets();
+        
+        // Get user's saved preset_id or default to Virtual Assistant
+        let presetIdToSelect = config.prompt_preset_id;
+        
+        // If no preset_id saved, find Virtual Assistant preset (default for new users)
+        if (!presetIdToSelect) {
+            const vaPreset = Object.values(globalPresets).find(p => 
+                p.name && p.name.toLowerCase().includes('virtual assistant')
+            );
+            if (vaPreset) {
+                presetIdToSelect = vaPreset.id;
+            } else {
+                // Fallback: use first preset
+                const firstPreset = Object.values(globalPresets)[0];
+                if (firstPreset) {
+                    presetIdToSelect = firstPreset.id;
+                }
+            }
+        }
+        
+        // Select the preset radio button (user's saved preset, or Virtual Assistant if new)
+        if (presetIdToSelect) {
+            const radio = document.getElementById(`preset-${presetIdToSelect}`);
+            if (radio) {
+                radio.checked = true;
+                const card = radio.closest('.preset-card');
+                if (card) {
+                    card.classList.add('active');
+                }
+                currentPresetId = presetIdToSelect;
+            }
+        }
+        
+        // Load prompt (user's modified version, or preset template if new)
         const editor = document.getElementById('promptEditor');
         if (editor) {
-            editor.value = config.prompt || getDefaultPrompt(config.bot_name || 'Cortex');
+            if (config.prompt) {
+                // User has a saved prompt (their modified version)
+                editor.value = config.prompt;
+                savedPrompt = config.prompt; // Store for reset functionality
+            } else if (presetIdToSelect && globalPresets[presetIdToSelect]) {
+                // No saved prompt, load the preset template
+                editor.value = globalPresets[presetIdToSelect].prompt;
+                savedPrompt = null; // No saved version yet
+            } else {
+                // Fallback to default prompt
+                editor.value = getDefaultPrompt(config.bot_name || 'Cortex');
+                savedPrompt = null;
+            }
         }
     } catch (error) {
         console.error('Failed to load prompt:', error);
@@ -85,6 +239,7 @@ async function savePrompt() {
     if (promptLoading) promptLoading.style.display = 'block';
     
     try {
+        // Save both prompt and the preset_id it came from (user-specific)
         const response = await fetch('/api/user/chatbot-config', {
             method: 'POST',
             headers: {
@@ -92,7 +247,8 @@ async function savePrompt() {
             },
             body: JSON.stringify({
                 bot_name: botName,
-                prompt: prompt
+                prompt: prompt,
+                prompt_preset_id: currentPresetId || null  // Save which preset user is using
             })
         });
         
@@ -105,6 +261,9 @@ async function savePrompt() {
         showAlert('promptSuccess', result.message || 'Configuration saved successfully');
         setTimeout(() => hideAlert('promptSuccess'), 3000);
         
+        // Update saved prompt after successful save
+        savedPrompt = prompt;
+        
     } catch (error) {
         showAlert('promptError', `Failed to save: ${error.message}`);
     }
@@ -114,13 +273,32 @@ async function savePrompt() {
 }
 
 function resetPrompt() {
-    const nameInput = document.getElementById('chatbotName');
-    const botName = nameInput ? nameInput.value.trim() || 'Cortex' : 'Cortex';
-    const defaultPrompt = getDefaultPrompt(botName);
-
+    // Show confirmation popup
+    const confirmMessage = 'Are you sure you want to reset the prompt?\n\n' +
+        'This will restore the original preset template and discard any unsaved changes.';
+    
+    if (!confirm(confirmMessage)) {
+        return; // User cancelled
+    }
+    
+    // Reset to the original preset template (not user's saved modified version)
     const editor = document.getElementById('promptEditor');
-    if (editor) {
+    if (!editor) return;
+    
+    if (currentPresetId && globalPresets[currentPresetId]) {
+        // Reset to original preset template
+        const preset = globalPresets[currentPresetId];
+        editor.value = preset.prompt;
+        showAlert('promptSuccess', 'Prompt reset to original preset template');
+        setTimeout(() => hideAlert('promptSuccess'), 3000);
+    } else {
+        // Fallback: if no preset selected, use default prompt
+        const nameInput = document.getElementById('chatbotName');
+        const botName = nameInput ? nameInput.value.trim() || 'Cortex' : 'Cortex';
+        const defaultPrompt = getDefaultPrompt(botName);
         editor.value = defaultPrompt;
+        showAlert('promptSuccess', 'Prompt reset to default');
+        setTimeout(() => hideAlert('promptSuccess'), 3000);
     }
 }
 

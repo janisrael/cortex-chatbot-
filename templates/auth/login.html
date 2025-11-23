@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Chatbot Dashboard</title>
+    <link rel="stylesheet" href="/static/css/auth.css?v=1.0.2">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo-container">
+                    <span class="material-symbols-outlined logo-icon">smart_toy</span>
+                </div>
+                <h1>Chatbot Dashboard</h1>
+                <p class="subtitle">Sign in to access your dashboard</p>
+            </div>
+
+            <form id="loginForm" class="login-form" method="POST" action="/login">
+                <div id="errorMessage" class="error-message" style="display: none;"></div>
+                
+                <div class="form-group">
+                    <label for="email">
+                        <span class="material-symbols-outlined">email</span>
+                        Email Address
+                    </label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        required 
+                        autocomplete="email"
+                        placeholder="Enter your email"
+                        autofocus
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password">
+                        <span class="material-symbols-outlined">lock</span>
+                        Password
+                    </label>
+                    <div class="password-input-wrapper">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            required 
+                            autocomplete="current-password"
+                            placeholder="Enter your password"
+                        >
+                        <button type="button" class="password-toggle" id="passwordToggle" aria-label="Toggle password visibility">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="remember" name="remember">
+                        <span>Remember me</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-login" id="loginBtn">
+                    <span class="btn-text">Sign In</span>
+                    <span class="btn-loader" style="display: none;">
+                        <span class="spinner"></span>
+                    </span>
+                </button>
+            </form>
+
+            <div class="login-footer">
+                <p>Don't have an account? <a href="/register">Sign up</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Password toggle
+        const passwordToggle = document.getElementById('passwordToggle');
+        const passwordInput = document.getElementById('password');
+        const passwordIcon = passwordToggle.querySelector('.material-symbols-outlined');
+
+        passwordToggle.addEventListener('click', () => {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            passwordIcon.textContent = type === 'password' ? 'visibility' : 'visibility_off';
+        });
+
+        // Form submission
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const btnText = loginBtn.querySelector('.btn-text');
+        const btnLoader = loginBtn.querySelector('.btn-loader');
+        const errorMessage = document.getElementById('errorMessage');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Show loading state
+            loginBtn.disabled = true;
+            btnText.style.display = 'none';
+            btnLoader.style.display = 'inline-flex';
+            errorMessage.style.display = 'none';
+
+            // Send as JSON instead of FormData for better compatibility
+            const formData = {
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            };
+            
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.status === 'success') {
+                    // Redirect to dashboard
+                    window.location.href = data.redirect || '/dashboard';
+                } else {
+                    // Show error
+                    errorMessage.textContent = data.message || data.error || 'Invalid email or password';
+                    errorMessage.style.display = 'block';
+                    loginBtn.disabled = false;
+                    btnText.style.display = 'inline';
+                    btnLoader.style.display = 'none';
+                }
+            } catch (error) {
+                errorMessage.textContent = 'An error occurred. Please try again.';
+                errorMessage.style.display = 'block';
+                loginBtn.disabled = false;
+                btnText.style.display = 'inline';
+                btnLoader.style.display = 'none';
+            }
+        });
+
+        // Check for messages in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get('error');
+        const registered = urlParams.get('registered');
+        
+        if (error) {
+            errorMessage.textContent = decodeURIComponent(error);
+            errorMessage.style.display = 'block';
+        }
+        
+        if (registered) {
+            errorMessage.textContent = '✅ Registration successful! Please log in.';
+            errorMessage.style.display = 'block';
+            errorMessage.style.borderLeftColor = '#28a745';
+            errorMessage.style.color = '#28a745';
+            errorMessage.style.background = '#d4edda';
+        }
+    </script>
+</body>
+</html>
+

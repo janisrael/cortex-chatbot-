@@ -1,8 +1,27 @@
 (function () {
   "use strict";
 
+  // Get the base URL from the script's src (where embed.js is loaded from)
+  // This ensures the widget loads from the chatbot server, not the current website
+  function getScriptBaseUrl() {
+    const scripts = document.getElementsByTagName('script');
+    for (let script of scripts) {
+      if (script.src && script.src.includes('embed.js')) {
+        try {
+          const url = new URL(script.src);
+          return url.origin; // Returns http://localhost:6001
+        } catch (e) {
+          // Fallback to window.location.origin if URL parsing fails
+          return window.location.origin;
+        }
+      }
+    }
+    // Fallback to window.location.origin if script not found
+    return window.location.origin;
+  }
+
   const WIDGET_CONFIG = {
-    apiBaseUrl: window.location.origin,
+    apiBaseUrl: getScriptBaseUrl(), // Use the chatbot server URL, not the current website
     widgetUrl: "/widget",
     triggerButtonText: "💬",
     position: "bottom-right",
@@ -411,8 +430,22 @@
     }
 
     createWidget() {
-      // Extract website_id from URL parameters
+      // Extract API key or website_id from URL parameters or script src
       const urlParams = new URLSearchParams(window.location.search);
+      let apiKey = urlParams.get("api_key") || urlParams.get("key");
+      
+      // If no API key in URL, try to get it from the script tag
+      if (!apiKey) {
+        const scripts = document.getElementsByTagName('script');
+        for (let script of scripts) {
+          if (script.src && script.src.includes('embed.js')) {
+            const scriptParams = new URLSearchParams(script.src.split('?')[1] || '');
+            apiKey = scriptParams.get('api_key') || scriptParams.get('key');
+            if (apiKey) break;
+          }
+        }
+      }
+      
       const websiteId = urlParams.get("website_id") || "default";
 
       this.widget = document.createElement("div");
@@ -427,10 +460,13 @@
       this.iframe = document.createElement("iframe");
       this.iframe.className = "bobot-widget-iframe";
 
-      // Add website_id to the iframe URL
-      const widgetUrl = `${WIDGET_CONFIG.apiBaseUrl}${
-        WIDGET_CONFIG.widgetUrl
-      }?website_id=${encodeURIComponent(websiteId)}`;
+      // Build widget URL with API key (for user isolation)
+      let widgetUrl = `${WIDGET_CONFIG.apiBaseUrl}${WIDGET_CONFIG.widgetUrl}`;
+      if (apiKey) {
+        widgetUrl += `?api_key=${encodeURIComponent(apiKey)}`;
+      } else {
+        widgetUrl += `?website_id=${encodeURIComponent(websiteId)}`;
+      }
       this.iframe.src = widgetUrl;
 
       this.iframe.allow = "microphone; camera";

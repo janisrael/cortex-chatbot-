@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ bot_name }} - Widget Preview</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Icons+Round&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/widget_preview.css">
+</head>
+<body>
+    <!-- Header with max-width -->
+    <header class="preview-header">
+        <div class="header-container">
+            <div class="header-left">
+                <h1>{{ bot_name }} Widget Preview</h1>
+            </div>
+            <div class="header-right">
+                <a href="/dashboard" class="back-btn">
+                    <span class="material-icons-round">dashboard</span>
+                    <span class="btn-text">Dashboard</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="preview-main">
+        <div class="preview-container">
+            <!-- Neumorphism Card -->
+            <div class="preview-card">
+                <div class="card-icon">
+                    <span class="material-icons-round">smart_toy</span>
+                </div>
+                <h2>Widget Integration Test</h2>
+                <p class="card-description">
+                    This page demonstrates your chatbot widget in action. 
+                    Look for the floating chat button in the bottom-right corner.
+                </p>
+                
+                <div class="instruction-box">
+                    <div class="instruction-item">
+                        <span class="material-icons-round">touch_app</span>
+                        <div>
+                            <h3>Click the Chat Button</h3>
+                            <p>Find the floating button in the bottom-right corner</p>
+                        </div>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="material-icons-round">chat_bubble</span>
+                        <div>
+                            <h3>Start a Conversation</h3>
+                            <p>Test your chatbot with suggested questions or type your own</p>
+                        </div>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="material-icons-round">code</span>
+                        <div>
+                            <h3>Copy Integration Code</h3>
+                            <p>Get your embed code from the Widget Integration tab in dashboard</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Card -->
+            <div class="info-card">
+                <h3>
+                    <span class="material-icons-round">info</span>
+                    How It Works
+                </h3>
+                <p>
+                    This preview page uses the same integration method as your website. 
+                    The widget automatically connects to your knowledge base and uses your configured chatbot settings.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Load the chatbot widget with user's API key -->
+    <script src="/static/embed.js?api_key={{ api_key }}"></script>
+</body>
+</html>
+

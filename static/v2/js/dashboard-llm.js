@@ -23,7 +23,8 @@ async function loadLLMConfig() {
             },
             effective_provider: data.llm_option || 'openai',
             effective_model: data.current_model || 'gpt-4o-mini',
-            website_overrides: {}
+            website_overrides: {},
+            is_fallback: false  // API call succeeded, not using fallback
         };
         
         populateLLMConfig();
@@ -45,7 +46,8 @@ async function loadLLMConfig() {
             },
             effective_provider: 'openai',
             effective_model: 'gpt-4o-mini',
-            website_overrides: {}
+            website_overrides: {},
+            is_fallback: true  // Using fallback values
         };
         populateLLMConfig();
         updateLLMStatus();
@@ -213,17 +215,59 @@ function updateLLMStatus() {
         `;
     }
     
-    // Update overview tab LLM status indicator
-    const statusText = document.getElementById('llmStatusText');
-    const statusDot = document.getElementById('llmStatusDot');
+    // Update overview tab LLM status indicator (systemLLMStatus section)
+    const systemLLMText = document.getElementById('systemLLMText');
+    const systemLLMDot = document.getElementById('systemLLMDot');
+    const systemLLMStatus = document.getElementById('systemLLMStatus');
     
-    if (statusText && statusDot) {
+    if (systemLLMText && systemLLMDot) {
+        const provider = llmConfig.effective_provider || 'openai';
+        const model = llmConfig.effective_model || 'gpt-4o-mini';
+        const hasApiKey = llmConfig.openai?.has_api_key || false;
+        const isFallback = llmConfig.is_fallback || false;
+        
+        if (isFallback) {
+            // Show fallback status
+            systemLLMText.textContent = `Fallback: ${provider.toUpperCase()}`;
+            systemLLMText.style.color = '#ff9800'; // Orange text
+            systemLLMDot.className = 'status-dot';
+            systemLLMDot.style.backgroundColor = '#ff9800'; // Orange dot
+            if (systemLLMStatus) {
+                systemLLMStatus.className = 'status-indicator';
+                systemLLMStatus.style.backgroundColor = '#5d5d5d'; // Dark gray background
+            }
+        } else if (hasApiKey || provider === 'ollama') {
+            // Active configuration
+            systemLLMText.textContent = `${provider.toUpperCase()}: ${model}`;
+            systemLLMDot.className = 'status-dot active';
+            systemLLMDot.style.backgroundColor = '#28a745';
+            if (systemLLMStatus) {
+                systemLLMStatus.className = 'status-indicator status-active';
+                systemLLMStatus.style.color = '';
+            }
+        } else {
+            // Not configured
+            systemLLMText.textContent = 'Not Configured';
+            systemLLMDot.className = 'status-dot';
+            systemLLMDot.style.backgroundColor = '#dc3545';
+            if (systemLLMStatus) {
+                systemLLMStatus.className = 'status-indicator';
+                systemLLMStatus.style.color = '#dc3545';
+            }
+        }
+    }
+    
+    // Also update LLM tab status indicator (for backward compatibility)
+    const llmStatusText = document.getElementById('llmStatusText');
+    const llmStatusDot = document.getElementById('llmStatusDot');
+    
+    if (llmStatusText && llmStatusDot) {
         const provider = llmConfig.effective_provider || 'openai';
         const model = llmConfig.effective_model || 'gpt-4o-mini';
         
-        statusText.textContent = `${provider.toUpperCase()}: ${model}`;
-        statusDot.className = 'status-dot active';
-        statusDot.style.backgroundColor = '#28a745';
+        llmStatusText.textContent = `${provider.toUpperCase()}: ${model}`;
+        llmStatusDot.className = 'status-dot active';
+        llmStatusDot.style.backgroundColor = '#28a745';
     }
 }
 

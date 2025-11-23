@@ -1,0 +1,491 @@
+/* Dashboard CSS - Extracted from dashboard.html */
+
+/* Reset Options */
+.reset-option {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+}
+
+.reset-option h4 {
+    margin-bottom: 8px;
+    color: #495057;
+}
+
+.reset-option p {
+    font-size: 13px;
+    color: #6c757d;
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.btn-danger {
+    background: #dc3545;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 8px;
+    background: white;
+    border-radius: 4px;
+}
+
+.stat-item strong {
+    display: block;
+    font-size: 18px;
+    color: #667eea;
+}
+
+.stat-item div {
+    font-size: 11px;
+    color: #666;
+    margin-top: 2px;
+}
+
+.backup-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid #eee;
+    font-size: 13px;
+}
+
+.backup-item:last-child {
+    border-bottom: none;
+}
+
+.backup-info {
+    flex: 1;
+}
+
+.backup-name {
+    font-weight: 600;
+    color: #495057;
+}
+
+.backup-date {
+    color: #6c757d;
+    font-size: 11px;
+}
+
+.backup-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.backup-actions button {
+    padding: 4px 8px;
+    font-size: 11px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+}
+
+.restore-btn {
+    background: #28a745;
+    color: white;
+}
+
+.delete-backup-btn {
+    background: #dc3545;
+    color: white;
+}
+
+/* Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f5f7fa;
+    color: #333;
+}
+
+/* Header */
+.header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+    font-size: 14px;
+}
+
+.logout-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.logout-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 20px;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid #e1e5e9;
+}
+
+.card h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #667eea;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Category Selection */
+.category-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.category-tab {
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 12px;
+    text-align: center;
+    min-width: 120px;
+}
+
+.category-tab.active {
+    background: white;
+    border-color: #667eea;
+    color: #667eea;
+    font-weight: 600;
+}
+
+.category-tab:hover {
+    border-color: #667eea;
+    background: #f8f9ff;
+}
+
+.category-description {
+    font-size: 11px;
+    color: #666;
+    margin-top: 4px;
+    line-height: 1.3;
+}
+
+/* File Upload */
+.file-upload {
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    padding: 30px 20px;
+    text-align: center;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.file-upload.dragover {
+    border-color: #667eea;
+    background: #f8f9ff;
+}
+
+.selected-category-info {
+    background: #f8f9ff;
+    border: 1px solid #e1e8ff;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 15px;
+    font-size: 13px;
+}
+
+.selected-category-name {
+    font-weight: 600;
+    color: #667eea;
+    margin-bottom: 4px;
+}
+
+/* File List by Categories */
+.files-by-category {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.category-section {
+    margin-bottom: 20px;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.category-header {
+    background: #f8f9fa;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.category-name {
+    font-weight: 600;
+    color: #495057;
+}
+
+.file-count-badge {
+    background: #667eea;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+}
+
+.category-files {
+    padding: 8px;
+    background: white;
+}
+
+.category-files.collapsed {
+    display: none;
+}
+
+.file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin-bottom: 4px;
+    background: #f8f9fa;
+    font-size: 12px;
+}
+
+/* Form Elements */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #555;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+textarea.form-control {
+    height: 120px;
+    resize: vertical;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn:hover {
+    background: #5a6fd8;
+    transform: translateY(-1px);
+}
+
+.btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Alerts */
+.alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: none;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Loading */
+.loading {
+    display: none;
+    text-align: center;
+    padding: 20px;
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+.prompt-editor {
+    height: 200px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* Website Stats */
+.website-stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    text-align: center;
+    border-left: 4px solid #667eea;
+}
+
+.website-stat-card.active {
+    border-left-color: #28a745;
+    background: #f8fff8;
+}
+
+.website-stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #667eea;
+    margin-bottom: 5px;
+}
+
+.website-stat-label {
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.website-stat-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.website-stat-bot {
+    font-size: 12px;
+    color: #888;
+}
+
+.website-selector-option {
+    padding: 8px 12px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.website-selector-option:hover {
+    background: #f8f9fa;
+}
+
+.website-selector-option.active {
+    background: #e3f2fd;
+    color: #1976d2;
+    font-weight: 600;
+}
+
