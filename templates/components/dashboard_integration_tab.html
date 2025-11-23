@@ -1,0 +1,134 @@
+<!-- Widget Integration Tab -->
+<div id="integration-tab" class="tab-content">
+    <div class="card">
+        <h2><span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">extension</span> Widget Integration</h2>
+        <p>Instructions for integrating the AI chat widget into your website.</p>
+
+        <div class="integration-steps">
+            <div class="integration-step">
+                <div class="integration-step-number"></div>
+                <div class="integration-step-content">
+                    <h3>Copy the Integration Code</h3>
+                    <p>Add this code snippet just before the closing <code>&lt;/body&gt;</code> tag on all pages where you want the widget to appear.</p>
+                    <div class="code-block">
+                        <pre><code id="integrationSnippet">Loading integration code...</code></pre>
+                    </div>
+                    <button class="copy-btn" onclick="copySnippet('integrationSnippet')">
+                        <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">content_copy</span> Copy Code
+                    </button>
+                </div>
+            </div>
+
+            <div class="integration-step">
+                <div class="integration-step-number"></div>
+                <div class="integration-step-content">
+                    <h3>Customize the Widget</h3>
+                    <p>You can customize the widget's appearance and behavior by modifying the configuration options:</p>
+                    
+                    <div class="customization-options">
+                        <div class="option-card">
+                            <h4>Simple Integration</h4>
+                            <p>The widget automatically uses your chatbot name and settings configured in the Prompt Editor tab.</p>
+                            <p style="margin-top: 10px; color: #666; font-size: 14px;">
+                                <strong>Note:</strong> Since you have 1 chatbot per account, no configuration is needed. Just paste the code snippet!
+                            </p>
+                        </div>
+                        <div class="option-card">
+                            <h4>How It Works</h4>
+                            <ul style="text-align: left; margin-top: 10px;">
+                                <li>The script loads your chatbot automatically</li>
+                                <li>Uses your configured chatbot name</li>
+                                <li>Uses your knowledge base and prompt</li>
+                                <li>Works on any website where you paste the code</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="integration-step">
+                <div class="integration-step-number"></div>
+                <div class="integration-step-content">
+                    <h3>Test the Integration</h3>
+                    <p>After adding the code to your website, test that the widget appears and functions correctly.</p>
+                    
+                    <div class="preview-container">
+                        <div class="preview-header">
+                            <h4>Widget Preview</h4>
+                            <div class="preview-actions">
+                                        <button class="btn btn-secondary" onclick="refreshPreview()">
+                                            <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">refresh</span> Refresh
+                                        </button>
+                                <button class="btn" onclick="openPreview()">
+                                    ↗️ Open Full Preview
+                                </button>
+                            </div>
+                        </div>
+                        <div class="preview-window">
+                            <iframe id="previewFrame" src="about:blank" frameborder="0"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+                    <h2><span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">help</span> Frequently Asked Questions</h2>
+            
+            <div class="faq-item">
+                <div class="faq-question">Do I need a website ID?</div>
+                <div class="faq-answer">No! Since you have 1 chatbot per account, the script automatically uses your chatbot configuration. Just paste the code snippet and it will work.</div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">Can I customize the widget's colors to match my brand?</div>
+                <div class="faq-answer">Yes, advanced customization is available. Contact support for help with custom CSS integration.</div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">Does the widget work on mobile devices?</div>
+                <div class="faq-answer">Yes, the widget is fully responsive and works on all modern mobile browsers.</div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">How do I track widget performance?</div>
+                <div class="faq-answer">Conversation metrics and widget analytics are available in the Overview and System Health sections.</div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">What if I need to remove the widget?</div>
+                <div class="faq-answer">Simply remove the code snippet from your website. The widget will no longer load on subsequent visits.</div>
+            </div>
+        </div>
+
+        <div class="card">
+                    <h2><span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">build</span> Advanced Integration</h2>
+            <p>For more complex integration needs, you can use our JavaScript API:</p>
+            
+            <div class="code-block">
+                <code id="apiSnippet">// Programmatically open the chat widget
+window.openAIChat();
+
+// Programmatically close the chat widget  
+window.closeAIChat();
+
+// Listen for chat events
+window.addEventListener('aiChatLoaded', function() {
+    console.log('Chat widget loaded');
+});
+
+window.addEventListener('aiChatOpened', function() {
+    console.log('Chat widget opened');
+});
+
+window.addEventListener('aiChatClosed', function() {
+    console.log('Chat widget closed');
+});</code>
+            </div>
+                    <button class="copy-btn" onclick="copySnippet('apiSnippet')">
+                        <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">content_copy</span> Copy API Examples
+                    </button>
+        </div>
+    </div>
+</div>
+

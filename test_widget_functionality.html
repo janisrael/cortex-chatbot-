@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Widget Functionality Test</title>
+</head>
+<body>
+    <h1>Widget Functionality Test</h1>
+    <div id="test-results"></div>
+    
+    <script>
+        const results = [];
+        
+        function test(name, condition) {
+            const passed = condition();
+            results.push({ name, passed });
+            console.log(`${passed ? '✅' : '❌'} ${name}`);
+            return passed;
+        }
+        
+        // Test 1: Check if sendSuggestion is defined
+        test('sendSuggestion function exists', () => {
+            return typeof window.sendSuggestion === 'function';
+        });
+        
+        // Test 2: Check if CHATBOT_CONFIG exists
+        test('CHATBOT_CONFIG exists', () => {
+            return typeof window.CHATBOT_CONFIG !== 'undefined';
+        });
+        
+        // Test 3: Check if widget container exists
+        test('Widget container exists', () => {
+            return document.getElementById('ai-chatbot-widget') !== null;
+        });
+        
+        // Test 4: Check if input field exists
+        test('Input field exists', () => {
+            return document.getElementById('chatbot-input') !== null;
+        });
+        
+        // Test 5: Check if send button exists
+        test('Send button exists', () => {
+            return document.getElementById('chatbot-send-btn') !== null;
+        });
+        
+        // Test 6: Check if suggested buttons exist
+        test('Suggested buttons exist', () => {
+            const buttons = document.querySelectorAll('.suggested-btn');
+            return buttons.length > 0;
+        });
+        
+        // Test 7: Test sendSuggestion function
+        test('sendSuggestion can set input value', () => {
+            const input = document.getElementById('chatbot-input');
+            if (!input) return false;
+            const testMessage = 'Test message';
+            window.sendSuggestion(testMessage);
+            return input.value === testMessage;
+        });
+        
+        // Display results
+        setTimeout(() => {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<h2>Test Results:</h2><ul>' +
+                results.map(r => `<li>${r.passed ? '✅' : '❌'} ${r.name}</li>`).join('') +
+                '</ul>';
+        }, 2000);
+    </script>
+    
+    <!-- Load the widget -->
+    <script src="http://localhost:6001/embed.js?api_key=TXGsMsXssT_hXSw1QTfYKzemEe3X2uLw4QiinO9y3vI"></script>
+</body>
+</html>
+

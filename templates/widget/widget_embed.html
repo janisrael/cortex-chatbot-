@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ bot_name }} Chat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Icons+Round&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        #chatbot-window {
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes typing {
+            0%, 80%, 100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+        
+        #chatbot-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        #chatbot-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        #chatbot-messages::-webkit-scrollbar-thumb {
+            background: #e4e4e7;
+            border-radius: 3px;
+        }
+        
+        #chatbot-close-btn:hover {
+            background: #f4f4f5;
+            color: #18181b;
+        }
+        
+        #chatbot-send-btn:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+        
+        #chatbot-send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .suggested-btn {
+            position: relative;
+            z-index: 10;
+            pointer-events: auto;
+            flex-shrink: 0;
+        }
+        
+        .suggested-btn:hover {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+            transform: translateY(-1px);
+        }
+        
+        .suggested-messages {
+            position: relative;
+            z-index: 1;
+            pointer-events: auto;
+        }
+        
+        .suggested-messages::-webkit-scrollbar {
+            width: 4px;
+            height: 6px;
+        }
+        
+        .suggested-messages::-webkit-scrollbar-track {
+            background: #f4f4f5;
+            border-radius: 3px;
+        }
+        
+        .suggested-messages::-webkit-scrollbar-thumb {
+            background: #d4d4d8;
+            border-radius: 3px;
+        }
+        
+        .suggested-messages::-webkit-scrollbar-thumb:hover {
+            background: #a1a1aa;
+        }
+    </style>
+</head>
+<body>
+    <!-- Chat Window - Full width/height for iframe -->
+    <div id="chatbot-window">
+        <!-- Header -->
+        <div style="background: linear-gradient(0deg, rgba(0, 0, 0, 0.02) 0.44%, rgba(0, 0, 0, 0) 49.5%), rgb(255, 255, 255); padding: 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f4f4f5;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <img src="https://ui-avatars.com/api/?name={{ bot_name }}&background={{ primary_color[1:] }}&color=fff&size=48" 
+                     alt="{{ bot_name }} Avatar" style="width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.1);">
+                <div>
+                    <div style="font-size: 24px; font-weight: 600; color: #18181b; margin: 0;">{{ bot_name }}</div>
+                    <div style="font-size: 14px; color: #71717a; margin: 0;">Your friendly assistant</div>
+                </div>
+            </div>
+            <button id="chatbot-close-btn" style="background: transparent; border: none; color: #71717a; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                <span class="material-icons-round" style="font-size: 24px;">close</span>
+            </button>
+        </div>
+        
+        <!-- Messages Area -->
+        <div id="chatbot-messages" style="flex: 1; overflow-y: auto; padding: 20px; background: #f8f9fa; display: flex; flex-direction: column; gap: 16px;">
+            <div class="message bot" style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start; animation: fadeIn 0.3s ease-out;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                    <img src="https://ui-avatars.com/api/?name={{ bot_name }}&background={{ primary_color[1:] }}&color=fff&size=24" 
+                         alt="Bot Avatar" style="width: 24px; height: 24px; border-radius: 50%;">
+                    <span style="font-size: 14px; font-weight: 500; color: #18181b;">{{ bot_name }}</span>
+                </div>
+                <div style="max-width: min(calc(100% - 40px), 65ch); padding: 12px 16px; border-radius: 20px; font-size: 14px; line-height: 1.6; word-wrap: break-word; background: #f4f4f5; color: #27272a; border-bottom-left-radius: 6px;">
+                    👋 Hi there! I'm {{ bot_name }}, your helpful assistant. How can I help you today?
+                </div>
+            </div>
+        </div>
+        
+        <!-- Suggested Messages -->
+        <div class="suggested-messages" style="padding: 8px; border-top: 1px solid #f4f4f5; background: white; overflow-x: auto; overflow-y: hidden; position: relative; z-index: 1000; pointer-events: auto;">
+            <div class="suggested-buttons" style="display: flex; flex-direction: row; gap: 8px; min-width: max-content; position: relative; z-index: 1001;">
+                <button class="suggested-btn" data-suggestion="What services do you offer?" style="background: white; border: 1px solid #e4e4e7; border-radius: 30px; padding: 8px 16px; font-size: 14px; color: #52525b; cursor: pointer; transition: all 0.2s; white-space: nowrap; position: relative; z-index: 1002; pointer-events: auto;" onclick="(window.sendSuggestion || function(m){var i=document.getElementById('chatbot-input');var b=document.getElementById('chatbot-send-btn');if(i){i.value=m;if(b)b.click();else{var e=new KeyboardEvent('keypress',{key:'Enter',keyCode:13,bubbles:true});i.dispatchEvent(e);}}})('What services do you offer?')">What services do you offer?</button>
+                <button class="suggested-btn" data-suggestion="How can I contact support?" style="background: white; border: 1px solid #e4e4e7; border-radius: 30px; padding: 8px 16px; font-size: 14px; color: #52525b; cursor: pointer; transition: all 0.2s; white-space: nowrap; position: relative; z-index: 1002; pointer-events: auto;" onclick="(window.sendSuggestion || function(m){var i=document.getElementById('chatbot-input');var b=document.getElementById('chatbot-send-btn');if(i){i.value=m;if(b)b.click();else{var e=new KeyboardEvent('keypress',{key:'Enter',keyCode:13,bubbles:true});i.dispatchEvent(e);}}})('How can I contact support?')">How can I contact support?</button>
+                <button class="suggested-btn" data-suggestion="What are your business hours?" style="background: white; border: 1px solid #e4e4e7; border-radius: 30px; padding: 8px 16px; font-size: 14px; color: #52525b; cursor: pointer; transition: all 0.2s; white-space: nowrap; position: relative; z-index: 1002; pointer-events: auto;" onclick="(window.sendSuggestion || function(m){var i=document.getElementById('chatbot-input');var b=document.getElementById('chatbot-send-btn');if(i){i.value=m;if(b)b.click();else{var e=new KeyboardEvent('keypress',{key:'Enter',keyCode:13,bubbles:true});i.dispatchEvent(e);}}})('What are your business hours?')">What are your business hours?</button>
+                <button class="suggested-btn" data-suggestion="Tell me about your pricing" style="background: white; border: 1px solid #e4e4e7; border-radius: 30px; padding: 8px 16px; font-size: 14px; color: #52525b; cursor: pointer; transition: all 0.2s; white-space: nowrap; position: relative; z-index: 1002; pointer-events: auto;" onclick="(window.sendSuggestion || function(m){var i=document.getElementById('chatbot-input');var b=document.getElementById('chatbot-send-btn');if(i){i.value=m;if(b)b.click();else{var e=new KeyboardEvent('keypress',{key:'Enter',keyCode:13,bubbles:true});i.dispatchEvent(e);}}})('Tell me about your pricing')">Tell me about your pricing</button>
+                <button class="suggested-btn" data-suggestion="How do I get started?" style="background: white; border: 1px solid #e4e4e7; border-radius: 30px; padding: 8px 16px; font-size: 14px; color: #52525b; cursor: pointer; transition: all 0.2s; white-space: nowrap; position: relative; z-index: 1002; pointer-events: auto;" onclick="(window.sendSuggestion || function(m){var i=document.getElementById('chatbot-input');var b=document.getElementById('chatbot-send-btn');if(i){i.value=m;if(b)b.click();else{var e=new KeyboardEvent('keypress',{key:'Enter',keyCode:13,bubbles:true});i.dispatchEvent(e);}}})('How do I get started?')">How do I get started?</button>
+            </div>
+        </div>
+        
+        <!-- Typing Indicator -->
+        <div id="typing-indicator" style="display: none; align-items: center; gap: 8px; padding: 12px 16px; background: #f4f4f5; border-radius: 20px; border-bottom-left-radius: 6px; max-width: fit-content; margin: 0 20px 16px 20px;">
+            <span style="font-size: 14px; color: #71717a;">{{ bot_name }} is typing</span>
+            <div style="display: flex; gap: 4px;">
+                <div style="width: 8px; height: 8px; background: #71717a; border-radius: 50%; animation: typing 1.4s infinite;"></div>
+                <div style="width: 8px; height: 8px; background: #71717a; border-radius: 50%; animation: typing 1.4s infinite; animation-delay: 0.2s;"></div>
+                <div style="width: 8px; height: 8px; background: #71717a; border-radius: 50%; animation: typing 1.4s infinite; animation-delay: 0.4s;"></div>
+            </div>
+        </div>
+        
+        <!-- Input Area -->
+        <div style="padding: 20px; background: white; border-top: 1px solid #f4f4f5;">
+            <div style="display: flex; align-items: center; background: white; border: 1.5px solid #e4e4e7; border-radius: 16px; padding: 8px 12px; transition: border-color 0.2s; min-height: 52px;">
+                <input type="text" id="chatbot-input" placeholder="Message..." style="flex: 1; border: none; outline: none; font-size: 16px; background: transparent; color: #18181b; padding: 4px 8px; font-family: inherit;" maxlength="8000">
+                <div style="display: flex; gap: 4px;">
+                    <button id="chatbot-send-btn" style="background: {{ primary_color }}; color: white; border: none; padding: 12px 20px; border-radius: 25px; font-size: 16px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22,2 15,22 11,13 2,9 22,2"></polygon>
+                        </svg>
+                        Send
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Get API key from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const apiKey = urlParams.get('api_key') || urlParams.get('key');
+    const apiBaseUrl = window.location.origin;
+    
+    // Define sendSuggestion immediately
+    window.sendSuggestion = window.sendSuggestion || function(message) {
+        console.log('sendSuggestion called (iframe) with:', message);
+        const inputField = document.getElementById('chatbot-input');
+        if (inputField) {
+            inputField.value = message;
+            const sendBtn = document.getElementById('chatbot-send-btn');
+            if (sendBtn) {
+                sendBtn.click();
+            } else {
+                const event = new KeyboardEvent('keypress', {
+                    key: 'Enter',
+                    code: 'Enter',
+                    keyCode: 13,
+                    which: 13,
+                    bubbles: true
+                });
+                inputField.dispatchEvent(event);
+            }
+        }
+    };
+    
+    // Initialize widget
+    (function() {
+        const closeBtn = document.getElementById('chatbot-close-btn');
+        const messagesDiv = document.getElementById('chatbot-messages');
+        const inputField = document.getElementById('chatbot-input');
+        const sendBtn = document.getElementById('chatbot-send-btn');
+        
+        // Close button - communicate with parent window to close iframe
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function() {
+                // Send message to parent window to close iframe
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage({ type: 'close_widget' }, '*');
+                }
+            });
+        }
+        
+        function addMessage(text, isBot) {
+            if (!messagesDiv) return;
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message ' + (isBot ? 'bot' : 'user');
+            messageDiv.style.cssText = 'display: flex; flex-direction: column; gap: 8px; align-items: ' + (isBot ? 'flex-start' : 'flex-end') + '; animation: fadeIn 0.3s ease-out;';
+            
+            const formattedText = text.replace(/<br>/g, '<br>').replace(/\\n/g, '<br>');
+            
+            if (isBot) {
+                const botName = '{{ bot_name }}';
+                const primaryColor = '{{ primary_color }}';
+                const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(botName)}&background=${primaryColor.substring(1)}&color=fff&size=24`;
+                messageDiv.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <img src="${avatarUrl}" alt="Bot Avatar" style="width: 24px; height: 24px; border-radius: 50%;">
+                        <span style="font-size: 14px; font-weight: 500; color: #18181b;">${botName}</span>
+                    </div>
+                    <div style="max-width: min(calc(100% - 40px), 65ch); padding: 12px 16px; border-radius: 20px; font-size: 14px; line-height: 1.6; word-wrap: break-word; background: #f4f4f5; color: #27272a; border-bottom-left-radius: 6px;">${formattedText}</div>
+                `;
+            } else {
+                const primaryColor = '{{ primary_color }}';
+                messageDiv.innerHTML = `
+                    <div style="max-width: min(calc(100% - 40px), 65ch); padding: 12px 16px; border-radius: 20px; font-size: 14px; line-height: 1.6; word-wrap: break-word; background: ${primaryColor}; color: white; border-bottom-right-radius: 6px;">${formattedText}</div>
+                `;
+            }
+            // If typing indicator is visible, insert message before it
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator && typingIndicator.parentNode === messagesDiv && typingIndicator.style.display !== 'none') {
+                messagesDiv.insertBefore(messageDiv, typingIndicator);
+            } else {
+                messagesDiv.appendChild(messageDiv);
+            }
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        function showTyping() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator && messagesDiv) {
+                // Ensure typing indicator is in messagesDiv
+                if (typingIndicator.parentNode !== messagesDiv) {
+                    messagesDiv.appendChild(typingIndicator);
+                } else {
+                    // If already in messagesDiv, move it to the end (last child)
+                    messagesDiv.appendChild(typingIndicator);
+                }
+                typingIndicator.style.display = 'flex';
+                // Scroll to bottom to show typing indicator
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+        }
+        
+        function hideTyping() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) {
+                // Just hide it, don't remove from DOM
+                // This allows it to be shown again on subsequent calls
+                typingIndicator.style.display = 'none';
+            }
+        }
+        
+        async function sendMessage() {
+            if (!inputField || !sendBtn || !apiKey) return;
+            const message = inputField.value.trim();
+            if (!message) return;
+            
+            addMessage(message, false);
+            inputField.value = '';
+            sendBtn.disabled = true;
+            
+            showTyping();
+            
+            try {
+                const response = await fetch(apiBaseUrl + '/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: message,
+                        api_key: apiKey
+                    })
+                });
+                
+                const data = await response.json();
+                hideTyping();
+                addMessage(data.response || 'Sorry, I encountered an error.', true);
+            } catch (error) {
+                hideTyping();
+                addMessage('Sorry, I encountered a connection error.', true);
+                console.error('Chatbot error:', error);
+            }
+            
+            sendBtn.disabled = false;
+        }
+        
+        if (sendBtn) {
+            sendBtn.addEventListener('click', sendMessage);
+        }
+        if (inputField) {
+            inputField.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') sendMessage();
+            });
+        }
+    })();
+    </script>
+</body>
+</html>

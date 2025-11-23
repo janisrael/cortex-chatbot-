@@ -5,6 +5,7 @@ Handles schema changes and data migrations
 import os
 import sqlite3
 from models import User
+from models.prompt_preset import PromptPreset
 
 
 class MigrationManager:
@@ -108,6 +109,7 @@ class MigrationManager:
         migrations = [
             (1, "001_initial_schema", MigrationManager._migration_001_initial_schema),
             (2, "002_add_username_field", MigrationManager._migration_002_add_username_field),
+            (3, "003_create_prompt_presets", MigrationManager._migration_003_create_prompt_presets),
         ]
         
         for version, name, migration_func in migrations:
@@ -164,6 +166,12 @@ class MigrationManager:
                 print(f"⚠️ Migration 002 note: {e}")
         finally:
             conn.close()
+    
+    @staticmethod
+    def _migration_003_create_prompt_presets():
+        """Create prompt_presets table and populate with default presets"""
+        # This is handled by PromptPreset.init_presets_db(), so we just ensure it's called
+        PromptPreset.init_presets_db()
 
 
 def run_migrations():

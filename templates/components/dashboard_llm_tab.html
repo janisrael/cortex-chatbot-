@@ -1,0 +1,146 @@
+<!-- LLM Configuration Tab -->
+<div id="llm-tab" class="tab-content">
+    <div class="card">
+        <h2><span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">settings</span> LLM Configuration</h2>
+        
+        <div class="alert alert-success" id="llmSuccess"></div>
+        <div class="alert alert-error" id="llmError"></div>
+
+        <!-- Website Selector - HIDDEN (v2 uses user-based system, not website-based) -->
+        <!-- <div class="website-selector-section" style="display: none;">
+            <label class="section-label">Configure LLM for Website</label>
+            <div class="website-tabs" id="websiteTabs">
+            </div>
+        </div> -->
+
+        <!-- Global Configuration -->
+        <div class="config-section">
+            <h3 class="section-title">Global LLM Settings</h3>
+
+            <div class="provider-tabs">
+                <button class="provider-tab active" id="globalOpenaiTab" onclick="selectGlobalProvider('openai')">
+                    OpenAI
+                </button>
+                <button class="provider-tab" id="globalOllamaTab" onclick="selectGlobalProvider('ollama')">
+                    Ollama (Local)
+                </button>
+            </div>
+
+            <!-- OpenAI Configuration -->
+            <div class="provider-config active" id="globalOpenaiConfig">
+                <div class="form-group">
+                    <label for="globalOpenaiKey">OpenAI API Key</label>
+                    <input type="password" id="globalOpenaiKey" class="form-control" 
+                           placeholder="sk-proj-... (leave empty to keep current)">
+                </div>
+                
+                <div class="config-row">
+                    <div class="form-group">
+                        <label for="globalOpenaiDefaultModel">Default Model</label>
+                        <select id="globalOpenaiDefaultModel" class="form-control">
+                            <option value="gpt-4o-mini">GPT-4o Mini (Recommended)</option>
+                            <option value="gpt-4o">GPT-4o</option>
+                            <option value="gpt-4">GPT-4</option>
+                            <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="globalProvider">Global Provider</label>
+                        <select id="globalProvider" class="form-control">
+                            <option value="openai">OpenAI</option>
+                            <option value="ollama">Ollama</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ollama Configuration -->
+            <div class="provider-config" id="globalOllamaConfig">
+                <div class="config-row">
+                    <div class="form-group">
+                        <label for="globalOllamaUrl">Ollama Server URL</label>
+                        <input type="url" id="globalOllamaUrl" class="form-control" 
+                               value="http://localhost:11434">
+                    </div>
+                    <div class="form-group">
+                        <label for="globalOllamaDefaultModel">Default Model</label>
+                        <select id="globalOllamaDefaultModel" class="form-control">
+                            <option value="llama3.1:8b">Llama 3.1 8B</option>
+                            <option value="llama3.1:70b">Llama 3.1 70B</option>
+                            <option value="mistral">Mistral</option>
+                            <option value="codellama">CodeLlama</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="config-actions">
+                <button class="btn" onclick="saveGlobalConfig()" id="saveGlobalBtn">
+                    <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">save</span> Save Global Settings
+                </button>
+            </div>
+        </div>
+
+        <!-- Website-Specific Override -->
+        <div class="config-section">
+            <h3 class="section-title">Website-Specific Override</h3>
+            <p class="section-description">Override global settings for <span id="currentWebsiteName">selected website</span></p>
+
+            <div class="config-row">
+                <div class="form-group">
+                    <label for="websiteProvider">LLM Provider</label>
+                    <select id="websiteProvider" class="form-control">
+                        <option value="">Use Global Default</option>
+                        <option value="openai">OpenAI</option>
+                        <option value="ollama">Ollama</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="websiteTemperature">Temperature</label>
+                    <input type="number" id="websiteTemperature" class="form-control" 
+                           min="0" max="2" step="0.1" placeholder="Global default">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="websiteModel">Model</label>
+                <input type="text" id="websiteModel" class="form-control" 
+                       placeholder="Leave empty to use provider default">
+            </div>
+
+            <div class="config-actions">
+                <button class="btn" onclick="saveWebsiteConfig()" id="saveWebsiteBtn">
+                    <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">save</span> Save Website Override
+                </button>
+                <button class="btn btn-secondary" onclick="clearWebsiteConfig()" id="clearWebsiteBtn">
+                    <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">delete</span> Clear Override
+                </button>
+            </div>
+        </div>
+
+        <!-- Testing Section -->
+        <div class="config-section">
+            <div class="testing-header">
+                <h3 class="section-title">LLM Testing</h3>
+                <span class="status-indicator" id="llmStatusIndicator">
+                    <span class="status-dot" id="llmStatusDot"></span>
+                    <span id="llmStatusText">Loading...</span>
+                </span>
+            </div>
+
+            <div class="config-actions">
+                <button class="btn btn-success" onclick="testLLM()" id="testLLMBtn">
+                    <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">science</span> Test Current Configuration
+                </button>
+            </div>
+
+            <div class="loading" id="llmLoading">
+                <div class="spinner"></div>
+                Processing LLM request...
+            </div>
+
+            <div class="test-response" id="testResponse"></div>
+        </div>
+    </div>
+</div>
+

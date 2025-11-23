@@ -1,0 +1,22 @@
+<!-- Dashboard Header Component -->
+<div class="header">
+    <div class="header-content">
+        <div>
+            <h1 style="margin: 0; font-size: 24px; font-weight: 600;">🤖 Enhanced AI Dashboard</h1>
+        </div>
+        <div class="header-right">
+            <div class="nav-links" style="display: flex; gap: 15px; align-items: center; margin-right: 15px;">
+                <a href="/chat-interface" style="color: white; text-decoration: none;">Chat Interface</a>
+                <a href="/demo" style="color: white; text-decoration: none;">Widget Preview</a>
+            </div>
+            <div class="user-info">
+                <span>{{ user.username if user else 'User' }}</span>
+            </div>
+            <a href="/logout" class="logout-btn">
+                <span class="material-icons-round" style="font-size: 18px;">logout</span>
+                Logout
+            </a>
+        </div>
+    </div>
+</div>
+

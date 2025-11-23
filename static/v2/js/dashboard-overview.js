@@ -25,6 +25,7 @@ function switchTab(tabName) {
         refreshFileList(); // Load files when knowledge tab is opened
     } else if (tabName === 'prompt') {
         loadPrompt();
+        loadPresets(); // Load prompt presets
     } else if (tabName === 'integration') {
         updateIntegrationSnippet();
     }

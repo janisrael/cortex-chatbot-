@@ -1,0 +1,62 @@
+<!-- Overview Tab -->
+<div id="overview-tab" class="tab-content active">
+    <!-- Statistics Section -->
+    <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+            <div class="stat-value" id="totalDocs">-</div>
+            <div class="stat-label">Documents</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="totalFiles">-</div>
+            <div class="stat-label">Uploaded Files</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="llmModel">-</div>
+            <div class="stat-label">LLM Model</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="currentWebsite">-</div>
+            <div class="stat-label">Current Website</div>
+        </div>
+    </div>
+
+    <!-- System Status -->
+    <div class="card">
+        <h2><span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">battery_charging_full</span> System Status</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+            <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                <span class="material-icons-round" style="font-size: 24px; margin-bottom: 10px; display: block;">smart_toy</span>
+                <div style="font-weight: 600; margin-bottom: 5px;">LLM Status</div>
+                <span class="status-indicator" id="systemLLMStatus">
+                    <span class="status-dot" id="systemLLMDot"></span>
+                    <span id="systemLLMText">Loading...</span>
+                </span>
+            </div>
+            <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                <span class="material-icons-round" style="font-size: 24px; margin-bottom: 10px; display: block;">psychology</span>
+                <div style="font-weight: 600; margin-bottom: 5px;">Vector Store</div>
+                <span class="status-indicator status-active">
+                    <span class="status-dot active"></span>
+                    Active
+                </span>
+            </div>
+            <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                <span class="material-icons-round" style="font-size: 24px; margin-bottom: 10px; display: block;">storage</span>
+                <div style="font-weight: 600; margin-bottom: 5px;">Database</div>
+                <span class="status-indicator status-active">
+                    <span class="status-dot active"></span>
+                    Connected
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- File List -->
+    <div class="card">
+        <h2><span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">folder</span> Recent Files</h2>
+        <div class="file-list" id="overviewFileList">
+            Loading files...
+        </div>
+    </div>
+</div>
+

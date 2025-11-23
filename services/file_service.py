@@ -1,0 +1,136 @@
+"""File upload and management service"""
+import os
+from datetime import datetime
+from werkzeug.utils import secure_filename
+from utils.helpers import allowed_file
+from langchain_community.document_loaders import PyPDFLoader, TextLoader, CSVLoader, Docx2txtLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+
+
+def save_uploaded_file(user_id, file, category):
+    """Save uploaded file to user's directory"""
+    filename = secure_filename(file.filename)
+    user_upload_dir = f"uploads/user_{user_id}"
+    category_dir = os.path.join(user_upload_dir, category)
+    os.makedirs(category_dir, exist_ok=True)
+    
+    filepath = os.path.join(category_dir, filename)
+    file.save(filepath)
+    return filepath, filename
+
+
+def list_user_files(user_id):
+    """List all files for a user"""
+    user_upload_dir = f"uploads/user_{user_id}"
+    files = []
+    
+    if os.path.exists(user_upload_dir):
+        for category in os.listdir(user_upload_dir):
+            category_path = os.path.join(user_upload_dir, category)
+            if os.path.isdir(category_path):
+                for filename in os.listdir(category_path):
+                    filepath = os.path.join(category_path, filename)
+                    if os.path.isfile(filepath):
+                        file_stat = os.stat(filepath)
+                        files.append({
+                            "filename": filename,
+                            "category": category,
+                            "size": file_stat.st_size,
+                            "uploaded_at": datetime.fromtimestamp(file_stat.st_mtime).isoformat(),
+                            "path": filepath
+                        })
+    
+    return files
+
+
+def delete_user_file(user_id, filename, category):
+    """Delete a file from user's directory"""
+    user_upload_dir = f"uploads/user_{user_id}"
+    category_dir = os.path.join(user_upload_dir, category)
+    filepath = os.path.join(category_dir, filename)
+    
+    if os.path.exists(filepath):
+        os.remove(filepath)
+        return True
+    return False
+
+
+def process_file_for_user(filepath, filename, category, user_id):
+    """Process file for specific user's knowledge base"""
+    try:
+        from services.knowledge_service import get_user_vectorstore, embeddings
+        
+        if not embeddings:
+            print("❌ Embeddings not available")
+            return False
+        
+        # Load document based on file extension
+        file_ext = filename.lower().split('.')[-1]
+        print(f"📄 Processing {file_ext} file: {filename}")
+        
+        try:
+            if file_ext == 'pdf':
+                loader = PyPDFLoader(filepath)
+            elif file_ext == 'csv':
+                loader = CSVLoader(filepath)
+            elif file_ext in ['docx', 'doc']:
+                try:
+                    loader = Docx2txtLoader(filepath)
+                except Exception as e:
+                    print(f"⚠️ Could not load .docx file, trying as text: {e}")
+                    loader = TextLoader(filepath, encoding='utf-8')
+            else:
+                loader = TextLoader(filepath, encoding='utf-8')
+            
+            documents = loader.load()
+            print(f"📚 Loaded {len(documents)} documents from {filename}")
+        except Exception as e:
+            print(f"❌ Error loading file {filename}: {e}")
+            import traceback
+            traceback.print_exc()
+            return False
+        
+        # Split into chunks
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1000,
+            chunk_overlap=200,
+            length_function=len
+        )
+        chunks = text_splitter.split_documents(documents)
+        print(f"✂️ Split into {len(chunks)} chunks")
+        
+        # Add user-specific metadata
+        for chunk in chunks:
+            chunk.metadata.update({
+                'source_file': filename,
+                'upload_time': datetime.now().isoformat(),
+                'category': category,
+                'user_id': str(user_id)
+            })
+        
+        # Add to user-specific vectorstore
+        try:
+            user_vectorstore = get_user_vectorstore(user_id)
+            if user_vectorstore is None:
+                print("❌ Failed to create/get user vectorstore")
+                return False
+            
+            # Add documents to vectorstore
+            print(f"📤 Adding {len(chunks)} chunks to vectorstore...")
+            user_vectorstore.add_documents(chunks)
+            print(f"✅ Added {len(chunks)} chunks from {filename} to user {user_id} knowledge base")
+            
+            return True
+        except Exception as e:
+            print(f"❌ Error adding to vectorstore: {e}")
+            import traceback
+            traceback.print_exc()
+            return False
+        
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"❌ File processing error for user {user_id}: {e}")
+        print(f"Full traceback:\n{error_details}")
+        return False
+
