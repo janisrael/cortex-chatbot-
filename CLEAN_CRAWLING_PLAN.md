@@ -1,8 +1,9 @@
 # 🕷️ Clean Web Crawling & Text Extraction Plan
 
-**Version:** 1.0  
+**Version:** 2.0  
 **Date:** 2025-11-23  
-**Status:** Planning
+**Status:** Planning  
+**Branch:** crawling-feature
 
 ---
 
@@ -14,6 +15,17 @@ Current crawling implementation has issues:
 - **Encoding issues** causing garbled text
 - **No preview** before saving to knowledge base
 - **Poor text quality** affecting RAG performance
+- **No tracking** of crawled URLs (separate from files)
+- **No overview** of crawled websites
+
+## 🎯 Requirements
+
+1. **Separate table for crawled URLs** (like uploaded files)
+2. **Overview display** showing crawled websites alongside uploaded files
+3. **List format:** `URL | view | delete`
+4. **Preview before ingesting** - user must verify text quality first
+5. **User can edit** extracted text before saving
+6. **User-isolated data** (same as uploaded documents)
 
 ---
 
@@ -35,6 +47,11 @@ Current crawling implementation has issues:
    - Users can't see what will be saved
    - Can't verify quality before committing
    - No way to edit/clean before saving
+
+4. **No tracking system:**
+   - Crawled URLs not stored separately
+   - No overview/list of crawled pages
+   - Can't manage crawled content like files
 
 ---
 
@@ -83,9 +100,60 @@ Current crawling implementation has issues:
 
 ---
 
+## 🗄️ Database Schema
+
+### `crawled_urls` Table
+```sql
+CREATE TABLE crawled_urls (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    url VARCHAR(500) NOT NULL,
+    title VARCHAR(255),
+    extracted_text TEXT,  -- Clean extracted text (not ingested yet)
+    word_count INT DEFAULT 0,
+    char_count INT DEFAULT 0,
+    status ENUM('preview', 'ingested', 'deleted') DEFAULT 'preview',
+    category VARCHAR(50) DEFAULT 'company_details',
+    crawled_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    ingested_at DATETIME NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user_id (user_id),
+    INDEX idx_status (status),
+    INDEX idx_url (url(255))
+);
+```
+
+**Note:** 
+- `extracted_text` stores the cleaned text (user can edit before ingesting)
+- `status='preview'` means not yet ingested to vectorstore
+- `status='ingested'` means saved to knowledge base
+- User can view/edit/delete before ingesting
+
+---
+
 ## 🛠️ Implementation Plan
 
-### Step 1: Create Text Cleaning Service
+### Step 1: Create Database Migration
+
+**File:** `migrations.py`
+
+Add migration 004:
+```python
+@staticmethod
+def _migration_004_create_crawled_urls():
+    """Create crawled_urls table"""
+    # Implementation here
+```
+
+### Step 2: Create CrawledUrl Model
+
+**File:** `models/crawled_url.py`
+
+Similar to User model pattern (MySQL/SQLite support)
+
+### Step 3: Create Text Cleaning Service
 
 **File:** `services/text_cleaning_service.py`
 
@@ -155,7 +223,7 @@ def extract_clean_text_from_url(url):
         return None
 ```
 
-### Step 2: Create Preview Endpoint
+### Step 2: Create Preview Endpoint (Saves to DB, not vectorstore)
 
 **File:** `blueprints/api.py`
 
@@ -163,13 +231,26 @@ def extract_clean_text_from_url(url):
 @api_bp.route("/api/crawl-preview", methods=["POST"])
 @login_required
 def crawl_url_preview():
-    """Preview crawled content before saving"""
+    """Crawl URL, extract clean text, save to crawled_urls table (preview status)"""
     try:
         data = request.json
         url = data.get('url')
+        category = data.get('category', 'company_details')
         
         if not url:
             return jsonify({"error": "No URL provided"}), 400
+        
+        user_id = current_user.id
+        
+        # Check if URL already crawled
+        from models.crawled_url import CrawledUrl
+        existing = CrawledUrl.get_by_url(user_id, url)
+        if existing and existing['status'] != 'deleted':
+            return jsonify({
+                "error": "URL already crawled",
+                "crawled_id": existing['id'],
+                "url": existing['url']
+            }), 400
         
         # Extract clean text
         from services.text_cleaning_service import extract_clean_text_from_url
@@ -182,60 +263,143 @@ def crawl_url_preview():
         # Get text stats
         word_count = len(text.split())
         char_count = len(text)
-        preview_length = 2000  # First 2000 chars for preview
+        
+        # Extract title from URL or text
+        title = url.split('/')[-1] or url
+        if len(text) > 100:
+            # Try to get title from first line
+            first_line = text.split('\n')[0][:100]
+            if first_line:
+                title = first_line
+        
+        # Save to crawled_urls table (status='preview')
+        crawled_id = CrawledUrl.create(
+            user_id=user_id,
+            url=url,
+            title=title,
+            extracted_text=text,
+            word_count=word_count,
+            char_count=char_count,
+            category=category,
+            status='preview'
+        )
+        
+        if not crawled_id:
+            return jsonify({"error": "Failed to save crawled URL"}), 500
         
         return jsonify({
+            "id": crawled_id,
             "url": url,
-            "preview": text[:preview_length],
-            "full_text": text,  # For saving later
+            "title": title,
+            "preview": text[:2000],  # First 2000 chars for preview
+            "full_text": text,  # Full text for editing
             "word_count": word_count,
             "char_count": char_count,
-            "preview_only": len(text) > preview_length
+            "status": "preview",
+            "message": "URL crawled successfully. Review the extracted text before ingesting."
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 ```
 
-### Step 3: Update Save Endpoint
+### Step 3: Create List Endpoint
 
 **File:** `blueprints/api.py`
 
 ```python
-@api_bp.route("/api/crawl-save", methods=["POST"])
+@api_bp.route("/api/crawled-urls", methods=["GET"])
 @login_required
-def crawl_url_save():
-    """Save previewed crawled content to knowledge base"""
+def list_crawled_urls():
+    """List all crawled URLs for current user"""
     try:
-        data = request.json
-        url = data.get('url')
-        text = data.get('text')  # User may have edited it
-        category = data.get('category', 'company_details')
-        
-        if not url or not text:
-            return jsonify({"error": "URL and text required"}), 400
-        
         user_id = current_user.id
+        from models.crawled_url import CrawledUrl
+        
+        urls = CrawledUrl.get_all_by_user(user_id)
+        
+        return jsonify({
+            "urls": urls,
+            "total": len(urls)
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+```
+
+### Step 4: Create View Endpoint
+
+**File:** `blueprints/api.py`
+
+```python
+@api_bp.route("/api/crawled-urls/<int:crawled_id>", methods=["GET"])
+@login_required
+def view_crawled_url(crawled_id):
+    """Get crawled URL details and extracted text"""
+    try:
+        user_id = current_user.id
+        from models.crawled_url import CrawledUrl
+        
+        crawled = CrawledUrl.get_by_id(user_id, crawled_id)
+        
+        if not crawled:
+            return jsonify({"error": "Crawled URL not found"}), 404
+        
+        return jsonify(crawled)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+```
+
+### Step 5: Create Ingest Endpoint (Save to Vectorstore)
+
+**File:** `blueprints/api.py`
+
+```python
+@api_bp.route("/api/crawled-urls/<int:crawled_id>/ingest", methods=["POST"])
+@login_required
+def ingest_crawled_url(crawled_id):
+    """Ingest crawled URL to knowledge base (vectorstore)"""
+    try:
+        user_id = current_user.id
+        data = request.json
+        
+        from models.crawled_url import CrawledUrl
+        from services.knowledge_service import get_user_vectorstore, embeddings
+        from langchain.text_splitter import RecursiveCharacterTextSplitter
+        from langchain.schema import Document
+        from datetime import datetime
+        
+        # Get crawled URL
+        crawled = CrawledUrl.get_by_id(user_id, crawled_id)
+        if not crawled:
+            return jsonify({"error": "Crawled URL not found"}), 404
+        
+        if crawled['status'] == 'ingested':
+            return jsonify({"error": "URL already ingested"}), 400
+        
+        # Get text (user may have edited it)
+        text = data.get('text', crawled['extracted_text'])
+        if not text:
+            return jsonify({"error": "No text to ingest"}), 400
+        
+        # Update text if edited
+        if text != crawled['extracted_text']:
+            CrawledUrl.update_text(crawled_id, text)
         
         # Split into chunks
-        from langchain.text_splitter import RecursiveCharacterTextSplitter
-        from services.knowledge_service import get_user_vectorstore, embeddings
-        
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=1000,
             chunk_overlap=200,
             length_function=len
         )
         
-        # Create document from cleaned text
-        from langchain.schema import Document
         doc = Document(
             page_content=text,
             metadata={
-                'source_file': url,
+                'source_file': crawled['url'],
                 'upload_time': datetime.now().isoformat(),
-                'category': category,
+                'category': crawled['category'],
                 'user_id': str(user_id),
-                'source_type': 'web_crawl'
+                'source_type': 'web_crawl',
+                'crawled_id': crawled_id
             }
         )
         
@@ -245,9 +409,14 @@ def crawl_url_save():
         user_vectorstore = get_user_vectorstore(user_id)
         if user_vectorstore:
             user_vectorstore.add_documents(chunks)
+            
+            # Update status to 'ingested'
+            CrawledUrl.update_status(crawled_id, 'ingested')
+            
             return jsonify({
-                "message": f"URL {url} saved successfully. Added {len(chunks)} chunks.",
-                "chunks_added": len(chunks)
+                "message": f"URL {crawled['url']} ingested successfully. Added {len(chunks)} chunks.",
+                "chunks_added": len(chunks),
+                "status": "ingested"
             })
         else:
             return jsonify({"error": "Failed to access knowledge base"}), 500
@@ -256,11 +425,70 @@ def crawl_url_save():
         return jsonify({"error": str(e)}), 500
 ```
 
-### Step 4: Update UI with Preview
+### Step 6: Create Delete Endpoint
+
+**File:** `blueprints/api.py`
+
+```python
+@api_bp.route("/api/crawled-urls/<int:crawled_id>", methods=["DELETE"])
+@login_required
+def delete_crawled_url(crawled_id):
+    """Delete crawled URL (and remove from vectorstore if ingested)"""
+    try:
+        user_id = current_user.id
+        from models.crawled_url import CrawledUrl
+        from services.knowledge_service import remove_file_from_vectorstore
+        
+        crawled = CrawledUrl.get_by_id(user_id, crawled_id)
+        if not crawled:
+            return jsonify({"error": "Crawled URL not found"}), 404
+        
+        # If ingested, remove from vectorstore
+        if crawled['status'] == 'ingested':
+            remove_file_from_vectorstore(user_id, crawled['url'])
+        
+        # Delete from database
+        success = CrawledUrl.delete(crawled_id)
+        
+        if success:
+            return jsonify({
+                "message": f"URL {crawled['url']} deleted successfully"
+            })
+        else:
+            return jsonify({"error": "Failed to delete"}), 500
+            
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+```
+
+### Step 7: Update UI - Add Crawled URLs Overview
 
 **File:** `templates/components/dashboard_knowledge_tab.html`
 
-Add preview section:
+Add crawled URLs section after uploaded files:
+```html
+<!-- Crawled URLs -->
+<div class="card" style="margin-top: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h2 style="margin: 0;">
+            <span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">language</span> 
+            Crawled Websites
+        </h2>
+        <button class="btn btn-secondary" onclick="refreshCrawledUrls()" style="padding: 6px 12px; font-size: 12px;">
+            <span class="material-icons-round" style="vertical-align: middle; font-size: 16px;">refresh</span> Refresh
+        </button>
+    </div>
+    <div class="crawled-urls-list" id="crawledUrlsList">
+        Loading crawled URLs...
+    </div>
+</div>
+```
+
+### Step 8: Update UI - Preview Modal
+
+**File:** `templates/components/dashboard_knowledge_tab.html`
+
+Add preview modal:
 ```html
 <!-- Crawl Preview Modal -->
 <div id="crawlPreviewModal" class="modal" style="display: none;">
@@ -292,7 +520,7 @@ Add preview section:
 </div>
 ```
 
-### Step 5: Update JavaScript
+### Step 9: Update JavaScript - Crawl Flow
 
 **File:** `static/js/dashboard/file_management.js`
 
@@ -300,24 +528,61 @@ Add preview section:
 let crawledPreviewData = null;
 
 async function crawlUrl() {
-    // ... existing code ...
+    const urlInput = document.getElementById('urlInput');
+    const crawlBtn = document.getElementById('crawlBtn');
+    const crawlLoading = document.getElementById('crawlLoading');
+    const crawlError = document.getElementById('crawlError');
     
-    // Change to preview endpoint
-    const response = await fetch('/api/crawl-preview', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: url })
-    });
+    if (!urlInput) return;
     
-    const result = await response.json();
-    
-    if (response.ok) {
-        // Show preview modal
-        crawledPreviewData = result;
-        showCrawlPreview(result);
-    } else {
-        // Show error
+    const url = urlInput.value.trim();
+    if (!url) {
+        if (crawlError) {
+            crawlError.textContent = 'Please enter a valid URL';
+            crawlError.style.display = 'block';
+        }
+        return;
     }
+    
+    if (crawlError) crawlError.style.display = 'none';
+    if (crawlBtn) crawlBtn.disabled = true;
+    if (crawlLoading) crawlLoading.style.display = 'block';
+    
+    try {
+        // Call preview endpoint (saves to DB, status='preview')
+        const response = await fetch('/api/crawl-preview', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                url: url,
+                category: selectedCategory || 'company_details'
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            // Show preview modal
+            crawledPreviewData = result;
+            showCrawlPreview(result);
+            
+            // Clear input
+            urlInput.value = '';
+            
+            // Refresh crawled URLs list
+            await refreshCrawledUrls();
+        } else {
+            throw new Error(result.error || 'Failed to crawl URL');
+        }
+    } catch (error) {
+        if (crawlError) {
+            crawlError.textContent = 'Failed to crawl URL: ' + error.message;
+            crawlError.style.display = 'block';
+        }
+    }
+    
+    if (crawlBtn) crawlBtn.disabled = false;
+    if (crawlLoading) crawlLoading.style.display = 'none';
 }
 
 function showCrawlPreview(data) {
@@ -333,20 +598,111 @@ function closeCrawlPreview() {
     crawledPreviewData = null;
 }
 
-async function saveCrawledContent() {
+async function ingestCrawledContent() {
     const editedText = document.getElementById('previewText').value;
+    const crawledId = crawledPreviewData.id;
     
-    const response = await fetch('/api/crawl-save', {
+    const response = await fetch(`/api/crawled-urls/${crawledId}/ingest`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            url: crawledPreviewData.url,
-            text: editedText,
-            category: 'company_details'
+            text: editedText
         })
     });
     
-    // Handle response...
+    const result = await response.json();
+    
+    if (response.ok) {
+        showAlert('crawlSuccess', result.message);
+        closeCrawlPreview();
+        await refreshCrawledUrls();
+        await refreshFileList(); // Refresh file list too
+    } else {
+        showAlert('crawlError', result.error || 'Failed to ingest');
+    }
+}
+
+async function refreshCrawledUrls() {
+    try {
+        const response = await fetch('/api/crawled-urls');
+        const data = await response.json();
+        
+        const listDiv = document.getElementById('crawledUrlsList');
+        if (!listDiv) return;
+        
+        if (data.urls.length === 0) {
+            listDiv.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">No crawled URLs yet</div>';
+            return;
+        }
+        
+        const html = data.urls.map(url => {
+            const statusBadge = url.status === 'ingested' 
+                ? '<span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px;">Ingested</span>'
+                : '<span style="background: #ffc107; color: #000; padding: 2px 8px; border-radius: 4px; font-size: 11px;">Preview</span>';
+            
+            return `
+                <div class="crawled-url-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #e1e5e9;">
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; margin-bottom: 4px;">${url.url}</div>
+                        <div style="font-size: 12px; color: #666;">
+                            ${statusBadge} • ${url.word_count} words • ${new Date(url.crawled_at).toLocaleDateString()}
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-secondary" onclick="viewCrawledUrl(${url.id})" style="padding: 6px 12px; font-size: 12px;">
+                            <span class="material-icons-round" style="font-size: 16px;">visibility</span> View
+                        </button>
+                        <button class="btn btn-danger" onclick="deleteCrawledUrl(${url.id})" style="padding: 6px 12px; font-size: 12px;">
+                            <span class="material-icons-round" style="font-size: 16px;">delete</span> Delete
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        listDiv.innerHTML = html;
+    } catch (error) {
+        console.error('Failed to load crawled URLs:', error);
+    }
+}
+
+async function viewCrawledUrl(crawledId) {
+    try {
+        const response = await fetch(`/api/crawled-urls/${crawledId}`);
+        const data = await response.json();
+        
+        if (response.ok) {
+            crawledPreviewData = data;
+            showCrawlPreview(data);
+        } else {
+            alert('Failed to load crawled URL: ' + data.error);
+        }
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+
+async function deleteCrawledUrl(crawledId) {
+    if (!confirm('Are you sure you want to delete this crawled URL?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/crawled-urls/${crawledId}`, {
+            method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            await refreshCrawledUrls();
+            showAlert('crawlSuccess', result.message);
+        } else {
+            showAlert('crawlError', result.error || 'Failed to delete');
+        }
+    } catch (error) {
+        showAlert('crawlError', 'Error: ' + error.message);
+    }
 }
 ```
 

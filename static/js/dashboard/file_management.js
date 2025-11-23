@@ -7,6 +7,7 @@ async function initializeFileManagement() {
     try {
         await loadCategories();
         await loadFilesByCategory();
+        await refreshCrawledUrls(); // Load crawled URLs
         setupFileUpload();
     } catch (error) {
         console.error('Failed to initialize file management:', error);
@@ -244,18 +245,29 @@ async function handleFileUpload(files) {
 // ====================================
 // API FUNCTIONS
 // ====================================
+let crawledPreviewData = null;
+
+function normalizeUrl(url) {
+    // Normalize URL by adding protocol if missing
+    url = url.trim();
+    
+    // If URL doesn't start with http:// or https://, add https://
+    if (!url.match(/^https?:\/\//i)) {
+        url = 'https://' + url;
+    }
+    
+    return url;
+}
+
 async function crawlUrl() {
     const urlInput = document.getElementById('urlInput');
-    const maxPages = document.getElementById('maxPages');
     const crawlBtn = document.getElementById('crawlBtn');
     const crawlLoading = document.getElementById('crawlLoading');
-    const crawlSuccess = document.getElementById('crawlSuccess');
     const crawlError = document.getElementById('crawlError');
     
     if (!urlInput) return;
     
-    const url = urlInput.value.trim();
-    const maxPagesValue = parseInt(maxPages && maxPages.value ? maxPages.value : '10') || 10;
+    let url = urlInput.value.trim();
     
     if (!url) {
         if (crawlError) {
@@ -265,21 +277,98 @@ async function crawlUrl() {
         return;
     }
     
-    if (crawlSuccess) crawlSuccess.style.display = 'none';
-    if (crawlError) crawlError.style.display = 'none';
+    // Normalize URL (add https:// if missing)
+    url = normalizeUrl(url);
     
+    if (crawlError) crawlError.style.display = 'none';
     if (crawlBtn) crawlBtn.disabled = true;
     if (crawlLoading) crawlLoading.style.display = 'block';
     
     try {
-        const response = await fetch('/api/crawl', {
+        // Get AI cleaning preference
+        const aiCleaningCheckbox = document.getElementById('aiCleaningEnabled');
+        const useAiCleaning = aiCleaningCheckbox ? aiCleaningCheckbox.checked : true;
+        
+        // Call preview endpoint (saves to DB, status='preview')
+        const response = await fetch('/api/crawl-preview', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 url: url,
-                max_pages: maxPagesValue,
-                category: 'company_details',
-                website_id: currentWebsiteId !== 'default' ? currentWebsiteId : undefined
+                category: selectedCategory || 'company_details',
+                use_ai_cleaning: useAiCleaning
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            // Show preview modal
+            crawledPreviewData = result;
+            showCrawlPreview(result);
+            
+            // Clear input
+            urlInput.value = '';
+            
+            // Refresh crawled URLs list
+            await refreshCrawledUrls();
+        } else {
+            throw new Error(result.error || 'Failed to crawl URL');
+        }
+    } catch (error) {
+        if (crawlError) {
+            crawlError.textContent = 'Failed to crawl URL: ' + error.message;
+            crawlError.style.display = 'block';
+        }
+    }
+    
+    if (crawlBtn) crawlBtn.disabled = false;
+    if (crawlLoading) crawlLoading.style.display = 'none';
+}
+
+function showCrawlPreview(data) {
+    const modal = document.getElementById('crawlPreviewModal');
+    const urlSpan = document.getElementById('previewUrl');
+    const wordCountSpan = document.getElementById('previewWordCount');
+    const charCountSpan = document.getElementById('previewCharCount');
+    const textArea = document.getElementById('previewText');
+    
+    if (urlSpan) urlSpan.textContent = data.url || 'N/A';
+    if (wordCountSpan) wordCountSpan.textContent = (data.word_count || 0).toLocaleString();
+    if (charCountSpan) charCountSpan.textContent = (data.char_count || 0).toLocaleString();
+    if (textArea) textArea.value = data.full_text || data.extracted_text || ''; // Full text for editing
+    
+    if (modal) modal.style.display = 'block';
+}
+
+function closeCrawlPreview() {
+    const modal = document.getElementById('crawlPreviewModal');
+    if (modal) modal.style.display = 'none';
+    crawledPreviewData = null;
+}
+
+async function ingestCrawledContent() {
+    const textArea = document.getElementById('previewText');
+    if (!textArea || !crawledPreviewData) return;
+    
+    const editedText = textArea.value.trim();
+    if (!editedText) {
+        alert('Text cannot be empty');
+        return;
+    }
+    
+    const crawledId = crawledPreviewData.id;
+    const crawlSuccess = document.getElementById('crawlSuccess');
+    const crawlError = document.getElementById('crawlError');
+    
+    if (crawlError) crawlError.style.display = 'none';
+    
+    try {
+        const response = await fetch(`/api/crawled-urls/${crawledId}/ingest`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                text: editedText
             })
         });
         
@@ -290,20 +379,129 @@ async function crawlUrl() {
                 crawlSuccess.textContent = result.message;
                 crawlSuccess.style.display = 'block';
             }
-            urlInput.value = '';
-            setTimeout(loadFilesByCategory, 1000);
+            closeCrawlPreview();
+            await refreshCrawledUrls();
+            await refreshFileList(); // Refresh file list too
         } else {
-            throw new Error(result.error);
+            throw new Error(result.error || 'Failed to ingest');
         }
-        
     } catch (error) {
         if (crawlError) {
-            crawlError.textContent = 'Failed to crawl URL: ' + error.message;
+            crawlError.textContent = 'Failed to ingest: ' + error.message;
             crawlError.style.display = 'block';
         }
     }
+}
+
+async function refreshCrawledUrls() {
+    const listDiv = document.getElementById('crawledUrlsList');
+    if (!listDiv) return;
     
-    if (crawlBtn) crawlBtn.disabled = false;
-    if (crawlLoading) crawlLoading.style.display = 'none';
+    try {
+        const response = await fetch('/api/crawled-urls');
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.error || 'Failed to load crawled URLs');
+        }
+        
+        if (data.urls.length === 0) {
+            listDiv.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">No crawled URLs yet</div>';
+            return;
+        }
+        
+        const html = data.urls.map(url => {
+            const statusBadge = url.status === 'ingested' 
+                ? '<span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 8px;">Ingested</span>'
+                : '<span style="background: #ffc107; color: #000; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 8px;">Preview</span>';
+            
+            const crawledDate = url.crawled_at ? new Date(url.crawled_at).toLocaleDateString() : 'N/A';
+            
+            return `
+                <div class="crawled-url-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #333; background: #252525; border-radius: 4px; margin-bottom: 8px;">
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; margin-bottom: 4px; color: white;">${url.url}</div>
+                        <div style="font-size: 12px; color: #999;">
+                            ${statusBadge}
+                            ${url.word_count.toLocaleString()} words • 
+                            ${url.char_count.toLocaleString()} chars • 
+                            ${crawledDate}
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-secondary" onclick="viewCrawledUrl(${url.id})" style="padding: 6px 12px; font-size: 12px;">
+                            <span class="material-icons-round" style="font-size: 16px; vertical-align: middle;">visibility</span> View
+                        </button>
+                        <button class="btn btn-danger" onclick="deleteCrawledUrl(${url.id})" style="padding: 6px 12px; font-size: 12px; background: #dc3545; color: white;">
+                            <span class="material-icons-round" style="font-size: 16px; vertical-align: middle;">delete</span> Delete
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        listDiv.innerHTML = html;
+    } catch (error) {
+        console.error('Failed to load crawled URLs:', error);
+        listDiv.innerHTML = `<div style="text-align: center; color: #dc3545; padding: 20px;">Error: ${error.message}</div>`;
+    }
+}
+
+async function viewCrawledUrl(crawledId) {
+    try {
+        const response = await fetch(`/api/crawled-urls/${crawledId}`);
+        const data = await response.json();
+        
+        if (response.ok) {
+            crawledPreviewData = data;
+            showCrawlPreview(data);
+        } else {
+            alert('Failed to load crawled URL: ' + data.error);
+        }
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+
+async function deleteCrawledUrl(crawledId) {
+    if (!confirm('Are you sure you want to delete this crawled URL?')) {
+        return;
+    }
+    
+    const crawlSuccess = document.getElementById('crawlSuccess');
+    const crawlError = document.getElementById('crawlError');
+    
+    if (crawlError) crawlError.style.display = 'none';
+    
+    try {
+        const response = await fetch(`/api/crawled-urls/${crawledId}`, {
+            method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            await refreshCrawledUrls();
+            if (crawlSuccess) {
+                crawlSuccess.textContent = result.message;
+                crawlSuccess.style.display = 'block';
+            }
+        } else {
+            throw new Error(result.error || 'Failed to delete');
+        }
+    } catch (error) {
+        if (crawlError) {
+            crawlError.textContent = 'Error: ' + error.message;
+            crawlError.style.display = 'block';
+        }
+    }
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('crawlPreviewModal');
+    if (event.target === modal) {
+        closeCrawlPreview();
+    }
 }
 

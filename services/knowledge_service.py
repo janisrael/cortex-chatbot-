@@ -48,15 +48,82 @@ def get_user_vectorstore(user_id):
     try:
         # Create/load vectorstore for this user
         print(f"🔧 Initializing Chroma vectorstore...")
-        user_vectorstore = Chroma(
-            persist_directory=kb_path,
-            embedding_function=embeddings
-        )
-        print(f"✅ Chroma vectorstore object created")
         
-        # Always return the vectorstore - Chroma will create collection on first use
-        # Even if empty, it can still be used for chat (just won't have RAG context)
-        return user_vectorstore
+        # Use collection_name to ensure user isolation
+        collection_name = f"user_{user_id}_collection"
+        
+        # Use PersistentClient for embedded mode (not Client which expects server)
+        import chromadb
+        import shutil
+        
+        client = None
+        
+        # Step 1: Check if database exists and test if it's accessible
+        if os.path.exists(kb_path):
+            try:
+                # Try to create client and test access
+                test_client = chromadb.PersistentClient(path=kb_path)
+                test_client.list_collections()  # Test if database is accessible
+                client = test_client
+                print(f"✅ Existing database is accessible")
+            except Exception as test_error:
+                # Database exists but is corrupted or inaccessible
+                error_str = str(test_error)
+                if "PanicException" in error_str or "panic" in error_str.lower() or "range" in error_str.lower() or "tenant" in error_str.lower():
+                    print(f"⚠️ Database corrupted or inaccessible: {error_str[:150]}")
+                    print(f"🔄 Deleting corrupted database...")
+                    shutil.rmtree(kb_path, ignore_errors=True)
+                    os.makedirs(kb_path, exist_ok=True)
+                    client = None  # Will create fresh below
+                else:
+                    # Unknown error, try to reset anyway
+                    print(f"⚠️ Database error: {error_str[:150]}")
+                    print(f"🔄 Attempting to reset database...")
+                    shutil.rmtree(kb_path, ignore_errors=True)
+                    os.makedirs(kb_path, exist_ok=True)
+                    client = None
+        
+        # Step 2: Create client (fresh database or existing good one)
+        if not client:
+            try:
+                print(f"📦 Creating fresh PersistentClient...")
+                client = chromadb.PersistentClient(path=kb_path)
+                print(f"✅ PersistentClient created successfully")
+            except Exception as client_error:
+                error_str = str(client_error)
+                print(f"⚠️ Failed to create PersistentClient: {error_str[:150]}")
+                # Last resort: delete and try once more
+                if os.path.exists(kb_path):
+                    print(f"🔄 Last attempt: deleting and recreating...")
+                    shutil.rmtree(kb_path, ignore_errors=True)
+                    os.makedirs(kb_path, exist_ok=True)
+                try:
+                    client = chromadb.PersistentClient(path=kb_path)
+                    print(f"✅ PersistentClient created after reset")
+                except Exception as final_error:
+                    print(f"❌ Failed to create PersistentClient even after reset: {final_error}")
+                    import traceback
+                    traceback.print_exc()
+                    return None
+        
+        # Step 3: Create Chroma vectorstore (ALWAYS runs if client exists)
+        if client:
+            try:
+                user_vectorstore = Chroma(
+                    client=client,
+                    collection_name=collection_name,
+                    embedding_function=embeddings
+                )
+                print(f"✅ Chroma vectorstore object created for collection: {collection_name}")
+                return user_vectorstore
+            except Exception as chroma_error:
+                print(f"❌ Error creating Chroma vectorstore: {chroma_error}")
+                import traceback
+                traceback.print_exc()
+                return None
+        else:
+            print(f"❌ No client available to create vectorstore")
+            return None
             
     except Exception as e:
         print(f"❌ Error creating vectorstore for user {user_id}: {e}")
@@ -69,7 +136,7 @@ def remove_file_from_vectorstore(user_id, filename):
     """Remove all chunks related to a specific file from user's vectorstore"""
     try:
         user_vectorstore = get_user_vectorstore(user_id)
-        if not user_vectorstore:
+        if user_vectorstore is None:
             print(f"⚠️ Vectorstore not available for user {user_id}")
             return False
         

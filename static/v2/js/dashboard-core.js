@@ -44,6 +44,10 @@ async function initializeDashboard() {
         loadStats();
         setupFileUpload();
         setupCategoryTabs();
+        // Initialize file management (includes crawl functionality)
+        if (typeof initializeFileManagement === 'function') {
+            await initializeFileManagement();
+        }
         // Update integration snippet when dashboard loads
         if (typeof updateIntegrationSnippet === 'function') {
             await updateIntegrationSnippet();

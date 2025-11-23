@@ -6,6 +6,7 @@ import os
 import sqlite3
 from models import User
 from models.prompt_preset import PromptPreset
+from models.crawled_url import CrawledUrl
 
 
 class MigrationManager:
@@ -110,6 +111,7 @@ class MigrationManager:
             (1, "001_initial_schema", MigrationManager._migration_001_initial_schema),
             (2, "002_add_username_field", MigrationManager._migration_002_add_username_field),
             (3, "003_create_prompt_presets", MigrationManager._migration_003_create_prompt_presets),
+            (4, "004_create_crawled_urls", MigrationManager._migration_004_create_crawled_urls),
         ]
         
         for version, name, migration_func in migrations:
@@ -172,6 +174,13 @@ class MigrationManager:
         """Create prompt_presets table and populate with default presets"""
         # This is handled by PromptPreset.init_presets_db(), so we just ensure it's called
         PromptPreset.init_presets_db()
+    
+    @staticmethod
+    def _migration_004_create_crawled_urls():
+        """Create crawled_urls table for storing crawled website data"""
+        from models.crawled_url import CrawledUrl
+        # This is handled by CrawledUrl.init_db(), so we just ensure it's called
+        CrawledUrl.init_db()
 
 
 def run_migrations():

@@ -27,6 +27,22 @@
                 <div class="spinner"></div>
                 Processing file...
             </div>
+
+            <!-- Uploaded Files (inside the same card) -->
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="margin: 0; font-size: 18px;">
+                        <span class="material-icons-round" style="vertical-align: middle; font-size: 20px;">folder_open</span> 
+                        Uploaded Files
+                    </h3>
+                    <button class="btn btn-secondary" onclick="refreshFileList()" style="padding: 6px 12px; font-size: 12px;">
+                        <span class="material-icons-round" style="vertical-align: middle; font-size: 16px;">refresh</span> Refresh
+                    </button>
+                </div>
+                <div class="file-list" id="fileList">
+                    Loading files...
+                </div>
+            </div>
         </div>
 
         <!-- URL Crawling -->
@@ -54,26 +70,64 @@
             </div>
 
             <div style="margin-top: 20px;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                    <input type="checkbox" id="aiCleaningEnabled" checked style="width: 18px; height: 18px; cursor: pointer;">
+                    <label for="aiCleaningEnabled" style="color: #ccc; cursor: pointer; font-size: 14px;">
+                        <strong>Enable AI Content Cleaning</strong> (removes navigation, footers, SEO metadata)
+                    </label>
+                </div>
                 <p><strong>Tips:</strong></p>
-                <ul style="margin-left: 20px; color: 666; font-size: 14px;">
-                    <li>Enter the full URL including https://</li>
-                    <li>The system will extract text content from web pages</li>
-                    <li>Start with a small number of pages for testing</li>
+                <ul style="margin-left: 20px; color: #666; font-size: 14px;">
+                    <li>Enter URL (https:// will be added automatically if missing)</li>
+                    <li>AI cleaning extracts only essential content (recommended)</li>
+                    <li>Review the extracted text before ingesting to knowledge base</li>
                 </ul>
+            </div>
+
+            <!-- Crawled URLs (inside the same card) -->
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="margin: 0; font-size: 18px;">
+                        <span class="material-icons-round" style="vertical-align: middle; font-size: 20px;">language</span> 
+                        Crawled Websites
+                    </h3>
+                    <button class="btn btn-secondary" onclick="refreshCrawledUrls()" style="padding: 6px 12px; font-size: 12px;">
+                        <span class="material-icons-round" style="vertical-align: middle; font-size: 16px;">refresh</span> Refresh
+                    </button>
+                </div>
+                <div class="crawled-urls-list" id="crawledUrlsList">
+                    Loading crawled URLs...
+                </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Uploaded Files -->
-    <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h2 style="margin: 0;"><span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">folder_open</span> Uploaded Files</h2>
-            <button class="btn btn-secondary" onclick="refreshFileList()" style="padding: 6px 12px; font-size: 12px;">
-                <span class="material-icons-round" style="vertical-align: middle; font-size: 16px;">refresh</span> Refresh
-            </button>
+<!-- Crawl Preview Modal -->
+<div id="crawlPreviewModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); overflow: auto;">
+    <div class="modal-content" style="background-color: #1e1e1e; margin: 5% auto; padding: 20px; border: 1px solid #333; border-radius: 8px; max-width: 900px; max-height: 90vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="margin: 0; color: white;">Crawl Preview</h2>
+            <button onclick="closeCrawlPreview()" style="background: none; border: none; color: white; font-size: 28px; cursor: pointer; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">&times;</button>
         </div>
-        <div class="file-list" id="fileList">
-            Loading files...
+        
+        <div style="margin-bottom: 15px; color: #ccc;">
+            <div style="margin-bottom: 8px;"><strong>URL:</strong> <span id="previewUrl" style="color: #0891b2;"></span></div>
+            <div style="margin-bottom: 8px;"><strong>Word Count:</strong> <span id="previewWordCount"></span></div>
+            <div><strong>Character Count:</strong> <span id="previewCharCount"></span></div>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label style="color: white; display: block; margin-bottom: 8px;"><strong>Extracted Text (You can edit before ingesting):</strong></label>
+            <textarea id="previewText" class="form-control" rows="20" style="font-family: 'Courier New', monospace; font-size: 13px; background: #2a2a2a; color: #e0e0e0; border: 1px solid #444; padding: 12px; border-radius: 4px; width: 100%; resize: vertical;"></textarea>
+            <small style="color: #999; display: block; margin-top: 8px;">Review the extracted text for accuracy. Edit if needed, then click "Ingest to Knowledge Base" to save.</small>
+        </div>
+        
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+            <button class="btn btn-secondary" onclick="closeCrawlPreview()" style="padding: 10px 20px;">Cancel</button>
+            <button class="btn" onclick="ingestCrawledContent()" style="padding: 10px 20px; background: #0891b2; color: white;">
+                <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">save</span> Ingest to Knowledge Base
+            </button>
         </div>
     </div>
 </div>
