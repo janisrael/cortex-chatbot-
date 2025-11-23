@@ -24,6 +24,7 @@ distro==1.9.0
 durationpy==0.10
 filelock==3.18.0
 Flask==3.1.1
+Flask-Login==0.6.3
 flask-cors==6.0.1
 flatbuffers==25.2.10
 frozenlist==1.7.0
@@ -160,3 +161,4 @@ xxhash==3.5.0
 yarl==1.20.1
 zipp==3.23.0
 zstandard==0.23.0
+pypdf
