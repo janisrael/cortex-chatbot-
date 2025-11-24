@@ -44,39 +44,13 @@ os.makedirs('data', exist_ok=True)
 os.makedirs('logs', exist_ok=True)
 
 # 🔐 LLM Configuration
-LLM_OPTION = os.getenv("LLM_OPTION", "ollama")
+# Using unified LLM service (default: OpenAI, fallback: OpenAI)
+from services.llm_service import LLMProvider
 
-if LLM_OPTION == "openai":
-    # OpenAI Option (requires API key and billing)
-    openai_api_key = os.getenv("OPENAI_API_KEY", "")
-    if not openai_api_key:
-        raise ValueError("Please set OPENAI_API_KEY environment variable")
-    
-    from langchain_openai import ChatOpenAI
-    llm = ChatOpenAI(
-        model="gpt-4o-mini",
-        temperature=0.3,
-        openai_api_key=openai_api_key
-    )
-    print(f"🤖 Using OpenAI model: gpt-4o-mini")
-else:
-    # Ollama Option (free, runs locally)
-    try:
-        from langchain_community.llms import Ollama
-        llm = Ollama(
-            model="llama3.1:8b",
-            temperature=0.7,
-            base_url="http://localhost:11434"
-        )
-        print(f"🤖 Using Ollama model: llama3.1:8b")
-    except ImportError:
-        print("❌ Ollama not available. Install with: pip install langchain-community")
-        # Fallback to a mock LLM for testing
-        class MockLLM:
-            def invoke(self, prompt):
-                return "I'm a mock response. Please set up either OpenAI API or Ollama to get real responses."
-        llm = MockLLM()
-        print("🤖 Using Mock LLM (for testing only)")
+# Default system LLM (used for system-level features like AI text cleaning)
+# User-specific LLMs are created dynamically in chatbot_service.py
+llm = LLMProvider.get_default_llm(temperature=0.3, max_tokens=2000)
+print(f"🤖 Using OpenAI model: gpt-4o-mini (unified LLM service)")
 
 # Make llm available globally (needed by chat blueprint)
 app.config['LLM'] = llm

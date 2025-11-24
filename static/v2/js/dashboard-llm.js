@@ -17,13 +17,10 @@ async function loadLLMConfig() {
                 default_model: data.openai_model || 'gpt-4o-mini',
                 temperature: data.openai_temperature || 1.0
             },
-            ollama: {
-                base_url: data.ollama_url || 'http://localhost:11434',
-                default_model: data.ollama_model || 'llama3.1:8b'
-            },
+            // Ollama removed - local LLM support removed
             effective_provider: data.llm_option || 'openai',
             effective_model: data.current_model || 'gpt-4o-mini',
-            website_overrides: {},
+            // Website overrides removed (v2 uses user-based system)
             is_fallback: false  // API call succeeded, not using fallback
         };
         
@@ -40,13 +37,10 @@ async function loadLLMConfig() {
                 default_model: 'gpt-4o-mini',
                 temperature: 1.0
             },
-            ollama: {
-                base_url: 'http://localhost:11434',
-                default_model: 'llama3.1:8b'
-            },
+            // Ollama removed - local LLM support removed
             effective_provider: 'openai',
             effective_model: 'gpt-4o-mini',
-            website_overrides: {},
+            // Website overrides removed (v2 uses user-based system)
             is_fallback: true  // Using fallback values
         };
         populateLLMConfig();
@@ -64,9 +58,6 @@ function populateLLMConfig() {
     if (llmConfig.openai) {
         const openaiKey = document.getElementById('globalOpenaiKey');
         const openaiModel = document.getElementById('globalOpenaiDefaultModel');
-        const ollamaUrl = document.getElementById('globalOllamaUrl');
-        const ollamaModel = document.getElementById('globalOllamaDefaultModel');
-        
         // Populate OpenAI API key (masked)
         if (openaiKey && llmConfig.openai.api_key_masked) {
             openaiKey.value = llmConfig.openai.api_key_masked;
@@ -74,45 +65,16 @@ function populateLLMConfig() {
         }
         
         if (openaiModel) openaiModel.value = llmConfig.openai.default_model || 'gpt-4o-mini';
-        if (ollamaUrl) ollamaUrl.value = llmConfig.ollama?.base_url || 'http://localhost:11434';
-        if (ollamaModel) ollamaModel.value = llmConfig.ollama?.default_model || 'llama3.1:8b';
+        // Ollama fields removed
     }
     
-    // Website-specific overrides
-    const websiteOverride = llmConfig.website_overrides?.[currentWebsiteId];
-    if (websiteOverride) {
-        const websiteProvider = document.getElementById('websiteProvider');
-        const websiteModel = document.getElementById('websiteModel');
-        const websiteTemp = document.getElementById('websiteTemperature');
-        
-        if (websiteProvider) websiteProvider.value = websiteOverride.provider || '';
-        if (websiteModel) websiteModel.value = websiteOverride.model || '';
-        if (websiteTemp) websiteTemp.value = websiteOverride.temperature || '';
-    } else {
-        const websiteProvider = document.getElementById('websiteProvider');
-        const websiteModel = document.getElementById('websiteModel');
-        const websiteTemp = document.getElementById('websiteTemperature');
-        
-        if (websiteProvider) websiteProvider.value = '';
-        if (websiteModel) websiteModel.value = '';
-        if (websiteTemp) websiteTemp.value = '';
-    }
+    // Load advanced chatbot settings
+    loadAdvancedSettings();
     
-    // Update global provider tabs
-    selectGlobalProvider(llmConfig.global_provider || 'openai');
+    // Provider tabs removed - only OpenAI supported
 }
 
-function selectGlobalProvider(provider) {
-    // Update tabs
-    document.querySelectorAll('.provider-tab').forEach(tab => tab.classList.remove('active'));
-    const providerTab = document.getElementById(`global${provider.charAt(0).toUpperCase() + provider.slice(1)}Tab`);
-    if (providerTab) providerTab.classList.add('active');
-    
-    // Show/hide config sections
-    document.querySelectorAll('.provider-config').forEach(config => config.classList.remove('active'));
-    const configSection = document.getElementById(`global${provider.charAt(0).toUpperCase() + provider.slice(1)}Config`);
-    if (configSection) configSection.classList.add('active');
-}
+// selectGlobalProvider function removed - only OpenAI supported now
 
 async function saveGlobalConfig() {
     const saveBtn = document.getElementById('saveGlobalBtn');
@@ -133,10 +95,7 @@ async function saveGlobalConfig() {
                 api_key: document.getElementById('globalOpenaiKey')?.value || undefined,
                 default_model: document.getElementById('globalOpenaiDefaultModel')?.value
             },
-            ollama: {
-                base_url: document.getElementById('globalOllamaUrl')?.value,
-                default_model: document.getElementById('globalOllamaDefaultModel')?.value
-            }
+            // Ollama removed
         };
         
         // Simulate API call - replace with actual API call
@@ -156,41 +115,102 @@ async function saveGlobalConfig() {
     }
 }
 
-async function saveWebsiteConfig() {
-    const saveBtn = document.getElementById('saveWebsiteBtn');
+// Load advanced chatbot settings from user config
+async function loadAdvancedSettings() {
+    try {
+        const response = await fetch('/api/user/chatbot-config');
+        if (!response.ok) throw new Error('Failed to load config');
+        
+        const data = await response.json();
+        const config = data.config || data; // Handle both formats
+        
+        // Populate advanced settings fields
+        const tempField = document.getElementById('chatbotTemperature');
+        const maxTokensField = document.getElementById('chatbotMaxTokens');
+        const topPField = document.getElementById('chatbotTopP');
+        const responseStyleField = document.getElementById('chatbotResponseStyle');
+        const freqPenaltyField = document.getElementById('chatbotFrequencyPenalty');
+        const presPenaltyField = document.getElementById('chatbotPresencePenalty');
+        const systemInstructionsField = document.getElementById('chatbotSystemInstructions');
+        
+        if (tempField) tempField.value = config.temperature ?? 0.3;
+        if (maxTokensField) maxTokensField.value = config.max_tokens ?? 2000;
+        if (topPField) topPField.value = config.top_p ?? 1.0;
+        if (responseStyleField) responseStyleField.value = config.response_style ?? 'balanced';
+        if (freqPenaltyField) freqPenaltyField.value = config.frequency_penalty ?? 0.0;
+        if (presPenaltyField) presPenaltyField.value = config.presence_penalty ?? 0.0;
+        if (systemInstructionsField) systemInstructionsField.value = config.system_instructions ?? '';
+    } catch (error) {
+        console.error('Failed to load advanced settings:', error);
+        // Use defaults if load fails
+    }
+}
+
+// Save advanced chatbot settings
+async function saveAdvancedSettings() {
+    const saveBtn = document.getElementById('saveAdvancedBtn');
     if (!saveBtn) return;
     
     const originalText = saveBtn.textContent;
     
     saveBtn.disabled = true;
-    saveBtn.textContent = '💾 Saving...';
+    saveBtn.innerHTML = '<span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">save</span> Saving...';
     hideAlert('llmSuccess');
     hideAlert('llmError');
     
     try {
         const configData = {
-            config_type: 'website',
-            website_id: currentWebsiteId,
-            provider: document.getElementById('websiteProvider')?.value || null,
-            model: document.getElementById('websiteModel')?.value || null,
-            temperature: document.getElementById('websiteTemperature')?.value || null
+            temperature: parseFloat(document.getElementById('chatbotTemperature')?.value) || 0.3,
+            max_tokens: parseInt(document.getElementById('chatbotMaxTokens')?.value) || 2000,
+            top_p: parseFloat(document.getElementById('chatbotTopP')?.value) || 1.0,
+            frequency_penalty: parseFloat(document.getElementById('chatbotFrequencyPenalty')?.value) || 0.0,
+            presence_penalty: parseFloat(document.getElementById('chatbotPresencePenalty')?.value) || 0.0,
+            response_style: document.getElementById('chatbotResponseStyle')?.value || 'balanced',
+            system_instructions: document.getElementById('chatbotSystemInstructions')?.value || ''
         };
         
-        // Simulate API call - replace with actual API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        const response = await fetch('/api/user/chatbot-config', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(configData)
+        });
         
-        showAlert('llmSuccess', `Configuration saved for ${websites[currentWebsiteId]?.name || currentWebsiteId}!`);
-        await loadLLMConfig();
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to save settings');
+        }
+        
+        showAlert('llmSuccess', 'Advanced chatbot settings saved successfully!');
+        await loadAdvancedSettings();
         
     } catch (error) {
-        console.error('Failed to save website config:', error);
-        showAlert('llmError', 'Failed to save configuration: ' + error.message);
+        console.error('Failed to save advanced settings:', error);
+        showAlert('llmError', 'Failed to save settings: ' + error.message);
     } finally {
         if (saveBtn) {
             saveBtn.disabled = false;
-            saveBtn.textContent = originalText;
+            saveBtn.innerHTML = '<span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">save</span> Save Advanced Settings';
         }
     }
+}
+
+// Reset advanced settings to defaults
+function resetAdvancedSettings() {
+    if (!confirm('Reset all advanced settings to defaults? This will discard your current settings.')) {
+        return;
+    }
+    
+    document.getElementById('chatbotTemperature').value = 0.3;
+    document.getElementById('chatbotMaxTokens').value = 2000;
+    document.getElementById('chatbotTopP').value = 1.0;
+    document.getElementById('chatbotResponseStyle').value = 'balanced';
+    document.getElementById('chatbotFrequencyPenalty').value = 0.0;
+    document.getElementById('chatbotPresencePenalty').value = 0.0;
+    document.getElementById('chatbotSystemInstructions').value = '';
+    
+    showAlert('llmSuccess', 'Settings reset to defaults. Click "Save Advanced Settings" to apply.');
 }
 
 function updateLLMStatus() {
@@ -236,7 +256,7 @@ function updateLLMStatus() {
                 systemLLMStatus.className = 'status-indicator';
                 systemLLMStatus.style.backgroundColor = '#5d5d5d'; // Dark gray background
             }
-        } else if (hasApiKey || provider === 'ollama') {
+        } else if (hasApiKey) {
             // Active configuration
             systemLLMText.textContent = `${provider.toUpperCase()}: ${model}`;
             systemLLMDot.className = 'status-dot active';
@@ -324,3 +344,4 @@ async function testLLMConnection() {
 function testLLM() {
     testLLMConnection();
 }
+

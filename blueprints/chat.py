@@ -39,8 +39,8 @@ def chat():
         if not user_input:
             return jsonify({"error": "No message provided"}), 400
 
-        # Get chatbot response
-        reply, error = get_chatbot_response(user_id, user_input, llm, name)
+        # Get chatbot response (system_llm is fallback, user-specific LLM is created in service)
+        reply, error = get_chatbot_response(user_id, user_input, system_llm=llm, name=name)
         
         if error:
             return jsonify({"error": error}), 500

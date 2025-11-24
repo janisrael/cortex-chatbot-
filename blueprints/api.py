@@ -162,6 +162,17 @@ def get_user_chatbot_config():
         user_id = current_user.id
         config = load_user_chatbot_config(user_id)
         
+        # Load appearance config from database
+        from models.chatbot_appearance import ChatbotAppearance
+        appearance = ChatbotAppearance.get_by_user(user_id)
+        if appearance:
+            appearance_dict = ChatbotAppearance.to_dict(appearance)
+            if appearance_dict:
+                config['short_info'] = appearance_dict.get('short_info')
+                config['primary_color'] = appearance_dict.get('primary_color')
+                config['avatar'] = appearance_dict.get('avatar')
+                config['suggested_messages'] = appearance_dict.get('suggested_messages')
+        
         # Generate API key if it doesn't exist
         if not config.get('api_key'):
             api_key = get_user_api_key(user_id)
@@ -172,7 +183,7 @@ def get_user_chatbot_config():
             bot_name = config.get('bot_name', 'Cortex')
             config['prompt'] = get_default_prompt_with_name(bot_name)
         
-        return jsonify(config)
+        return jsonify({"config": config})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -196,8 +207,56 @@ def save_user_chatbot_config_endpoint():
         if 'prompt_preset_id' in data:
             config['prompt_preset_id'] = data['prompt_preset_id']
         
-        # Save config
+        # Advanced chatbot settings
+        if 'temperature' in data:
+            config['temperature'] = float(data['temperature'])
+        if 'max_tokens' in data:
+            config['max_tokens'] = int(data['max_tokens'])
+        if 'top_p' in data:
+            config['top_p'] = float(data['top_p'])
+        if 'frequency_penalty' in data:
+            config['frequency_penalty'] = float(data['frequency_penalty'])
+        if 'presence_penalty' in data:
+            config['presence_penalty'] = float(data['presence_penalty'])
+        if 'response_style' in data:
+            config['response_style'] = data['response_style']
+        if 'system_instructions' in data:
+            config['system_instructions'] = data['system_instructions']
+        
+        # LLM Provider settings
+        if 'llm_provider' in data:
+            config['llm_provider'] = data['llm_provider']
+        if 'llm_model' in data:
+            config['llm_model'] = data['llm_model']
+        if 'llm_api_key' in data:
+            # Only save if provided (not masked)
+            if data['llm_api_key']:
+                config['llm_api_key'] = data['llm_api_key']
+            # If None or empty, remove it (use system default)
+            elif 'llm_api_key' in config:
+                config['llm_api_key'] = None
+        
+        # Save basic config to file
         success = save_user_chatbot_config_file(user_id, config)
+        
+        # Save appearance config to database
+        from models.chatbot_appearance import ChatbotAppearance
+        short_info = data.get('short_info') or data.get('description')
+        primary_color = data.get('primary_color')
+        avatar = data.get('avatar')
+        suggested_messages = data.get('suggested_messages')
+        
+        if short_info is not None or primary_color is not None or avatar is not None or suggested_messages is not None:
+            appearance_success = ChatbotAppearance.create_or_update(
+                user_id=user_id,
+                short_info=short_info,
+                primary_color=primary_color,
+                avatar_type=avatar.get('type') if avatar else None,
+                avatar_value=avatar.get('value') if avatar else None,
+                suggested_messages=suggested_messages
+            )
+            if not appearance_success:
+                print(f"⚠️ Warning: Failed to save appearance config to database for user {user_id}")
         
         if success:
             return jsonify({
@@ -340,23 +399,16 @@ def get_llm_config():
         # Get model and temperature from env or defaults
         openai_model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
         openai_temperature = float(os.getenv("OPENAI_TEMPERATURE", "0.3"))
-        ollama_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-        ollama_model = os.getenv("OLLAMA_MODEL", "llama3.1:8b")
         
-        # Determine current model
-        if llm_option == "openai":
-            current_model = openai_model
-        else:
-            current_model = ollama_model
+        # Only OpenAI supported now (Ollama removed)
+        current_model = openai_model
         
         return jsonify({
-            "llm_option": llm_option,
+            "llm_option": "openai",  # Always OpenAI now
             "has_openai_key": has_openai_key,
             "openai_key_masked": openai_key_masked,
             "openai_model": openai_model,
             "openai_temperature": openai_temperature,
-            "ollama_url": ollama_url,
-            "ollama_model": ollama_model,
             "current_model": current_model
         })
     except Exception as e:

@@ -118,7 +118,18 @@ async function loadPrompt() {
             throw new Error('Failed to load config');
         }
         
-        const config = await response.json();
+        const data = await response.json();
+        const config = data.config || data; // Handle both {config: {...}} and direct config
+        
+        console.log('📥 Loaded prompt config from API:', {
+            raw_response: data,
+            config_object: config,
+            prompt_preset_id: config.prompt_preset_id,
+            prompt_preset_id_type: typeof config.prompt_preset_id,
+            has_prompt: !!config.prompt,
+            bot_name: config.bot_name,
+            all_config_keys: Object.keys(config)
+        });
         
         // Load chatbot name
         const nameInput = document.getElementById('chatbotName');
@@ -129,8 +140,24 @@ async function loadPrompt() {
         // Load presets first (needed to select default)
         await loadPresets();
         
+        // Wait a bit for DOM to update after presets are loaded
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
         // Get user's saved preset_id or default to Virtual Assistant
+        // Handle both string and number IDs
         let presetIdToSelect = config.prompt_preset_id;
+        if (presetIdToSelect !== null && presetIdToSelect !== undefined) {
+            // Convert to string for comparison (preset IDs are stored as strings in HTML)
+            presetIdToSelect = String(presetIdToSelect);
+        }
+        
+        console.log('📝 Loading prompt config:', { 
+            saved_preset_id: config.prompt_preset_id,
+            saved_preset_id_type: typeof config.prompt_preset_id,
+            presetIdToSelect: presetIdToSelect,
+            has_prompt: !!config.prompt,
+            available_presets: Object.keys(globalPresets)
+        });
         
         // If no preset_id saved, find Virtual Assistant preset (default for new users)
         if (!presetIdToSelect) {
@@ -139,25 +166,55 @@ async function loadPrompt() {
             );
             if (vaPreset) {
                 presetIdToSelect = vaPreset.id;
+                console.log('✅ Defaulting to Virtual Assistant preset:', presetIdToSelect);
             } else {
                 // Fallback: use first preset
                 const firstPreset = Object.values(globalPresets)[0];
                 if (firstPreset) {
                     presetIdToSelect = firstPreset.id;
+                    console.log('✅ Using first available preset:', presetIdToSelect);
                 }
             }
         }
         
         // Select the preset radio button (user's saved preset, or Virtual Assistant if new)
         if (presetIdToSelect) {
-            const radio = document.getElementById(`preset-${presetIdToSelect}`);
-            if (radio) {
-                radio.checked = true;
-                const card = radio.closest('.preset-card');
-                if (card) {
-                    card.classList.add('active');
+            // Try multiple times in case DOM isn't ready yet
+            let attempts = 0;
+            const maxAttempts = 10;
+            const selectPreset = () => {
+                // Try both string and number ID formats
+                let radio = document.getElementById(`preset-${presetIdToSelect}`);
+                if (!radio) {
+                    // Try with numeric ID
+                    const numericId = parseInt(presetIdToSelect);
+                    if (!isNaN(numericId)) {
+                        radio = document.getElementById(`preset-${numericId}`);
+                    }
                 }
-                currentPresetId = presetIdToSelect;
+                
+                if (radio) {
+                    radio.checked = true;
+                    const card = radio.closest('.preset-card');
+                    if (card) {
+                        card.classList.add('active');
+                    }
+                    currentPresetId = presetIdToSelect;
+                    console.log('✅ Preset selected:', presetIdToSelect);
+                    return true;
+                }
+                console.log(`⏳ Attempt ${attempts + 1}: Radio button not found for preset ${presetIdToSelect}`);
+                return false;
+            };
+            
+            while (!selectPreset() && attempts < maxAttempts) {
+                attempts++;
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
+            if (attempts >= maxAttempts) {
+                console.error('❌ Failed to select preset after', maxAttempts, 'attempts');
+                console.error('Available preset IDs in DOM:', Array.from(document.querySelectorAll('.preset-radio')).map(r => r.id));
             }
         }
         
@@ -168,12 +225,26 @@ async function loadPrompt() {
                 // User has a saved prompt (their modified version)
                 editor.value = config.prompt;
                 savedPrompt = config.prompt; // Store for reset functionality
-            } else if (presetIdToSelect && globalPresets[presetIdToSelect]) {
-                // No saved prompt, load the preset template
-                editor.value = globalPresets[presetIdToSelect].prompt;
-                savedPrompt = null; // No saved version yet
+                console.log('✅ Loaded saved prompt from config');
+            } else if (presetIdToSelect) {
+                // Try to find preset by string or number ID
+                const preset = globalPresets[presetIdToSelect] || 
+                              globalPresets[String(presetIdToSelect)] || 
+                              Object.values(globalPresets).find(p => p.id == presetIdToSelect);
+                
+                if (preset) {
+                    // No saved prompt, load the preset template
+                    editor.value = preset.prompt;
+                    savedPrompt = null; // No saved version yet
+                    console.log('✅ Loaded preset template:', preset.name);
+                } else {
+                    console.warn('⚠️ Preset not found, using default prompt');
+                    editor.value = getDefaultPrompt(config.bot_name || 'Cortex');
+                    savedPrompt = null;
+                }
             } else {
                 // Fallback to default prompt
+                console.log('ℹ️ No preset selected, using default prompt');
                 editor.value = getDefaultPrompt(config.bot_name || 'Cortex');
                 savedPrompt = null;
             }
@@ -240,16 +311,25 @@ async function savePrompt() {
     
     try {
         // Save both prompt and the preset_id it came from (user-specific)
+        const saveData = {
+            bot_name: botName,
+            prompt: prompt,
+            prompt_preset_id: currentPresetId || null  // Save which preset user is using
+        };
+        
+        console.log('💾 Saving prompt config:', {
+            bot_name: botName,
+            has_prompt: !!prompt,
+            prompt_preset_id: currentPresetId,
+            prompt_preset_id_type: typeof currentPresetId
+        });
+        
         const response = await fetch('/api/user/chatbot-config', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                bot_name: botName,
-                prompt: prompt,
-                prompt_preset_id: currentPresetId || null  // Save which preset user is using
-            })
+            body: JSON.stringify(saveData)
         });
         
         if (!response.ok) {

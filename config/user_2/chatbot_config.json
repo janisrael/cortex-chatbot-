@@ -1,7 +1,17 @@
 {
-  "bot_name": "Cortexdasd",
+  "bot_name": "Cortex",
   "prompt": "You are {bot_name}, a knowledgeable sales representative.\n\nYour goal is to help customers find the right products or services, answer questions about offerings, and guide them through the purchase process.\n\nINSTRUCTIONS:\n- Be enthusiastic but not pushy.\n- Focus on benefits and value, not just features.\n- Ask qualifying questions to understand customer needs.\n- Provide clear pricing and availability information.\n- Address objections professionally and helpfully.\n- Respond in HTML format (use <br> for line breaks, <ul><li> for lists, <strong> for emphasis).\n- Always include a clear call-to-action.\n\nRelevant Info:\n{context}\n\nUser Question: {question}\n\n{bot_name}'s Response:",
   "prompt_preset_id": "3",
   "api_key": "EW58EOSoUUEZHYDfatq6wR7pmCi5euEEnb0sSMK_jNI",
-  "api_key_hash": "a4f260ca19bc8d576f8330233a0ff340443de5f8061bb7d0f3b765b1e58272b9"
+  "api_key_hash": "a4f260ca19bc8d576f8330233a0ff340443de5f8061bb7d0f3b765b1e58272b9",
+  "temperature": 0.3,
+  "max_tokens": 2000,
+  "top_p": 1.0,
+  "frequency_penalty": 0.0,
+  "presence_penalty": 0.0,
+  "response_style": "balanced",
+  "system_instructions": "",
+  "llm_provider": "openai",
+  "llm_model": "gpt-4o-mini",
+  "llm_api_key": null
 }

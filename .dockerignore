@@ -1,0 +1,66 @@
+# Git
+.git
+.gitignore
+.github
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+myenv/
+env/
+ENV/
+
+# Development
+.env
+.env.*
+*.log
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Documentation
+*.md
+docs/
+*.txt
+!requirements*.txt
+
+# Archives and backups
+archive/
+backups/
+*.tar.gz
+*.zip
+
+# User data (should be on S3)
+chroma_db/
+uploads/
+config/user_*/
+
+# Large files
+*.pdf
+*.mp4
+*.avi
+*.mov
+
+# OS
+.DS_Store
+Thumbs.db
+
+# CI/CD
+.github/workflows/
+

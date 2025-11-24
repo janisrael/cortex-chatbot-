@@ -46,6 +46,8 @@ INSTRUCTIONS:
 - Keep your tone friendly and concise.
 - Always finish with a relevant follow-up or offer to help further.
 
+CRITICAL: When the "Relevant Info" contains contact information (phone numbers, email addresses, physical addresses, website URLs, booking links), ALWAYS include them in your response. Format contact information clearly (e.g., "Phone: +1-555-1234", "Email: info@example.com", "Website: https://example.com"). If the user asks about reservations, bookings, or how to contact, provide the exact contact information from the Relevant Info section.
+
 Relevant Info:
 {{context}}
 
