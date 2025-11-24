@@ -9,7 +9,6 @@ on:
   workflow_dispatch:
 
 env:
-  AWS_REGION: us-east-1
   PYTHON_VERSION: '3.11'
 
 jobs:
@@ -49,8 +48,8 @@ jobs:
           python -c "from blueprints import register_blueprints; print('✅ Blueprints import successfully')"
           python -c "from services import chatbot_service; print('✅ Services import successfully')"
 
-  build-and-deploy:
-    name: Build and Deploy
+  deploy-production:
+    name: Deploy to Production
     needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/v2'
@@ -59,52 +58,141 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.AWS_SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.AWS_EC2_HOST }} >> ~/.ssh/known_hosts
       
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-      
-      - name: Build, tag, and push image to Amazon ECR
+      - name: Create deployment script
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: chatbot
-          IMAGE_TAG: ${{ github.sha }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          cat > deploy.sh << 'DEPLOYSCRIPT'
+          #!/bin/bash
+          set -e
+          
+          DEPLOY_PATH="$1"
+          REPO_URL="$2"
+          GITHUB_TOKEN="$3"
+          APP_NAME="$4"
+          APP_PORT="$5"
+          
+          echo "=== Starting Deployment ==="
+          
+          echo "=== Pulling latest code ==="
+          if [ -d "$DEPLOY_PATH/.git" ]; then
+            echo "Git repository found, pulling latest changes..."
+            cd "$DEPLOY_PATH"
+            
+            # Configure git credential helper for token authentication
+            if [ -n "$GITHUB_TOKEN" ]; then
+              git config --local credential.helper store
+              echo "https://${GITHUB_TOKEN}@github.com" > ~/.git-credentials
+              git remote set-url origin "$REPO_URL"
+            fi
+            
+            # Try to fetch
+            if git fetch origin 2>/dev/null; then
+              echo "Fetch successful, resetting to origin/main..."
+              git reset --hard origin/main
+              git clean -fd
+            else
+              echo "Fetch failed, using rsync method..."
+              cd /tmp
+              TEMP_DIR=$(mktemp -d)
+              cd "$TEMP_DIR"
+              
+              if [ -n "$GITHUB_TOKEN" ]; then
+                git clone "https://${GITHUB_TOKEN}@github.com/$(echo $REPO_URL | sed 's|https://github.com/||; s|\.git$||')" temp-repo
+              else
+                git clone "$REPO_URL" temp-repo
+              fi
+              
+              cd temp-repo
+              git checkout main
+              rsync -av --exclude='.git' --exclude='venv*' --exclude='__pycache__' --exclude='*.pyc' --exclude='instance' --exclude='.env' --exclude='chroma_db' --exclude='uploads' --exclude='*.db' --exclude='*.sqlite*' ./ "$DEPLOY_PATH/"
+              rm -rf "$TEMP_DIR"
+              cd "$DEPLOY_PATH"
+            fi
+          else
+            echo "Not a git repository, cloning..."
+            cd /tmp
+            TEMP_DIR=$(mktemp -d)
+            cd "$TEMP_DIR"
+            
+            if [ -n "$GITHUB_TOKEN" ]; then
+              git clone "https://${GITHUB_TOKEN}@github.com/$(echo $REPO_URL | sed 's|https://github.com/||; s|\.git$||')" temp-repo
+            else
+              git clone "$REPO_URL" temp-repo
+            fi
+            
+            cd temp-repo
+            git checkout main
+            rsync -av --exclude='.git' --exclude='venv*' --exclude='__pycache__' --exclude='*.pyc' --exclude='instance' --exclude='.env' --exclude='chroma_db' --exclude='uploads' --exclude='*.db' --exclude='*.sqlite*' ./ "$DEPLOY_PATH/"
+            rm -rf "$TEMP_DIR"
+            cd "$DEPLOY_PATH"
+          fi
+          
+          echo "=== Activating virtual environment ==="
+          if [ ! -d "venv-prod" ]; then
+            python3 -m venv venv-prod
+          fi
+          source venv-prod/bin/activate
+          
+          echo "=== Installing/updating dependencies ==="
+          pip install --upgrade pip
+          pip install -r requirements-prod.txt
+          
+          echo "=== Creating necessary directories ==="
+          mkdir -p uploads chroma_db config logs data
+          
+          echo "=== Restarting application ==="
+          if screen -list | grep -q "$APP_NAME"; then
+            screen -S "$APP_NAME" -X quit || true
+            sleep 2
+          fi
+          
+          screen -dmS "$APP_NAME" bash -c "cd '$DEPLOY_PATH' && source venv-prod/bin/activate && python app.py"
+          
+          echo "=== Waiting for services to start ==="
+          sleep 5
+          
+          echo "=== Checking application status ==="
+          screen -list
+          
+          echo "=== Testing health endpoint ==="
+          sleep 3
+          curl -f http://localhost:$APP_PORT/health || echo "Health check failed, but app may still be starting"
+          
+          echo "=== Deployment completed ==="
+          DEPLOYSCRIPT
+          chmod +x deploy.sh
       
-      - name: Deploy to ECS
+      - name: Deploy to AWS EC2
         env:
-          ECS_CLUSTER: chatbot-cluster
-          ECS_SERVICE: chatbot-service
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: chatbot
-          IMAGE_TAG: ${{ github.sha }}
+          REPO_URL: https://github.com/${{ github.repository }}.git
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APP_NAME: chatbot-app
+          APP_PORT: ${{ secrets.AWS_APP_PORT || '6001' }}
         run: |
-          aws ecs update-service \
-            --cluster $ECS_CLUSTER \
-            --service $ECS_SERVICE \
-            --force-new-deployment \
-            --region ${{ env.AWS_REGION }}
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no deploy.sh ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }}:/tmp/deploy.sh
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }} "bash /tmp/deploy.sh ${{ secrets.AWS_DEPLOY_PATH }} '$REPO_URL' '$GITHUB_TOKEN' '$APP_NAME' '$APP_PORT'"
       
-      - name: Wait for deployment
+      - name: Verify deployment
         run: |
-          echo "⏳ Waiting for service to stabilize..."
-          sleep 30
+          sleep 10
+          curl -f ${{ secrets.AWS_APP_URL || 'https://chatbot.janisrael.com' }}/health || echo "Health check failed, but deployment may still be in progress"
       
-      - name: Verify deployment health
+      - name: Notify deployment status
+        if: always()
         run: |
-          echo "✅ Production deployment completed"
-          echo "Image: ${{ steps.login-ecr.outputs.registry }}/chatbot:${{ github.sha }}"
-          echo "Service: ${{ env.ECS_CLUSTER }}/${{ env.ECS_SERVICE }}"
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Production deployment successful!"
+          else
+            echo "❌ Production deployment failed!"
+          fi
 
   deploy-staging:
     name: Deploy to Staging
@@ -116,41 +204,137 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-      
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-      
-      - name: Build, tag, and push image to Amazon ECR (Staging)
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: chatbot-staging
-          IMAGE_TAG: staging-${{ github.sha }}
+      - name: Configure SSH
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          mkdir -p ~/.ssh
+          echo "${{ secrets.AWS_SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.AWS_EC2_HOST }} >> ~/.ssh/known_hosts
       
-      - name: Deploy to ECS Staging
+      - name: Create deployment script
         env:
-          ECS_CLUSTER: chatbot-cluster-staging
-          ECS_SERVICE: chatbot-service-staging
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          aws ecs update-service \
-            --cluster $ECS_CLUSTER \
-            --service $ECS_SERVICE \
-            --force-new-deployment \
-            --region ${{ env.AWS_REGION }} || echo "⚠️ Staging deployment skipped (cluster/service may not exist)"
+          cat > deploy.sh << 'DEPLOYSCRIPT'
+          #!/bin/bash
+          set -e
+          
+          DEPLOY_PATH="$1"
+          REPO_URL="$2"
+          GITHUB_TOKEN="$3"
+          APP_NAME="$4"
+          APP_PORT="$5"
+          
+          echo "=== Starting Staging Deployment ==="
+          
+          echo "=== Pulling latest code ==="
+          if [ -d "$DEPLOY_PATH/.git" ]; then
+            echo "Git repository found, pulling latest changes..."
+            cd "$DEPLOY_PATH"
+            
+            if [ -n "$GITHUB_TOKEN" ]; then
+              git config --local credential.helper store
+              echo "https://${GITHUB_TOKEN}@github.com" > ~/.git-credentials
+              git remote set-url origin "$REPO_URL"
+            fi
+            
+            if git fetch origin 2>/dev/null; then
+              echo "Fetch successful, resetting to origin/v2-appearance..."
+              git reset --hard origin/v2-appearance
+              git clean -fd
+            else
+              echo "Fetch failed, using rsync method..."
+              cd /tmp
+              TEMP_DIR=$(mktemp -d)
+              cd "$TEMP_DIR"
+              
+              if [ -n "$GITHUB_TOKEN" ]; then
+                git clone "https://${GITHUB_TOKEN}@github.com/$(echo $REPO_URL | sed 's|https://github.com/||; s|\.git$||')" temp-repo
+              else
+                git clone "$REPO_URL" temp-repo
+              fi
+              
+              cd temp-repo
+              git checkout v2-appearance
+              rsync -av --exclude='.git' --exclude='venv*' --exclude='__pycache__' --exclude='*.pyc' --exclude='instance' --exclude='.env' --exclude='chroma_db' --exclude='uploads' --exclude='*.db' --exclude='*.sqlite*' ./ "$DEPLOY_PATH/"
+              rm -rf "$TEMP_DIR"
+              cd "$DEPLOY_PATH"
+            fi
+          else
+            echo "Not a git repository, cloning..."
+            cd /tmp
+            TEMP_DIR=$(mktemp -d)
+            cd "$TEMP_DIR"
+            
+            if [ -n "$GITHUB_TOKEN" ]; then
+              git clone "https://${GITHUB_TOKEN}@github.com/$(echo $REPO_URL | sed 's|https://github.com/||; s|\.git$||')" temp-repo
+            else
+              git clone "$REPO_URL" temp-repo
+            fi
+            
+            cd temp-repo
+            git checkout v2-appearance
+            rsync -av --exclude='.git' --exclude='venv*' --exclude='__pycache__' --exclude='*.pyc' --exclude='instance' --exclude='.env' --exclude='chroma_db' --exclude='uploads' --exclude='*.db' --exclude='*.sqlite*' ./ "$DEPLOY_PATH/"
+            rm -rf "$TEMP_DIR"
+            cd "$DEPLOY_PATH"
+          fi
+          
+          echo "=== Activating virtual environment ==="
+          if [ ! -d "venv-prod" ]; then
+            python3 -m venv venv-prod
+          fi
+          source venv-prod/bin/activate
+          
+          echo "=== Installing/updating dependencies ==="
+          pip install --upgrade pip
+          pip install -r requirements-prod.txt
+          
+          echo "=== Creating necessary directories ==="
+          mkdir -p uploads chroma_db config logs data
+          
+          echo "=== Restarting application ==="
+          if screen -list | grep -q "$APP_NAME"; then
+            screen -S "$APP_NAME" -X quit || true
+            sleep 2
+          fi
+          
+          screen -dmS "$APP_NAME" bash -c "cd '$DEPLOY_PATH' && source venv-prod/bin/activate && python app.py"
+          
+          echo "=== Waiting for services to start ==="
+          sleep 5
+          
+          echo "=== Checking application status ==="
+          screen -list
+          
+          echo "=== Testing health endpoint ==="
+          sleep 3
+          curl -f http://localhost:$APP_PORT/health || echo "Health check failed, but app may still be starting"
+          
+          echo "=== Staging deployment completed ==="
+          DEPLOYSCRIPT
+          chmod +x deploy.sh
+      
+      - name: Deploy to AWS EC2 (Staging)
+        env:
+          REPO_URL: https://github.com/${{ github.repository }}.git
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APP_NAME: chatbot-app-staging
+          APP_PORT: ${{ secrets.AWS_APP_PORT_STAGING || '6002' }}
+        run: |
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no deploy.sh ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }}:/tmp/deploy.sh
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }} "bash /tmp/deploy.sh ${{ secrets.AWS_DEPLOY_PATH_STAGING || secrets.AWS_DEPLOY_PATH }}/staging '$REPO_URL' '$GITHUB_TOKEN' '$APP_NAME' '$APP_PORT'"
       
       - name: Verify deployment
         run: |
+          sleep 10
           echo "✅ Staging deployment completed"
-          echo "Image: ${{ steps.login-ecr.outputs.registry }}/chatbot-staging:staging-${{ github.sha }}"
+      
+      - name: Notify deployment status
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Staging deployment successful!"
+          else
+            echo "❌ Staging deployment failed!"
+          fi
 
