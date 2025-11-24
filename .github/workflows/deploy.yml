@@ -232,17 +232,29 @@ jobs:
           fi
           source venv-prod/bin/activate
           
+          echo "=== Cleaning up disk space ==="
+          # Clean pip cache
+          pip cache purge || true
+          # Remove old venv if exists (might have heavy packages)
+          if [ -d "venv" ]; then
+            echo "Removing old venv directory..."
+            rm -rf venv
+          fi
+          # Clean system package cache
+          sudo apt-get clean || true
+          # Check disk space
+          df -h / || true
+          
           echo "=== Installing/updating dependencies ==="
           pip install --upgrade pip
-          # Clean pip cache to save space
-          pip cache purge || true
           # Use requirements-prod.txt (optimized, no heavy dependencies)
           if [ -f "requirements-prod.txt" ]; then
-            echo "Installing from requirements-prod.txt (optimized)"
+            echo "Installing from requirements-prod.txt (optimized - no torch, no CUDA)"
+            # Install without cache to save disk space
             pip install --no-cache-dir -r requirements-prod.txt
           else
-            echo "WARNING: requirements-prod.txt not found, using requirements.txt"
-            pip install --no-cache-dir -r requirements.txt
+            echo "ERROR: requirements-prod.txt not found!"
+            exit 1
           fi
           
           echo "=== Cleaning up old dependencies ==="
