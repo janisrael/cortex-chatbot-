@@ -174,8 +174,8 @@ jobs:
         env:
           REPO_URL: https://github.com/${{ github.repository }}.git
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          APP_NAME: chatbot-app
-          APP_PORT: ${{ secrets.AWS_APP_PORT || '6001' }}
+          APP_NAME: cortex-app
+          APP_PORT: ${{ secrets.AWS_APP_PORT || '6002' }}
         run: |
           scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no deploy.sh ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }}:/tmp/deploy.sh
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }} "bash /tmp/deploy.sh ${{ secrets.AWS_DEPLOY_PATH }} '$REPO_URL' '$GITHUB_TOKEN' '$APP_NAME' '$APP_PORT'"
@@ -183,7 +183,7 @@ jobs:
       - name: Verify deployment
         run: |
           sleep 10
-          curl -f ${{ secrets.AWS_APP_URL || 'https://chatbot.janisrael.com' }}/health || echo "Health check failed, but deployment may still be in progress"
+          curl -f ${{ secrets.AWS_APP_URL || 'https://cortex.janisrael.com' }}/health || echo "Health check failed, but deployment may still be in progress"
       
       - name: Notify deployment status
         if: always()
@@ -318,8 +318,8 @@ jobs:
         env:
           REPO_URL: https://github.com/${{ github.repository }}.git
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          APP_NAME: chatbot-app-staging
-          APP_PORT: ${{ secrets.AWS_APP_PORT_STAGING || '6002' }}
+          APP_NAME: cortex-app-staging
+          APP_PORT: ${{ secrets.AWS_APP_PORT_STAGING || '6003' }}
         run: |
           scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no deploy.sh ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }}:/tmp/deploy.sh
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }} "bash /tmp/deploy.sh ${{ secrets.AWS_DEPLOY_PATH_STAGING || secrets.AWS_DEPLOY_PATH }}/staging '$REPO_URL' '$GITHUB_TOKEN' '$APP_NAME' '$APP_PORT'"
