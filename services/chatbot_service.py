@@ -22,6 +22,12 @@ def get_chatbot_response(user_id, message, system_llm=None, name="User"):
     bot_name = user_config.get('bot_name', 'Cortex')
     user_prompt_template = user_config.get('prompt')
     
+    # Log prompt status for debugging
+    print(f"📝 User {user_id} prompt status:")
+    print(f"   - Has prompt: {user_prompt_template is not None}")
+    print(f"   - Prompt length: {len(user_prompt_template) if user_prompt_template else 0}")
+    print(f"   - Prompt preview: {user_prompt_template[:100] if user_prompt_template else 'None'}...")
+    
     # Get user-specific LLM settings
     temperature = float(user_config.get('temperature', 0.3))
     max_tokens = int(user_config.get('max_tokens', 2000))
@@ -73,8 +79,10 @@ def get_chatbot_response(user_id, message, system_llm=None, name="User"):
     # Use user's custom prompt or default
     if user_prompt_template:
         prompt_template_text = user_prompt_template
+        print(f"✅ Using user's custom prompt (length: {len(prompt_template_text)})")
     else:
         prompt_template_text = get_default_prompt_with_name(bot_name)
+        print(f"⚠️ No custom prompt found, using default prompt")
     
     # Replace {bot_name} placeholder with actual bot name (at runtime)
     prompt_template_text = prompt_template_text.replace('{bot_name}', bot_name)
