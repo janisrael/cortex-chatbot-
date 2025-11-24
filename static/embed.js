@@ -40,17 +40,32 @@
       this.widget = null;
       this.triggerButton = null;
       this.iframe = null;
-      this.init();
+      this.config = {};
+      this.apiKey = null;
+      this.initialize();
     }
 
-    init() {
+    initialize() {
       const urlParams = new URLSearchParams(window.location.search);
       this.websiteId = urlParams.get("website_id") || "default";
+      this.apiKey = urlParams.get("api_key") || urlParams.get("key") || this.getApiKeyFromScript();
 
       this.createStyles();
       this.createTriggerButton();
       this.createWidget();
       this.attachEventListeners();
+    }
+
+    getApiKeyFromScript() {
+      const scripts = document.getElementsByTagName('script');
+      for (let script of scripts) {
+        if (script.src && script.src.includes('embed.js')) {
+          const params = new URLSearchParams(script.src.split('?')[1] || '');
+          const key = params.get('api_key') || params.get('key');
+          if (key) return key;
+        }
+      }
+      return null;
     }
 
     createStyles() {
@@ -74,6 +89,15 @@
           display: flex;
           align-items: center;
           justify-content: center;
+        }
+
+        .bobot-widget-trigger img {
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2px solid rgba(255, 255, 255, 0.6);
+          background: white;
         }
 
         .bobot-widget-trigger:hover {
@@ -342,7 +366,7 @@
     createTriggerButton() {
       this.triggerButton = document.createElement("button");
       this.triggerButton.className = "bobot-widget-trigger";
-      this.triggerButton.innerHTML = WIDGET_CONFIG.triggerButtonText;
+      this.renderTriggerButtonContent();
       this.triggerButton.setAttribute("aria-label", "Open chat");
       this.triggerButton.addEventListener("click", () => this.toggleWidget());
       document.body.appendChild(this.triggerButton);
@@ -352,6 +376,23 @@
 
       // Show welcome message after delay
       setTimeout(() => this.showWelcomeMessage(), 3000);
+    }
+
+    renderTriggerButtonContent() {
+      if (!this.triggerButton) return;
+      this.triggerButton.innerHTML = "";
+      
+      const avatarUrl = this.config?.avatarUrl;
+      if (avatarUrl) {
+        const img = document.createElement("img");
+        img.src = avatarUrl;
+        img.alt = this.config?.botName || "Open chat";
+        this.triggerButton.appendChild(img);
+        this.triggerButton.style.background = "transparent";
+      } else {
+        this.triggerButton.textContent = WIDGET_CONFIG.triggerButtonText;
+        this.triggerButton.style.background = `linear-gradient(135deg, ${WIDGET_CONFIG.primaryColor} 0%, #2563eb 100%)`;
+      }
     }
 
     addNotificationBadge() {
@@ -462,8 +503,9 @@
 
       // Build widget URL with API key (for user isolation)
       let widgetUrl = `${WIDGET_CONFIG.apiBaseUrl}${WIDGET_CONFIG.widgetUrl}`;
-      if (apiKey) {
-        widgetUrl += `?api_key=${encodeURIComponent(apiKey)}`;
+      const keyToUse = this.apiKey || apiKey;
+      if (keyToUse) {
+        widgetUrl += `?api_key=${encodeURIComponent(keyToUse)}`;
       } else {
         widgetUrl += `?website_id=${encodeURIComponent(websiteId)}`;
       }
@@ -515,7 +557,22 @@
         if (event.data.type === "close_widget") {
           this.closeWidget();
         }
+
+        if (event.data.type === "widget_config") {
+          this.applyWidgetConfig(event.data);
+        }
       });
+    }
+
+    applyWidgetConfig(data) {
+      this.config = this.config || {};
+      if (data.botName) this.config.botName = data.botName;
+      if (data.avatarUrl) this.config.avatarUrl = data.avatarUrl;
+      if (data.primaryColor) {
+        this.config.primaryColor = data.primaryColor;
+        WIDGET_CONFIG.primaryColor = data.primaryColor;
+      }
+      this.renderTriggerButtonContent();
     }
 
     toggleWidget() {
