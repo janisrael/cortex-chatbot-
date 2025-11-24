@@ -65,7 +65,17 @@ def _build_widget_config(user_id):
                 avatar_url = request.host_url.rstrip('/') + src_value
     
     if not avatar_url:
-        hex_color = primary_color.replace('#', '')[:6] or '0891b2'
+        # Extract hex color from primary_color (handle gradients)
+        hex_color = '0891b2'  # default
+        if isinstance(primary_color, str):
+            if primary_color.startswith('#'):
+                hex_color = primary_color.replace('#', '')[:6] or '0891b2'
+            elif 'linear-gradient' in primary_color:
+                # Extract first hex color from gradient
+                import re
+                hex_match = re.search(r'#([0-9A-Fa-f]{6})', primary_color)
+                if hex_match:
+                    hex_color = hex_match.group(1)
         avatar_url = (
             f"https://ui-avatars.com/api/?name={quote(bot_name)}"
             f"&background={hex_color}&color=fff&size=64&rounded=true"

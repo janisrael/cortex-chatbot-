@@ -282,10 +282,28 @@
             if (isBot) {
                 const botName = '{{ bot_name }}';
                 const primaryColor = '{{ primary_color }}';
-                const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(botName)}&background=${primaryColor.substring(1)}&color=fff&size=24`;
+                {% if avatar and avatar.type == 'preset' and avatar.value %}
+                const avatarUrl = '{{ base_url }}/static/img/avatar/{{ avatar.value }}.png';
+                {% else %}
+                // Extract hex color from primaryColor (handle gradients)
+                let hexColor = '0891b2'; // default
+                if (primaryColor && primaryColor.startsWith('#')) {
+                    hexColor = primaryColor.substring(1).substring(0, 6);
+                } else if (primaryColor && primaryColor.includes('linear-gradient')) {
+                    // Extract first hex color from gradient
+                    const hexMatch = primaryColor.match(/#([0-9A-Fa-f]{6})/);
+                    if (hexMatch) {
+                        hexColor = hexMatch[1];
+                    }
+                } else if (primaryColor && primaryColor.length >= 6) {
+                    // Try to extract hex from string
+                    hexColor = primaryColor.replace('#', '').substring(0, 6);
+                }
+                const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(botName)}&background=${hexColor}&color=fff&size=24`;
+                {% endif %}
                 messageDiv.innerHTML = `
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                        <img src="${avatarUrl}" alt="Bot Avatar" style="width: 24px; height: 24px; border-radius: 50%;">
+                        <img src="${avatarUrl}" alt="Bot Avatar" style="width: 24px; height: 24px; border-radius: 50%; object-fit: contain;">
                         <span style="font-size: 14px; font-weight: 500; color: #18181b;">${botName}</span>
                     </div>
                     <div style="max-width: min(calc(100% - 40px), 65ch); padding: 12px 16px; border-radius: 20px; font-size: 14px; line-height: 1.6; word-wrap: break-word; background: #f4f4f5; color: #27272a; border-bottom-left-radius: 6px;">${formattedText}</div>
