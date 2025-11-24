@@ -178,46 +178,52 @@ jobs:
               fi
             fi
           else
-            echo "Not a git repository, initializing..."
-            cd "$DEPLOY_PATH"
+            echo "Not a git repository, downloading via GitHub API tarball..."
+            cd /tmp
+            TEMP_DIR=$(mktemp -d)
+            cd "$TEMP_DIR"
             
-            # Initialize git repository
-            git init
-            git remote add origin "$REPO_URL" || git remote set-url origin "$REPO_URL"
+            # Use GitHub API to download tarball (most reliable method)
+            REPO_NAME=$(echo "$REPO_URL" | sed 's|https://github.com/||; s|\.git$||')
+            echo "Downloading ${REPO_NAME} branch ${BRANCH_NAME}..."
             
-            # Configure git for token authentication
             if [ -n "$GITHUB_TOKEN" ]; then
-              git config --local credential.helper store
-              echo "https://${GITHUB_TOKEN}@github.com" > ~/.git-credentials
-              # Use token in URL for fetch
-              REPO_NAME=$(echo "$REPO_URL" | sed 's|https://github.com/||; s|\.git$||')
-              REPO_WITH_TOKEN="https://${GITHUB_TOKEN}@github.com/${REPO_NAME}.git"
+              curl -L -H "Authorization: token ${GITHUB_TOKEN}" \
+                -H "Accept: application/vnd.github.v3.raw" \
+                "https://api.github.com/repos/${REPO_NAME}/tarball/${BRANCH_NAME}" \
+                -o repo.tar.gz
             else
-              REPO_WITH_TOKEN="$REPO_URL"
+              curl -L "https://api.github.com/repos/${REPO_NAME}/tarball/${BRANCH_NAME}" \
+                -o repo.tar.gz
             fi
             
-            # Fetch and checkout the branch
-            git fetch "$REPO_WITH_TOKEN" "$BRANCH_NAME" || git fetch origin "$BRANCH_NAME"
-            git checkout -b "$BRANCH_NAME" "origin/$BRANCH_NAME" 2>/dev/null || git checkout "$BRANCH_NAME" || {
-              echo "Git checkout failed, using GitHub API tarball..."
-              cd /tmp
-              TEMP_DIR=$(mktemp -d)
-              cd "$TEMP_DIR"
-              REPO_NAME=$(echo "$REPO_URL" | sed 's|https://github.com/||; s|\.git$||')
-              if [ -n "$GITHUB_TOKEN" ]; then
-                curl -L -H "Authorization: token ${GITHUB_TOKEN}" \
-                  "https://api.github.com/repos/${REPO_NAME}/tarball/${BRANCH_NAME}" \
-                  -o repo.tar.gz
-              else
-                curl -L "https://api.github.com/repos/${REPO_NAME}/tarball/${BRANCH_NAME}" \
-                  -o repo.tar.gz
-              fi
+            if [ -f repo.tar.gz ] && [ -s repo.tar.gz ]; then
+              echo "Tarball downloaded successfully, extracting..."
               tar -xzf repo.tar.gz
               REPO_DIR=$(ls -d */ | head -1)
+              echo "Syncing files to $DEPLOY_PATH..."
               rsync -av --exclude='.git' --exclude='venv*' --exclude='__pycache__' --exclude='*.pyc' --exclude='instance' --exclude='.env' --exclude='chroma_db' --exclude='uploads' --exclude='*.db' --exclude='*.sqlite*' "$REPO_DIR" "$DEPLOY_PATH/"
               rm -rf "$TEMP_DIR"
               cd "$DEPLOY_PATH"
-            }
+              echo "Code deployed successfully"
+            else
+              echo "Tarball download failed, trying git clone as last resort..."
+              if [ -n "$GITHUB_TOKEN" ]; then
+                # Use GIT_ASKPASS to avoid password prompt
+                export GIT_ASKPASS=echo
+                export GIT_TERMINAL_PROMPT=0
+                git clone "https://${GITHUB_TOKEN}@github.com/${REPO_NAME}.git" temp-repo
+                cd temp-repo
+                git checkout "$BRANCH_NAME"
+                rsync -av --exclude='.git' --exclude='venv*' --exclude='__pycache__' --exclude='*.pyc' --exclude='instance' --exclude='.env' --exclude='chroma_db' --exclude='uploads' --exclude='*.db' --exclude='*.sqlite*' ./ "$DEPLOY_PATH/"
+                cd /tmp
+                rm -rf "$TEMP_DIR"
+                cd "$DEPLOY_PATH"
+              else
+                echo "No token available and tarball failed, cannot deploy"
+                exit 1
+              fi
+            fi
           fi
           
           echo "=== Activating virtual environment ==="
