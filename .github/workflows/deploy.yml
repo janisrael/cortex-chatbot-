@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - v2
-      - v2-appearance
+      - v2-appearance  # Also deploy to production
   workflow_dispatch:
 
 env:
@@ -52,7 +52,7 @@ jobs:
     name: Deploy to Production
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/v2'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/v2' || github.ref == 'refs/heads/v2-appearance'
     
     steps:
       - name: Checkout code
@@ -79,7 +79,16 @@ jobs:
           APP_NAME="$4"
           APP_PORT="$5"
           
-          echo "=== Starting Deployment ==="
+          echo "=== Starting Production Deployment ==="
+          
+          # Determine branch from GITHUB_REF environment variable
+          if [ -n "$GITHUB_REF" ]; then
+            BRANCH_NAME=$(echo "$GITHUB_REF" | sed 's|refs/heads/||')
+          else
+            BRANCH_NAME="main"
+          fi
+          
+          echo "=== Deploying branch: $BRANCH_NAME ==="
           
           echo "=== Pulling latest code ==="
           if [ -d "$DEPLOY_PATH/.git" ]; then
@@ -95,8 +104,8 @@ jobs:
             
             # Try to fetch
             if git fetch origin 2>/dev/null; then
-              echo "Fetch successful, resetting to origin/main..."
-              git reset --hard origin/main
+              echo "Fetch successful, resetting to origin/$BRANCH_NAME..."
+              git reset --hard "origin/$BRANCH_NAME"
               git clean -fd
             else
               echo "Fetch failed, using rsync method..."
@@ -170,15 +179,16 @@ jobs:
           DEPLOYSCRIPT
           chmod +x deploy.sh
       
-      - name: Deploy to AWS EC2
+      - name: Deploy to AWS EC2 (Production)
         env:
           REPO_URL: https://github.com/${{ github.repository }}.git
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           APP_NAME: cortex-app
           APP_PORT: ${{ secrets.AWS_APP_PORT || '6002' }}
+          GITHUB_REF: ${{ github.ref }}
         run: |
           scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no deploy.sh ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }}:/tmp/deploy.sh
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }} "bash /tmp/deploy.sh ${{ secrets.AWS_DEPLOY_PATH }} '$REPO_URL' '$GITHUB_TOKEN' '$APP_NAME' '$APP_PORT'"
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }} "GITHUB_REF='$GITHUB_REF' bash /tmp/deploy.sh ${{ secrets.AWS_DEPLOY_PATH }} '$REPO_URL' '$GITHUB_TOKEN' '$APP_NAME' '$APP_PORT'"
       
       - name: Verify deployment
         run: |
@@ -194,147 +204,4 @@ jobs:
             echo "❌ Production deployment failed!"
           fi
 
-  deploy-staging:
-    name: Deploy to Staging
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/v2-appearance'
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Configure SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.AWS_SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H ${{ secrets.AWS_EC2_HOST }} >> ~/.ssh/known_hosts
-      
-      - name: Create deployment script
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          cat > deploy.sh << 'DEPLOYSCRIPT'
-          #!/bin/bash
-          set -e
-          
-          DEPLOY_PATH="$1"
-          REPO_URL="$2"
-          GITHUB_TOKEN="$3"
-          APP_NAME="$4"
-          APP_PORT="$5"
-          
-          echo "=== Starting Staging Deployment ==="
-          
-          echo "=== Pulling latest code ==="
-          if [ -d "$DEPLOY_PATH/.git" ]; then
-            echo "Git repository found, pulling latest changes..."
-            cd "$DEPLOY_PATH"
-            
-            if [ -n "$GITHUB_TOKEN" ]; then
-              git config --local credential.helper store
-              echo "https://${GITHUB_TOKEN}@github.com" > ~/.git-credentials
-              git remote set-url origin "$REPO_URL"
-            fi
-            
-            if git fetch origin 2>/dev/null; then
-              echo "Fetch successful, resetting to origin/v2-appearance..."
-              git reset --hard origin/v2-appearance
-              git clean -fd
-            else
-              echo "Fetch failed, using rsync method..."
-              cd /tmp
-              TEMP_DIR=$(mktemp -d)
-              cd "$TEMP_DIR"
-              
-              if [ -n "$GITHUB_TOKEN" ]; then
-                git clone "https://${GITHUB_TOKEN}@github.com/$(echo $REPO_URL | sed 's|https://github.com/||; s|\.git$||')" temp-repo
-              else
-                git clone "$REPO_URL" temp-repo
-              fi
-              
-              cd temp-repo
-              git checkout v2-appearance
-              rsync -av --exclude='.git' --exclude='venv*' --exclude='__pycache__' --exclude='*.pyc' --exclude='instance' --exclude='.env' --exclude='chroma_db' --exclude='uploads' --exclude='*.db' --exclude='*.sqlite*' ./ "$DEPLOY_PATH/"
-              rm -rf "$TEMP_DIR"
-              cd "$DEPLOY_PATH"
-            fi
-          else
-            echo "Not a git repository, cloning..."
-            cd /tmp
-            TEMP_DIR=$(mktemp -d)
-            cd "$TEMP_DIR"
-            
-            if [ -n "$GITHUB_TOKEN" ]; then
-              git clone "https://${GITHUB_TOKEN}@github.com/$(echo $REPO_URL | sed 's|https://github.com/||; s|\.git$||')" temp-repo
-            else
-              git clone "$REPO_URL" temp-repo
-            fi
-            
-            cd temp-repo
-            git checkout v2-appearance
-            rsync -av --exclude='.git' --exclude='venv*' --exclude='__pycache__' --exclude='*.pyc' --exclude='instance' --exclude='.env' --exclude='chroma_db' --exclude='uploads' --exclude='*.db' --exclude='*.sqlite*' ./ "$DEPLOY_PATH/"
-            rm -rf "$TEMP_DIR"
-            cd "$DEPLOY_PATH"
-          fi
-          
-          echo "=== Activating virtual environment ==="
-          if [ ! -d "venv-prod" ]; then
-            python3 -m venv venv-prod
-          fi
-          source venv-prod/bin/activate
-          
-          echo "=== Installing/updating dependencies ==="
-          pip install --upgrade pip
-          pip install -r requirements-prod.txt
-          
-          echo "=== Creating necessary directories ==="
-          mkdir -p uploads chroma_db config logs data
-          
-          echo "=== Restarting application ==="
-          if screen -list | grep -q "$APP_NAME"; then
-            screen -S "$APP_NAME" -X quit || true
-            sleep 2
-          fi
-          
-          screen -dmS "$APP_NAME" bash -c "cd '$DEPLOY_PATH' && source venv-prod/bin/activate && python app.py"
-          
-          echo "=== Waiting for services to start ==="
-          sleep 5
-          
-          echo "=== Checking application status ==="
-          screen -list
-          
-          echo "=== Testing health endpoint ==="
-          sleep 3
-          curl -f http://localhost:$APP_PORT/health || echo "Health check failed, but app may still be starting"
-          
-          echo "=== Staging deployment completed ==="
-          DEPLOYSCRIPT
-          chmod +x deploy.sh
-      
-      - name: Deploy to AWS EC2 (Staging)
-        env:
-          REPO_URL: https://github.com/${{ github.repository }}.git
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          APP_NAME: cortex-app-staging
-          APP_PORT: ${{ secrets.AWS_APP_PORT_STAGING || '6003' }}
-        run: |
-          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no deploy.sh ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }}:/tmp/deploy.sh
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }} "bash /tmp/deploy.sh ${{ secrets.AWS_DEPLOY_PATH_STAGING || secrets.AWS_DEPLOY_PATH }}/staging '$REPO_URL' '$GITHUB_TOKEN' '$APP_NAME' '$APP_PORT'"
-      
-      - name: Verify deployment
-        run: |
-          sleep 10
-          echo "✅ Staging deployment completed"
-      
-      - name: Notify deployment status
-        if: always()
-        run: |
-          if [ "${{ job.status }}" == "success" ]; then
-            echo "✅ Staging deployment successful!"
-          else
-            echo "❌ Staging deployment failed!"
-          fi
 
