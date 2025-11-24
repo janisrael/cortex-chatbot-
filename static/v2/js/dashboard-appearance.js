@@ -118,8 +118,10 @@ async function loadAppearanceConfig() {
         }
         
         // Load suggested messages
+        console.log('📥 Loading suggested messages:', config.suggested_messages);
         if (config.suggested_messages && Array.isArray(config.suggested_messages) && config.suggested_messages.length > 0) {
             appearanceConfig.suggested_messages = config.suggested_messages;
+            console.log('✅ Loaded suggested messages from config:', appearanceConfig.suggested_messages.length);
         } else {
             // Default messages
             appearanceConfig.suggested_messages = [
@@ -127,6 +129,7 @@ async function loadAppearanceConfig() {
                 { id: 'default_2', text: 'Tell me more', order: 2 },
                 { id: 'default_3', text: 'How can I get started?', order: 3 }
             ];
+            console.log('⚠️ Using default suggested messages');
         }
         
         // Update UI - but wait a bit for DOM to be ready
@@ -165,13 +168,20 @@ function setupColorPicker() {
                 gradientSection.style.display = 'none';
                 appearanceConfig.primary_color.type = 'solid';
             } else {
+                // Gradient selected
                 solidSection.style.display = 'none';
                 gradientSection.style.display = 'block';
                 appearanceConfig.primary_color.type = 'gradient';
+                
+                // If no gradient colors exist, initialize with defaults
                 if (gradientColors.length === 0) {
-                    addGradientColor('#0891b2');
-                    addGradientColor('#764ba2');
+                    console.log('🔄 Initializing gradient colors');
+                    addGradientColor('#0891b2', 0);
+                    addGradientColor('#764ba2', 100);
                 }
+                
+                // Update gradient value to ensure preview works
+                updateGradientValue();
             }
             updatePreview();
         });
@@ -479,39 +489,53 @@ function setupAvatarSelection() {
         });
     }
     
-    // Preset selection
+    // Preset selection - use event delegation for better reliability
     const presetGrid = document.getElementById('presetAvatarsGrid');
     if (presetGrid) {
-        presetGrid.addEventListener('click', (e) => {
+        // Remove any existing listeners
+        const newPresetGrid = presetGrid.cloneNode(true);
+        presetGrid.parentNode.replaceChild(newPresetGrid, presetGrid);
+        
+        // Add click listener with event delegation
+        newPresetGrid.addEventListener('click', (e) => {
+            // Check if click is on preset item or its children
             const presetItem = e.target.closest('.preset-avatar-item');
-            if (presetItem) {
-                const presetId = presetItem.dataset.preset;
-                const presetName = presetItem.dataset.name;
-                appearanceConfig.avatar = {
-                    type: 'preset',
-                    value: presetId,
-                    name: presetName,
-                    fallback: 'ui-avatars'
-                };
-                
-                // Update selection - highlight the avatar circle
-                document.querySelectorAll('.preset-avatar-item').forEach(item => {
-                    const avatarCircle = item.querySelector('div');
-                    if (avatarCircle) {
-                        avatarCircle.style.borderColor = '#e4e4e7';
-                        avatarCircle.style.borderWidth = '2px';
-                    }
-                });
-                const selectedCircle = presetItem.querySelector('div');
-                if (selectedCircle) {
-                    selectedCircle.style.borderColor = '#0891b2';
-                    selectedCircle.style.borderWidth = '3px';
-                    selectedCircle.style.boxShadow = '0 0 0 2px rgba(8, 145, 178, 0.2)';
+            if (!presetItem) return;
+            
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const presetId = presetItem.dataset.preset;
+            const presetName = presetItem.dataset.name;
+            
+            console.log('🎯 Preset avatar clicked:', { presetId, presetName });
+            
+            appearanceConfig.avatar = {
+                type: 'preset',
+                value: presetId,
+                name: presetName,
+                fallback: 'ui-avatars'
+            };
+            
+            // Update selection - highlight the avatar circle
+            document.querySelectorAll('.preset-avatar-item').forEach(item => {
+                const avatarCircle = item.querySelector('div');
+                if (avatarCircle) {
+                    avatarCircle.style.borderColor = '#e4e4e7';
+                    avatarCircle.style.borderWidth = '2px';
+                    avatarCircle.style.boxShadow = 'none';
                 }
-                
-                updateAvatarUI();
-                updatePreview();
+            });
+            
+            const selectedCircle = presetItem.querySelector('div');
+            if (selectedCircle) {
+                selectedCircle.style.borderColor = '#0891b2';
+                selectedCircle.style.borderWidth = '3px';
+                selectedCircle.style.boxShadow = '0 0 0 2px rgba(8, 145, 178, 0.2)';
             }
+            
+            updateAvatarUI();
+            updatePreview();
         });
     }
     
@@ -627,7 +651,18 @@ function addSuggestedMessage(text = '', isNew = false) {
 // Update suggested messages UI
 function updateSuggestedMessagesUI() {
     const messagesList = document.getElementById('suggestedMessagesList');
-    if (!messagesList) return;
+    if (!messagesList) {
+        console.warn('⚠️ suggestedMessagesList element not found');
+        return;
+    }
+    
+    console.log('🔄 Updating suggested messages UI:', appearanceConfig.suggested_messages);
+    
+    if (!appearanceConfig.suggested_messages || appearanceConfig.suggested_messages.length === 0) {
+        console.warn('⚠️ No suggested messages to display');
+        messagesList.innerHTML = '<p style="color: #71717a; font-size: 14px; padding: 10px;">No suggested messages. Click "Add Message" to add one.</p>';
+        return;
+    }
     
     // Sort by order
     const sortedMessages = [...appearanceConfig.suggested_messages].sort((a, b) => a.order - b.order);
