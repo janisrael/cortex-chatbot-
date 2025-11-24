@@ -34,13 +34,25 @@ jobs:
       - name: Run linting
         run: |
           pip install flake8
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+          # Exclude archive, backups, venv, and other non-active directories
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics \
+            --exclude=archive,backups,venv,venv-prod,__pycache__,.git,chroma_db,uploads,*.pyc
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics \
+            --exclude=archive,backups,venv,venv-prod,__pycache__,.git,chroma_db,uploads,*.pyc
       
       - name: Check for syntax errors
         run: |
           python -m py_compile app.py
-          find . -name "*.py" -not -path "./venv*/*" -not -path "./.git/*" -not -path "./archive/*" -exec python -m py_compile {} \;
+          # Only check active code, exclude archive, backups, venv, etc.
+          find . -name "*.py" \
+            -not -path "./venv*/*" \
+            -not -path "./.git/*" \
+            -not -path "./archive/*" \
+            -not -path "./backups/*" \
+            -not -path "./__pycache__/*" \
+            -not -path "./chroma_db/*" \
+            -not -path "./uploads/*" \
+            -exec python -m py_compile {} \;
       
       - name: Verify imports
         run: |
