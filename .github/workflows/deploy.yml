@@ -234,7 +234,23 @@ jobs:
           
           echo "=== Installing/updating dependencies ==="
           pip install --upgrade pip
-          pip install -r requirements-prod.txt
+          # Clean pip cache to save space
+          pip cache purge || true
+          # Use requirements-prod.txt (optimized, no heavy dependencies)
+          if [ -f "requirements-prod.txt" ]; then
+            echo "Installing from requirements-prod.txt (optimized)"
+            pip install --no-cache-dir -r requirements-prod.txt
+          else
+            echo "WARNING: requirements-prod.txt not found, using requirements.txt"
+            pip install --no-cache-dir -r requirements.txt
+          fi
+          
+          echo "=== Cleaning up old dependencies ==="
+          # Remove old venv if it exists and has heavy packages
+          if [ -d "venv" ]; then
+            echo "Removing old venv directory to free space..."
+            rm -rf venv
+          fi
           
           echo "=== Creating necessary directories ==="
           mkdir -p uploads chroma_db config logs data
