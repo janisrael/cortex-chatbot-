@@ -1,7 +1,7 @@
 # CI/CD Workflow Documentation
 
 ## Overview
-This repository uses GitHub Actions for continuous integration and deployment to AWS ECS.
+This repository uses GitHub Actions for continuous integration and deployment to AWS EC2 via SSH (same method as Sandata project).
 
 ## Workflows
 
@@ -22,43 +22,97 @@ This repository uses GitHub Actions for continuous integration and deployment to
    - Check for syntax errors
    - Verify imports
 
-2. **Build and Deploy** (main/v2 branches only)
-   - Build Docker image
-   - Push to ECR: `chatbot:latest` and `chatbot:{sha}`
-   - Deploy to ECS: `chatbot-cluster/chatbot-service`
-   - Wait for deployment stabilization
+2. **Deploy Production** (main/v2 branches only)
+   - Configure SSH access
+   - Create deployment script
+   - Deploy code to EC2 via SSH
+   - Restart application in screen session
    - Verify deployment health
 
 3. **Deploy Staging** (v2-appearance branch only)
-   - Build Docker image
-   - Push to ECR: `chatbot-staging:latest` and `chatbot-staging:staging-{sha}`
-   - Deploy to ECS: `chatbot-cluster-staging/chatbot-service-staging`
+   - Configure SSH access
+   - Create deployment script
+   - Deploy code to EC2 via SSH (staging path)
+   - Restart application in screen session
    - Verify deployment
 
 ## Required GitHub Secrets
 
-- `AWS_ACCESS_KEY_ID` - AWS access key
-- `AWS_SECRET_ACCESS_KEY` - AWS secret key
+| Secret Name | Description | Example Value |
+|------------|-------------|---------------|
+| `AWS_SSH_PRIVATE_KEY` | SSH private key content | Content of `~/.ssh/swordfishproject.pem` |
+| `AWS_EC2_HOST` | EC2 instance IP address | `16.52.149.96` |
+| `AWS_EC2_USER` | SSH username | `ubuntu` |
+| `AWS_DEPLOY_PATH` | Production deployment path | `/var/www/portfolio/chatbot` |
+| `AWS_DEPLOY_PATH_STAGING` | Staging deployment path (optional) | `/var/www/portfolio/chatbot/staging` |
+| `AWS_APP_PORT` | Application port (optional) | `6001` |
+| `AWS_APP_PORT_STAGING` | Staging app port (optional) | `6002` |
+| `AWS_APP_URL` | Production URL (optional) | `https://chatbot.janisrael.com` |
 
-## AWS Resources Required
+## Getting SSH Private Key
 
-### Production:
-- ECR Repository: `chatbot`
-- ECS Cluster: `chatbot-cluster`
-- ECS Service: `chatbot-service`
+On your local machine:
 
-### Staging:
-- ECR Repository: `chatbot-staging`
-- ECS Cluster: `chatbot-cluster-staging`
-- ECS Service: `chatbot-service-staging`
+```bash
+# Display the private key
+cat ~/.ssh/swordfishproject.pem
 
-## Docker Configuration
+# Copy the ENTIRE output including:
+# -----BEGIN RSA PRIVATE KEY-----
+# ... (all the key content) ...
+# -----END RSA PRIVATE KEY-----
+```
 
-- **Base Image:** `python:3.11-slim`
-- **Multi-stage build:** Yes (builder + runtime)
-- **Port:** 6001
-- **Health Check:** `/health` endpoint
-- **Requirements:** `requirements-prod.txt` (optimized, no PyTorch/CUDA)
+**Important**: Copy the entire key including the BEGIN and END lines.
+
+## Adding Secrets in GitHub
+
+1. Go to your repository on GitHub
+2. Click `Settings` tab
+3. Navigate to `Secrets and variables > Actions`
+4. Click `New repository secret`
+5. Enter the secret name (exactly as listed above)
+6. Paste the value
+7. Click `Add secret`
+8. Repeat for all secrets
+
+## Deployment Process
+
+1. **Test Phase:**
+   - Code is checked out
+   - Dependencies installed
+   - Linting and syntax checks
+   - Import verification
+
+2. **Deploy Phase:**
+   - SSH connection configured
+   - Deployment script created
+   - Code pulled/cloned to server
+   - Virtual environment activated
+   - Dependencies installed
+   - Application restarted in screen session
+   - Health check verification
+
+## Application Management
+
+The application runs in a screen session for easy management:
+
+```bash
+# SSH to server
+ssh -i ~/.ssh/swordfishproject.pem ubuntu@16.52.149.96
+
+# View running screen sessions
+screen -list
+
+# Attach to application screen
+screen -r chatbot-app        # Production
+screen -r chatbot-app-staging  # Staging
+
+# Detach from screen: Press Ctrl+A then D
+
+# Check application health
+curl http://localhost:6001/health
+```
 
 ## Health Check
 
@@ -70,44 +124,55 @@ The application exposes a `/health` endpoint that returns:
 }
 ```
 
-## Deployment Process
-
-1. **Test Phase:**
-   - Code is checked out
-   - Dependencies installed
-   - Linting and syntax checks
-   - Import verification
-
-2. **Build Phase:**
-   - Docker image built using multi-stage Dockerfile
-   - Image tagged with commit SHA and `latest`
-   - Image pushed to ECR
-
-3. **Deploy Phase:**
-   - ECS service updated with new image
-   - Force new deployment triggered
-   - Service waits for stabilization
-   - Health check verification
-
 ## Troubleshooting
 
-### Build Fails
+### Test Fails
 - Check `requirements-prod.txt` for dependency issues
-- Verify Dockerfile syntax
+- Verify Python version compatibility
 - Check GitHub Actions logs
 
 ### Deployment Fails
-- Verify AWS credentials in GitHub Secrets
-- Check ECR repository exists
-- Verify ECS cluster and service names
-- Check AWS region matches (`us-east-1`)
+
+**Issue**: SSH connection fails
+- Verify `AWS_EC2_HOST` and `AWS_EC2_USER` are correct
+- Check SSH key is correctly formatted (include BEGIN/END lines)
+- Ensure EC2 security group allows SSH from GitHub Actions IPs
+
+**Issue**: Deployment fails
+- Check deployment logs in Actions tab
+- SSH to server and check manually
+- Verify `AWS_DEPLOY_PATH` is correct
+- Ensure Git repository is initialized on server
+
+**Issue**: Application doesn't start
+- Check screen sessions: `screen -list`
+- View logs: `screen -r chatbot-app`
+- Verify Python dependencies: `pip list`
+- Check application logs in the screen session
 
 ### Health Check Fails
 - Verify `/health` endpoint is accessible
-- Check application logs in CloudWatch
-- Verify port 6001 is exposed and accessible
+- Check application is running: `screen -list`
+- Verify port is correct and accessible
+- Check nginx/load balancer configuration
 
 ## Manual Deployment
+
+If automated deployment fails, deploy manually:
+
+```bash
+ssh -i ~/.ssh/swordfishproject.pem ubuntu@16.52.149.96
+cd /var/www/portfolio/chatbot
+git pull origin main
+source venv-prod/bin/activate
+pip install -r requirements-prod.txt
+
+# Restart application
+screen -S chatbot-app -X quit
+screen -dmS chatbot-app bash -c "source venv-prod/bin/activate && python app.py"
+```
+
+## Manual Workflow Trigger
 
 You can manually trigger deployments via GitHub Actions UI:
 1. Go to Actions tab
