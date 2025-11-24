@@ -1,5 +1,50 @@
+# Python
 venv/
-myenv/.env
-.env.env
+myenv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Environment
 .env
-.env
+.env.*
+*.env
+
+# Logs
+*.log
+logs/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+users.db
+
+# User data (should be on S3/external storage)
+chroma_db/
+uploads/
+config/user_*/
+
+# Archives and backups
+archive/
+backups/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS
+.DS_Store
+Thumbs.db

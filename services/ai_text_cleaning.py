@@ -66,22 +66,37 @@ def clean_text_with_ai(raw_text, llm=None):
     prompt = f"""You are a content extraction assistant. Your task is to clean and restructure the following text extracted from a website, keeping ONLY the essential content and removing all unnecessary elements.
 
 REMOVE:
-- Navigation menus and links
-- Footer information (copyright, terms, privacy policy)
+- Navigation menus and links (except important content links)
+- Header/footer navigation elements (menus, breadcrumbs)
 - SEO metadata and experiment notes
 - Repetitive headers and formatting
-- Contact information (unless it's the main content)
-- Social media links
+- Copyright notices and generic legal text
+- Social media icons/links (unless they contain important information)
 - "Skip to main content" and similar UI elements
 - Breadcrumbs and site structure elements
+- Advertisement text
+- Cookie notices and legal disclaimers (unless they are the main content)
 
-KEEP:
+KEEP (CRITICAL - DO NOT REMOVE):
 - Main article/content text
 - Important headings and subheadings
 - Key information and facts
 - Educational content
 - Product/service descriptions
 - Core message and value proposition
+- **ALL CONTACT INFORMATION** (phone numbers, email addresses, physical addresses, website URLs)
+- **FOOTER CONTACT DETAILS** (extract and preserve phone, email, address, booking links from footers)
+- Important links to other pages (not navigation)
+- Business hours and location details
+- Pricing information (if relevant)
+- Booking/reservation links and information
+
+SPECIAL INSTRUCTIONS FOR CONTACT INFORMATION:
+- Extract ALL phone numbers, email addresses, and physical addresses
+- Preserve website URLs and booking links
+- If contact info is in footer, extract it and include it in a "Contact Information" section at the end
+- Format contact information clearly (e.g., "Phone: +1-555-1234", "Email: info@example.com", "Address: 123 Main St")
+- Keep all reservation/booking links and contact methods
 
 RESTRUCTURE:
 - Use clear, concise headings
@@ -89,11 +104,12 @@ RESTRUCTURE:
 - Remove redundant information
 - Keep only the most important details
 - Maintain readability and flow
+- Add a "Contact Information" section at the end if contact details were found in footer
 
 INPUT TEXT:
 {raw_text[:8000]}  # Limit to avoid token limits
 
-OUTPUT: Clean, restructured content with only essential information. Be concise but comprehensive."""
+OUTPUT: Clean, restructured content with only essential information. Include a "Contact Information" section at the end if contact details were found. Be concise but comprehensive."""
 
     try:
         # Use LLM to clean the text

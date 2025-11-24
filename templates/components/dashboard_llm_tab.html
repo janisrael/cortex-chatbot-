@@ -13,107 +13,127 @@
             </div>
         </div> -->
 
-        <!-- Global Configuration -->
+        <!-- LLM Provider Selection -->
         <div class="config-section">
-            <h3 class="section-title">Global LLM Settings</h3>
+            <h3 class="section-title">LLM Provider & Model</h3>
+            <p class="section-description">Choose which AI provider and model your chatbot will use. You can use your own API key or the system default.</p>
 
-            <div class="provider-tabs">
-                <button class="provider-tab active" id="globalOpenaiTab" onclick="selectGlobalProvider('openai')">
-                    OpenAI
-                </button>
-                <button class="provider-tab" id="globalOllamaTab" onclick="selectGlobalProvider('ollama')">
-                    Ollama (Local)
-                </button>
+            <!-- Provider Info Box -->
+            <div id="providerInfoBox" class="provider-info-box" style="display: none;">
+                <div class="provider-info-header">
+                    <span class="material-icons-round" style="font-size: 20px; margin-right: 8px;">info</span>
+                    <strong id="providerInfoName">Provider Information</strong>
+                </div>
+                <div id="providerInfoDescription" class="provider-info-description"></div>
+                <div id="providerInfoStrengths" class="provider-info-strengths"></div>
             </div>
 
-            <!-- OpenAI Configuration -->
-            <div class="provider-config active" id="globalOpenaiConfig">
+            <div class="config-row">
                 <div class="form-group">
-                    <label for="globalOpenaiKey">OpenAI API Key</label>
-                    <input type="password" id="globalOpenaiKey" class="form-control" 
-                           placeholder="sk-proj-... (leave empty to keep current)">
+                    <label for="llmProvider">Provider</label>
+                    <select id="llmProvider" class="form-control" onchange="onProviderChange()">
+                        <option value="openai">OpenAI (Default)</option>
+                        <option value="claude">Anthropic Claude</option>
+                        <option value="gemini">Google Gemini</option>
+                        <option value="deepseek">DeepSeek</option>
+                        <option value="groq">Groq (Llama)</option>
+                        <option value="together">Together AI (Llama)</option>
+                    </select>
+                    <small style="color: #71717a; font-size: 12px;">Select your preferred AI provider</small>
                 </div>
-                
-                <div class="config-row">
-                    <div class="form-group">
-                        <label for="globalOpenaiDefaultModel">Default Model</label>
-                        <select id="globalOpenaiDefaultModel" class="form-control">
-                            <option value="gpt-4o-mini">GPT-4o Mini (Recommended)</option>
-                            <option value="gpt-4o">GPT-4o</option>
-                            <option value="gpt-4">GPT-4</option>
-                            <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="globalProvider">Global Provider</label>
-                        <select id="globalProvider" class="form-control">
-                            <option value="openai">OpenAI</option>
-                            <option value="ollama">Ollama</option>
-                        </select>
-                    </div>
+                <div class="form-group">
+                    <label for="llmModel">Model</label>
+                    <select id="llmModel" class="form-control">
+                        <!-- Models will be populated dynamically based on provider -->
+                    </select>
+                    <small style="color: #71717a; font-size: 12px;">Select the specific model</small>
                 </div>
             </div>
 
-            <!-- Ollama Configuration -->
-            <div class="provider-config" id="globalOllamaConfig">
-                <div class="config-row">
-                    <div class="form-group">
-                        <label for="globalOllamaUrl">Ollama Server URL</label>
-                        <input type="url" id="globalOllamaUrl" class="form-control" 
-                               value="http://localhost:11434">
-                    </div>
-                    <div class="form-group">
-                        <label for="globalOllamaDefaultModel">Default Model</label>
-                        <select id="globalOllamaDefaultModel" class="form-control">
-                            <option value="llama3.1:8b">Llama 3.1 8B</option>
-                            <option value="llama3.1:70b">Llama 3.1 70B</option>
-                            <option value="mistral">Mistral</option>
-                            <option value="codellama">CodeLlama</option>
-                        </select>
-                    </div>
-                </div>
+            <div class="form-group">
+                <label for="llmApiKey">API Key (Optional)</label>
+                <input type="password" id="llmApiKey" class="form-control" 
+                       placeholder="Leave empty to use system default API key">
+                <small style="color: #71717a; font-size: 12px;">Provide your own API key for the selected provider, or leave empty to use the system default</small>
             </div>
 
             <div class="config-actions">
-                <button class="btn" onclick="saveGlobalConfig()" id="saveGlobalBtn">
-                    <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">save</span> Save Global Settings
+                <button class="btn" onclick="saveLLMProviderConfig()" id="saveLLMProviderBtn">
+                    <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">save</span> Save Provider Settings
+                </button>
+                <button class="btn btn-secondary" onclick="testLLMProvider()" id="testLLMProviderBtn">
+                    <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">science</span> Test Connection
                 </button>
             </div>
         </div>
 
-        <!-- Website-Specific Override -->
+        <!-- Advanced Chatbot Settings -->
         <div class="config-section">
-            <h3 class="section-title">Website-Specific Override</h3>
-            <p class="section-description">Override global settings for <span id="currentWebsiteName">selected website</span></p>
+            <h3 class="section-title">Advanced Chatbot Settings</h3>
+            <p class="section-description">Fine-tune how your chatbot responds. These settings directly affect chatbot behavior.</p>
 
             <div class="config-row">
                 <div class="form-group">
-                    <label for="websiteProvider">LLM Provider</label>
-                    <select id="websiteProvider" class="form-control">
-                        <option value="">Use Global Default</option>
-                        <option value="openai">OpenAI</option>
-                        <option value="ollama">Ollama</option>
-                    </select>
+                    <label for="chatbotTemperature">Temperature</label>
+                    <input type="number" id="chatbotTemperature" class="form-control" 
+                           min="0" max="2" step="0.1" value="0.3">
+                    <small style="color: #71717a; font-size: 12px;">Controls creativity (0.0 = focused, 2.0 = creative)</small>
                 </div>
                 <div class="form-group">
-                    <label for="websiteTemperature">Temperature</label>
-                    <input type="number" id="websiteTemperature" class="form-control" 
-                           min="0" max="2" step="0.1" placeholder="Global default">
+                    <label for="chatbotMaxTokens">Max Tokens</label>
+                    <input type="number" id="chatbotMaxTokens" class="form-control" 
+                           min="50" max="4000" step="50" value="2000">
+                    <small style="color: #71717a; font-size: 12px;">Maximum response length</small>
                 </div>
             </div>
-            
+
+            <div class="config-row">
+                <div class="form-group">
+                    <label for="chatbotTopP">Top P (Nucleus Sampling)</label>
+                    <input type="number" id="chatbotTopP" class="form-control" 
+                           min="0" max="1" step="0.1" value="1.0">
+                    <small style="color: #71717a; font-size: 12px;">Controls diversity (0.0-1.0)</small>
+                </div>
+                <div class="form-group">
+                    <label for="chatbotResponseStyle">Response Style</label>
+                    <select id="chatbotResponseStyle" class="form-control">
+                        <option value="concise">Concise</option>
+                        <option value="balanced" selected>Balanced</option>
+                        <option value="detailed">Detailed</option>
+                        <option value="creative">Creative</option>
+                    </select>
+                    <small style="color: #71717a; font-size: 12px;">Overall response style</small>
+                </div>
+            </div>
+
+            <div class="config-row">
+                <div class="form-group">
+                    <label for="chatbotFrequencyPenalty">Frequency Penalty</label>
+                    <input type="number" id="chatbotFrequencyPenalty" class="form-control" 
+                           min="-2" max="2" step="0.1" value="0.0">
+                    <small style="color: #71717a; font-size: 12px;">Reduces repetition (-2.0 to 2.0)</small>
+                </div>
+                <div class="form-group">
+                    <label for="chatbotPresencePenalty">Presence Penalty</label>
+                    <input type="number" id="chatbotPresencePenalty" class="form-control" 
+                           min="-2" max="2" step="0.1" value="0.0">
+                    <small style="color: #71717a; font-size: 12px;">Encourages new topics (-2.0 to 2.0)</small>
+                </div>
+            </div>
+
             <div class="form-group">
-                <label for="websiteModel">Model</label>
-                <input type="text" id="websiteModel" class="form-control" 
-                       placeholder="Leave empty to use provider default">
+                <label for="chatbotSystemInstructions">System Instructions (Optional)</label>
+                <textarea id="chatbotSystemInstructions" class="form-control" rows="3" 
+                          placeholder="Additional context or instructions for your chatbot (e.g., 'Always be professional', 'Use technical terms when appropriate')"></textarea>
+                <small style="color: #71717a; font-size: 12px;">Additional instructions that guide chatbot behavior</small>
             </div>
 
             <div class="config-actions">
-                <button class="btn" onclick="saveWebsiteConfig()" id="saveWebsiteBtn">
-                    <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">save</span> Save Website Override
+                <button class="btn" onclick="saveAdvancedSettings()" id="saveAdvancedBtn">
+                    <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">save</span> Save Advanced Settings
                 </button>
-                <button class="btn btn-secondary" onclick="clearWebsiteConfig()" id="clearWebsiteBtn">
-                    <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">delete</span> Clear Override
+                <button class="btn btn-secondary" onclick="resetAdvancedSettings()" id="resetAdvancedBtn">
+                    <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">refresh</span> Reset to Defaults
                 </button>
             </div>
         </div>

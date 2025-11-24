@@ -286,6 +286,46 @@
             box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
         }
 
+        /* Provider Info Box - Blue/Info Style */
+        .provider-info-box {
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            border: 2px solid #0891b2;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(8, 145, 178, 0.15);
+        }
+
+        .provider-info-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            color: #0c4a6e;
+            font-size: 16px;
+        }
+
+        .provider-info-header .material-icons-round {
+            color: #0891b2;
+        }
+
+        .provider-info-description {
+            color: #075985;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .provider-info-strengths {
+            color: #075985;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .provider-info-strengths strong {
+            color: #0c4a6e;
+            font-weight: 600;
+        }
+
         .loading {
             display: none;
             text-align: center;
@@ -910,5 +950,153 @@
             
             .customization-options {
                 grid-template-columns: 1fr;
+            }
+        }
+
+        /* Appearance Tab Styles */
+        .appearance-container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .appearance-settings {
+            min-width: 0;
+        }
+
+        .appearance-preview {
+            position: sticky;
+            top: 20px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #e4e4e7;
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+        }
+
+        .color-section {
+            margin-top: 15px;
+        }
+
+        .gradient-color-item {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 10px;
+            background: #f4f4f5;
+            border-radius: 8px;
+        }
+
+        .preset-avatar-item {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid #e4e4e7;
+            background: #f4f4f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .preset-avatar-item:hover {
+            border-color: #0891b2;
+            transform: scale(1.05);
+        }
+
+        .preset-avatar-item.selected {
+            border-color: #0891b2;
+            border-width: 3px;
+        }
+
+        .suggested-message-item {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 12px;
+            background: #f4f4f5;
+            border-radius: 8px;
+            cursor: move;
+            transition: all 0.2s;
+        }
+
+        .suggested-message-item:hover {
+            background: #e4e4e7;
+        }
+
+        .suggested-message-item.dragging {
+            opacity: 0.5;
+        }
+
+        .drag-handle {
+            color: #71717a;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .tab-toggle {
+            flex: 1;
+            padding: 10px;
+            background: #f4f4f5;
+            color: #52525b;
+            border: 1px solid #e4e4e7;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .tab-toggle.active {
+            background: #0891b2;
+            color: white;
+            border-color: #0891b2;
+        }
+
+        .tab-toggle:hover:not(.active) {
+            background: #e4e4e7;
+        }
+
+        /* Preview Panel Styles */
+        #previewTriggerButton {
+            transition: all 0.2s;
+        }
+
+        #previewTriggerButton:hover {
+            transform: scale(1.1);
+        }
+
+        #previewChatboxHeader {
+            transition: all 0.2s;
+        }
+
+        #previewSuggestedMessages button {
+            transition: all 0.2s;
+        }
+
+        #previewSuggestedMessages button:hover {
+            background: #f4f4f5;
+            border-color: #0891b2;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            .appearance-container {
+                grid-template-columns: 1fr;
+            }
+
+            .appearance-preview {
+                position: static;
+                margin-top: 30px;
             }
         }

@@ -1,0 +1,87 @@
+# Production Requirements - Optimized for AWS Deployment
+# Removed: PyTorch, CUDA, full transformers, training dependencies
+
+# Core Flask & Web Framework
+Flask==3.1.1
+Flask-Login==0.6.3
+flask-cors==6.0.1
+Werkzeug==3.1.3
+Jinja2==3.1.6
+MarkupSafe==3.0.2
+itsdangerous==2.2.0
+click==8.2.1
+blinker==1.9.0
+
+# Database
+mysql-connector-python==9.3.0
+SQLAlchemy==2.0.41
+
+# Environment & Config
+python-dotenv==1.1.1
+pydantic==2.11.7
+pydantic-settings==2.10.1
+pydantic_core==2.33.2
+
+# Vector Database (ChromaDB - needed for RAG)
+chromadb==1.0.15
+
+# Embeddings (sentence-transformers - minimal, no full transformers)
+sentence-transformers==5.0.0
+# Note: sentence-transformers will pull in minimal dependencies
+# It uses transformers internally but we don't need the full library
+
+# LangChain (for RAG)
+langchain==0.3.26
+langchain-community==0.3.27
+langchain-core==0.3.68
+langchain-huggingface==0.3.0
+langchain-text-splitters==0.3.8
+langchain-openai==0.2.11
+
+# OpenAI (for LLM)
+openai==1.57.0
+
+# Document Processing
+pypdf==5.7.0
+beautifulsoup4==4.13.4
+trafilatura==2.0.0
+html2text==2025.4.15
+
+# HTTP & Requests
+requests==2.32.4
+urllib3==2.5.0
+certifi==2025.7.9
+charset-normalizer==3.4.2
+idna==3.10
+
+# Utilities
+python-dateutil==2.9.0.post0
+pytz==2025.2
+tzdata==2025.2
+tzlocal==5.3.1
+
+# JSON & Data
+orjson==3.10.18
+
+# Security
+bcrypt==4.3.0
+
+# Logging
+coloredlogs==15.0.1
+humanfriendly==10.0
+
+# Optional: Monitoring (if needed)
+# langsmith==0.4.5
+
+# REMOVED (Not needed for production):
+# - torch==2.7.1 (1.7GB) - Only for local model training
+# - transformers==4.53.2 (56MB) - sentence-transformers includes minimal version
+# - datasets==4.0.0 - Only for training
+# - pandas==2.3.1 - Not used in production code
+# - scikit-learn==1.7.0 - Not used
+# - scipy==1.16.0 - Not used
+# - nvidia-* (all packages) - CUDA libraries, not needed
+# - triton==3.3.1 - PyTorch dependency
+# - plotly==6.2.0 - Not used
+# - onnxruntime==1.22.1 - Not used
+

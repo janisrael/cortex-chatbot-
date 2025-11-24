@@ -112,6 +112,7 @@ class MigrationManager:
             (2, "002_add_username_field", MigrationManager._migration_002_add_username_field),
             (3, "003_create_prompt_presets", MigrationManager._migration_003_create_prompt_presets),
             (4, "004_create_crawled_urls", MigrationManager._migration_004_create_crawled_urls),
+            (5, "005_create_chatbot_appearance", MigrationManager._migration_005_create_chatbot_appearance),
         ]
         
         for version, name, migration_func in migrations:
@@ -181,6 +182,13 @@ class MigrationManager:
         from models.crawled_url import CrawledUrl
         # This is handled by CrawledUrl.init_db(), so we just ensure it's called
         CrawledUrl.init_db()
+    
+    @staticmethod
+    def _migration_005_create_chatbot_appearance():
+        """Create chatbot_appearance table for storing appearance configuration"""
+        from models.chatbot_appearance import ChatbotAppearance
+        # This is handled by ChatbotAppearance.init_db(), so we just ensure it's called
+        ChatbotAppearance.init_db()
 
 
 def run_migrations():

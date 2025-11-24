@@ -1,12 +1,87 @@
 """Widget and demo blueprint"""
-from flask import Blueprint, request, render_template, send_from_directory
+from flask import Blueprint, request, render_template, send_from_directory, jsonify, url_for
 from flask_login import login_required, current_user
 from services.config_service import load_user_chatbot_config
 from utils.api_key import validate_api_key
 from config.constants import SUGGESTED_MESSAGES
+from models.chatbot_appearance import ChatbotAppearance
+from urllib.parse import quote
+import json
 import os
 
 widget_bp = Blueprint('widget', __name__)
+
+
+def _build_widget_config(user_id):
+    """Assemble widget/appearance config for a user"""
+    user_config = load_user_chatbot_config(user_id)
+    bot_name = user_config.get('bot_name', 'Cortex')
+    website_name = bot_name
+    
+    primary_color = '#0891b2'
+    primary_color_obj = None
+    contrast_text = '#ffffff'
+    short_info = 'Your friendly assistant'
+    avatar = {
+        'type': 'preset',
+        'value': 'avatar_1',
+        'fallback': 'ui-avatars',
+        'src': '/static/img/avatar/avatar_1.png'
+    }
+    suggested = list(SUGGESTED_MESSAGES)
+    
+    appearance = ChatbotAppearance.get_by_user(user_id)
+    if appearance:
+        appearance_dict = ChatbotAppearance.to_dict(appearance)
+        primary_color_obj = appearance_dict.get('primary_color')
+        if isinstance(primary_color_obj, dict):
+            primary_color = primary_color_obj.get('value', '#0891b2')
+            contrast_text = primary_color_obj.get('contrast_text', '#ffffff')
+        elif isinstance(primary_color_obj, str):
+            primary_color = primary_color_obj
+            primary_color_obj = None
+            contrast_text = '#ffffff'
+        else:
+            primary_color_obj = None
+        
+        suggested_raw = appearance_dict.get('suggested_messages', [])
+        if suggested_raw and isinstance(suggested_raw, list):
+            processed = [msg.get('text', msg) if isinstance(msg, dict) else msg for msg in suggested_raw]
+            suggested = processed or suggested
+        
+        avatar = appearance_dict.get('avatar', avatar)
+        short_info = appearance_dict.get('short_info', short_info)
+    
+    avatar_url = None
+    if avatar:
+        avatar_value = avatar.get('value')
+        if avatar.get('type') == 'preset' and avatar_value:
+            avatar_url = url_for('static', filename=f"img/avatar/{avatar_value}.png", _external=True)
+        elif avatar.get('src'):
+            src_value = avatar['src']
+            if src_value.startswith('http'):
+                avatar_url = src_value
+            else:
+                avatar_url = request.host_url.rstrip('/') + src_value
+    
+    if not avatar_url:
+        hex_color = primary_color.replace('#', '')[:6] or '0891b2'
+        avatar_url = (
+            f"https://ui-avatars.com/api/?name={quote(bot_name)}"
+            f"&background={hex_color}&color=fff&size=64&rounded=true"
+        )
+    
+    return {
+        'bot_name': bot_name,
+        'website_name': website_name,
+        'primary_color': primary_color,
+        'primary_color_obj': primary_color_obj,
+        'contrast_text': contrast_text,
+        'avatar': avatar,
+        'avatar_url': avatar_url,
+        'short_info': short_info,
+        'suggested_messages': suggested
+    }
 
 
 @widget_bp.route("/demo")
@@ -60,25 +135,69 @@ def widget_multi():
     try:
         user_config = load_user_chatbot_config(user_id)
         bot_name = user_config.get('bot_name', 'Cortex')
-        primary_color = '#0891b2'  # Default primary color
+        
+        # Load appearance config from database
+        from models.chatbot_appearance import ChatbotAppearance
+        appearance = ChatbotAppearance.get_by_user(user_id)
+        
+        if appearance:
+            appearance_dict = ChatbotAppearance.to_dict(appearance)
+            # Get primary color (handle both string and object format)
+            primary_color_obj = appearance_dict.get('primary_color')
+            if isinstance(primary_color_obj, dict):
+                primary_color = primary_color_obj.get('value', '#0891b2')
+                contrast_text = primary_color_obj.get('contrast_text', '#ffffff')
+            elif isinstance(primary_color_obj, str):
+                primary_color = primary_color_obj
+                contrast_text = '#ffffff'  # Default contrast for string colors
+            else:
+                primary_color = '#0891b2'
+                contrast_text = '#ffffff'
+            
+            # Get suggested messages
+            suggested = appearance_dict.get('suggested_messages', [])
+            if not suggested or not isinstance(suggested, list):
+                from config.constants import SUGGESTED_MESSAGES
+                suggested = SUGGESTED_MESSAGES
+            else:
+                # Convert to list of strings if needed
+                suggested = [msg.get('text', msg) if isinstance(msg, dict) else msg for msg in suggested]
+            
+            # Get avatar
+            avatar = appearance_dict.get('avatar', {})
+            short_info = appearance_dict.get('short_info', 'Your friendly assistant')
+        else:
+            # Defaults
+            primary_color = '#0891b2'
+            contrast_text = '#ffffff'
+            suggested = SUGGESTED_MESSAGES if 'SUGGESTED_MESSAGES' in locals() else []
+            avatar = {'type': 'preset', 'value': 'avatar_1', 'fallback': 'ui-avatars'}
+            short_info = 'Your friendly assistant'
+        
         website_name = bot_name  # Use bot name as website name
     except Exception as e:
         print(f"Error loading user config for widget: {e}")
+        import traceback
+        traceback.print_exc()
         bot_name = 'Cortex'
         primary_color = '#667eea'
         website_name = 'Website'
-    
-    # Get suggested messages (will be dynamic later)
-    from config.constants import SUGGESTED_MESSAGES
-    suggested = SUGGESTED_MESSAGES
+        from config.constants import SUGGESTED_MESSAGES
+        suggested = SUGGESTED_MESSAGES
+        avatar = {'type': 'preset', 'value': 'avatar_1', 'fallback': 'ui-avatars'}
+        short_info = 'Your friendly assistant'
     
     # Pass user-specific config to template - use embeddable widget
     return render_template("widget/widget_embed.html", 
                          bot_name=bot_name,
                          primary_color=primary_color,
+                         primary_color_obj=primary_color_obj if 'primary_color_obj' in locals() else None,
+                         contrast_text=contrast_text if 'contrast_text' in locals() else '#ffffff',
                          website_name=website_name,
                          api_key=api_key,
-                         suggested=suggested)
+                         suggested=suggested,
+                         avatar=avatar,
+                         short_info=short_info)
 
 
 @widget_bp.route("/embed.js")
@@ -110,18 +229,48 @@ def serve_embed_script_multi():
     try:
         user_config = load_user_chatbot_config(user_id)
         bot_name = user_config.get('bot_name', 'Cortex')
-        primary_color = '#0891b2'
+        
+        # Load appearance config from database
+        from models.chatbot_appearance import ChatbotAppearance
+        appearance = ChatbotAppearance.get_by_user(user_id)
+        
+        if appearance:
+            appearance_dict = ChatbotAppearance.to_dict(appearance)
+            # Get primary color (handle both string and object format)
+            primary_color_obj = appearance_dict.get('primary_color')
+            if isinstance(primary_color_obj, dict):
+                primary_color = primary_color_obj.get('value', '#0891b2')
+            elif isinstance(primary_color_obj, str):
+                primary_color = primary_color_obj
+            else:
+                primary_color = '#0891b2'
+            
+            # Get avatar
+            avatar = appearance_dict.get('avatar', {})
+            short_info = appearance_dict.get('short_info', 'Your friendly assistant')
+        else:
+            # Defaults
+            primary_color = '#0891b2'
+            avatar = {'type': 'preset', 'value': 'avatar_1', 'fallback': 'ui-avatars'}
+            short_info = 'Your friendly assistant'
+        
         website_name = bot_name
     except Exception as e:
         print(f"Error loading user config for embed: {e}")
+        import traceback
+        traceback.print_exc()
         bot_name = 'Cortex'
         primary_color = '#667eea'
         website_name = 'Website'
+        avatar = {'type': 'preset', 'value': 'avatar_1', 'fallback': 'ui-avatars'}
+        short_info = 'Your friendly assistant'
     
     config = {
         'bot_name': bot_name,
         'primary_color': primary_color,
-        'name': website_name
+        'name': website_name,
+        'avatar': avatar,
+        'short_info': short_info
     }
     
     # Generate dynamic embed script with user-specific config
@@ -171,6 +320,8 @@ console.log('✅ sendSuggestion function defined globally (SYNCHRONOUS)');
         apiKey: '{api_key}',
         botName: '{config.get('bot_name', 'Assistant')}',
         primaryColor: '{config.get('primary_color', '#667eea')}',
+        avatar: {config.get('avatar', {})},
+        shortInfo: '{config.get('short_info', 'Your friendly assistant')}',
         websiteName: '{config.get('name', 'Website')}'
     }};
     

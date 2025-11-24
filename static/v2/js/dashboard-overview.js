@@ -23,9 +23,35 @@ function switchTab(tabName) {
         loadStats();
     } else if (tabName === 'knowledge') {
         refreshFileList(); // Load files when knowledge tab is opened
+    } else if (tabName === 'llm') {
+        // Initialize LLM provider selection when LLM tab is opened
+        console.log('📑 LLM tab opened, initializing provider selection...');
+        setTimeout(() => {
+            if (typeof window.initializeLLMProvider === 'function') {
+                console.log('✅ Calling window.initializeLLMProvider...');
+                window.initializeLLMProvider();
+            } else if (typeof initializeLLMProvider === 'function') {
+                console.log('✅ Calling initializeLLMProvider...');
+                initializeLLMProvider();
+            } else {
+                console.error('❌ initializeLLMProvider function not found!');
+                // Try to manually populate models
+                if (typeof onProviderChange === 'function') {
+                    console.log('🔄 Trying onProviderChange directly...');
+                    onProviderChange();
+                } else if (typeof window.onProviderChange === 'function') {
+                    console.log('🔄 Trying window.onProviderChange directly...');
+                    window.onProviderChange();
+                }
+            }
+        }, 200);
     } else if (tabName === 'prompt') {
         loadPrompt();
         loadPresets(); // Load prompt presets
+    } else if (tabName === 'appearance') {
+        if (typeof initializeAppearance === 'function') {
+            initializeAppearance();
+        }
     } else if (tabName === 'integration') {
         updateIntegrationSnippet();
     }
@@ -111,12 +137,12 @@ async function loadStats() {
         // Update overview stats
         const totalDocs = document.getElementById('totalDocs');
         const totalFiles = document.getElementById('totalFiles');
-        const llmModel = document.getElementById('llmModel');
+        const llmModelDisplay = document.getElementById('llmModelDisplay');
         const currentWebsite = document.getElementById('currentWebsite');
         
         if (totalDocs) totalDocs.textContent = stats.total_documents || 0;
         if (totalFiles) totalFiles.textContent = stats.uploaded_files?.length || 0;
-        if (llmModel) llmModel.textContent = stats.llm_model || 'Unknown';
+        if (llmModelDisplay) llmModelDisplay.textContent = stats.llm_model || 'Unknown';
         if (currentWebsite) currentWebsite.textContent = websites[currentWebsiteId]?.name || currentWebsiteId;
         
         // Update system management stats

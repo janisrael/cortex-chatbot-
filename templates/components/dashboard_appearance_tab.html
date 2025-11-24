@@ -1,0 +1,292 @@
+<!-- Appearance Tab -->
+<div id="appearance-tab" class="tab-content">
+    <div class="appearance-container" style="display: grid; grid-template-columns: 1fr 400px; gap: 30px; align-items: start;">
+        
+        <!-- Left Column: Settings -->
+        <div class="appearance-settings">
+            <div class="card">
+                <h2>
+                    <span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">palette</span>
+                    Appearance Settings
+                </h2>
+                
+                <div class="alert alert-success" id="appearanceSuccess" style="display: none;"></div>
+                <div class="alert alert-error" id="appearanceError" style="display: none;"></div>
+                
+                <!-- Chatbot Info Section -->
+                <div class="form-section" style="margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid #e4e4e7;">
+                    <h3 style="margin-bottom: 20px; font-size: 18px; color: #18181b;">
+                        <span class="material-icons-round" style="vertical-align: middle; font-size: 20px;">info</span>
+                        Chatbot Information
+                    </h3>
+                    
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #52525b;">
+                            Description
+                        </label>
+                        <input type="text" id="chatbotDescription" class="form-control" placeholder="Your friendly assistant" maxlength="100" style="width: 100%; padding: 10px; border: 1px solid #e4e4e7; border-radius: 8px; font-size: 14px;">
+                        <small style="display: block; margin-top: 5px; color: #71717a; font-size: 12px;">
+                            Brief description shown below the chatbot name in the chatbox header (max 100 characters).
+                        </small>
+                    </div>
+                </div>
+                
+                <!-- Primary Color Section -->
+                <div class="form-section" style="margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid #e4e4e7;">
+                    <h3 style="margin-bottom: 20px; font-size: 18px; color: #18181b;">
+                        <span class="material-icons-round" style="vertical-align: middle; font-size: 20px;">color_lens</span>
+                        Primary Color
+                    </h3>
+                    
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #52525b;">
+                            Color Type
+                        </label>
+                        <div style="display: flex; gap: 15px;">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="colorType" value="solid" checked style="margin-right: 8px;">
+                                <span>Solid</span>
+                            </label>
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="colorType" value="gradient" style="margin-right: 8px;">
+                                <span>Gradient</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Solid Color Picker -->
+                    <div id="solidColorSection" class="color-section">
+                        <div class="form-group">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #52525b;">
+                                Color
+                            </label>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="color" id="solidColorPicker" value="#0891b2" style="width: 60px; height: 40px; border: 2px solid #e4e4e7; border-radius: 8px; cursor: pointer;">
+                                <input type="text" id="solidColorInput" value="#0891b2" placeholder="#0891b2" style="flex: 1; padding: 10px; border: 1px solid #e4e4e7; border-radius: 8px; font-family: monospace;">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gradient Builder -->
+                    <div id="gradientColorSection" class="color-section" style="display: none;">
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #52525b;">
+                                Direction
+                            </label>
+                            <select id="gradientDirection" style="width: 100%; padding: 10px; border: 1px solid #e4e4e7; border-radius: 8px;">
+                                <option value="to right">Left to Right</option>
+                                <option value="to bottom">Top to Bottom</option>
+                                <option value="to bottom right">Top Left to Bottom Right</option>
+                                <option value="to bottom left">Top Right to Bottom Left</option>
+                                <option value="135deg">Diagonal (135deg)</option>
+                                <option value="45deg">Diagonal (45deg)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #52525b;">
+                                Colors
+                            </label>
+                            <div id="gradientColors" style="display: flex; flex-direction: column; gap: 10px;">
+                                <!-- Gradient color stops will be added here dynamically -->
+                            </div>
+                            <button type="button" id="addGradientColor" style="margin-top: 10px; padding: 8px 16px; background: #f4f4f5; border: 1px solid #e4e4e7; border-radius: 8px; cursor: pointer; font-size: 14px;">
+                                <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">add</span>
+                                Add Color
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #52525b;">
+                            Contrast Text Color (Auto-calculated)
+                        </label>
+                        <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: #f4f4f5; border-radius: 8px;">
+                            <div id="contrastTextPreview" style="width: 30px; height: 30px; border-radius: 50%; border: 2px solid #e4e4e7; background: #ffffff;"></div>
+                            <span id="contrastTextValue" style="font-family: monospace; color: #52525b;">#ffffff</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Avatar Section -->
+                <div class="form-section" style="margin-bottom: 30px; padding-bottom: 30px; border-bottom: 1px solid #e4e4e7;">
+                    <h3 style="margin-bottom: 20px; font-size: 18px; color: #18181b;">
+                        <span class="material-icons-round" style="vertical-align: middle; font-size: 20px;">face</span>
+                        Avatar
+                    </h3>
+                    
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #52525b;">
+                            Current Avatar
+                        </label>
+                        <div id="currentAvatarPreview" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid #e4e4e7; display: flex; align-items: center; justify-content: center; background: #f4f4f5; margin-bottom: 15px;">
+                            <span class="material-icons-round" style="font-size: 40px; color: #71717a;">face</span>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                        <button type="button" id="showPresetsBtn" class="tab-toggle active" style="flex: 1; padding: 10px; background: #0891b2; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                            Presets
+                        </button>
+                        <button type="button" id="showUploadBtn" class="tab-toggle" style="flex: 1; padding: 10px; background: #f4f4f5; color: #52525b; border: 1px solid #e4e4e7; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                            Upload
+                        </button>
+                    </div>
+                    
+                    <!-- Preset Avatars -->
+                    <div id="presetAvatarsSection" class="avatar-section">
+                        <label style="display: block; margin-bottom: 12px; font-weight: 500; color: #52525b;">
+                            Select Preset Avatar
+                        </label>
+                        <div id="presetAvatarsGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                            <!-- Preset avatars -->
+                            <div class="preset-avatar-item" data-preset="avatar_1" data-name="cort" style="display: flex; flex-direction: column; align-items: center; gap: 12px; cursor: pointer;">
+                                <div style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid #e4e4e7; background: transparent; display: flex; align-items: center; justify-content: center; overflow: visible; transition: all 0.2s; position: relative;">
+                                    <img src="/static/img/avatar/avatar_1.png" alt="Cort" style="width: 100%; height: 100%; border-radius: 50%; object-fit: contain; display: block;">
+                                </div>
+                                <span style="font-size: 14px; font-weight: 500; color: #52525b; margin-top: 4px;">Cort</span>
+                            </div>
+                            <div class="preset-avatar-item" data-preset="avatar_2" data-name="janiz" style="display: flex; flex-direction: column; align-items: center; gap: 12px; cursor: pointer;">
+                                <div style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid #e4e4e7; background: transparent; display: flex; align-items: center; justify-content: center; overflow: visible; transition: all 0.2s; position: relative;">
+                                    <img src="/static/img/avatar/avatar_2.png" alt="Janiz" style="width: 100%; height: 100%; border-radius: 50%; object-fit: contain; display: block;">
+                                </div>
+                                <span style="font-size: 14px; font-weight: 500; color: #52525b; margin-top: 4px;">Janiz</span>
+                            </div>
+                            <div class="preset-avatar-item" data-preset="avatar_3" data-name="levi" style="display: flex; flex-direction: column; align-items: center; gap: 12px; cursor: pointer;">
+                                <div style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid #e4e4e7; background: transparent; display: flex; align-items: center; justify-content: center; overflow: visible; transition: all 0.2s; position: relative;">
+                                    <img src="/static/img/avatar/avatar_3.png" alt="Levi" style="width: 100%; height: 100%; border-radius: 50%; object-fit: contain; display: block;">
+                                </div>
+                                <span style="font-size: 14px; font-weight: 500; color: #52525b; margin-top: 4px;">Levi</span>
+                            </div>
+                        </div>
+                        <small style="display: block; margin-top: 10px; color: #71717a; font-size: 12px;">
+                            Click to select an avatar.
+                        </small>
+                    </div>
+                    
+                    <!-- Upload Avatar -->
+                    <div id="uploadAvatarSection" class="avatar-section" style="display: none;">
+                        <label style="display: block; margin-bottom: 12px; font-weight: 500; color: #52525b;">
+                            Upload Custom Avatar
+                        </label>
+                        <div style="border: 2px dashed #e4e4e7; border-radius: 8px; padding: 30px; text-align: center; background: #fafafa;">
+                            <input type="file" id="avatarUpload" accept="image/png,image/jpeg,image/svg+xml,image/webp" style="display: none;">
+                            <label for="avatarUpload" style="display: inline-block; padding: 12px 24px; background: #0891b2; color: white; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                                <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">upload</span>
+                                Choose File
+                            </label>
+                            <p id="avatarFileName" style="margin-top: 10px; color: #71717a; font-size: 14px;">No file selected</p>
+                            <small style="display: block; margin-top: 10px; color: #71717a; font-size: 12px;">
+                                PNG, JPG, SVG, or WebP. Max 2MB. Square images recommended (512x512px).
+                            </small>
+                        </div>
+                        <button type="button" id="removeAvatarBtn" style="margin-top: 15px; padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; display: none;">
+                            <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">delete</span>
+                            Remove Avatar
+                        </button>
+                        <small style="display: block; margin-top: 10px; color: #71717a; font-size: 12px;">
+                            Upload functionality will be implemented in Phase 4. UI is ready.
+                        </small>
+                    </div>
+                </div>
+                
+                <!-- Suggested Messages Section -->
+                <div class="form-section">
+                    <h3 style="margin-bottom: 20px; font-size: 18px; color: #18181b;">
+                        <span class="material-icons-round" style="vertical-align: middle; font-size: 20px;">chat_bubble_outline</span>
+                        Suggested Messages
+                    </h3>
+                    
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #52525b;">
+                            Quick Message Buttons (Max: 5)
+                        </label>
+                        <p style="margin-bottom: 15px; color: #71717a; font-size: 14px;">
+                            These messages appear as quick-action buttons in the chat widget. Drag to reorder.
+                        </p>
+                        
+                        <div id="suggestedMessagesList" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
+                            <!-- Suggested messages will be loaded here -->
+                        </div>
+                        
+                        <button type="button" id="addMessageBtn" style="padding: 10px 20px; background: #0891b2; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+                            <span class="material-icons-round" style="font-size: 18px;">add</span>
+                            Add Message
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Save Button -->
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e4e4e7;">
+                    <button type="button" id="saveAppearanceBtn" style="width: 100%; padding: 14px; background: #0891b2; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                        <span class="material-icons-round" style="vertical-align: middle; font-size: 20px;">save</span>
+                        Save Appearance Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Column: Preview -->
+        <div class="appearance-preview" style="position: sticky; top: 20px;">
+            <div class="card" style="background: #fafafa;">
+                <h3 style="margin-bottom: 20px; font-size: 18px; color: #18181b;">
+                    <span class="material-icons-round" style="vertical-align: middle; font-size: 20px;">preview</span>
+                    Live Preview
+                </h3>
+                
+                <!-- Chatbox Preview -->
+                <div style="border: 1px solid #e4e4e7; border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <!-- Header -->
+                    <div id="previewChatboxHeader" style="background: #0891b2; color: white; padding: 16px; display: flex; align-items: center; gap: 12px;">
+                        <img id="previewHeaderAvatar" src="" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%; display: none;">
+                        <span class="material-icons-round" id="previewHeaderIcon" style="font-size: 24px;">face</span>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; font-size: 16px;" id="previewBotName">Cortex</div>
+                            <div style="font-size: 14px; color: rgba(255, 255, 255, 0.9); margin: 0;" id="previewBotDescription">Your friendly assistant</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Messages Area -->
+                    <div style="height: 200px; padding: 16px; overflow-y: auto; background: #fafafa;">
+                        <div style="margin-bottom: 12px;">
+                            <div style="max-width: 70%; padding: 10px 14px; background: #f4f4f5; border-radius: 12px; font-size: 14px; color: #27272a;">
+                                Hello! How can I help you today?
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Suggested Messages Preview -->
+                    <div id="previewSuggestedMessages" style="padding: 12px; border-top: 1px solid #e4e4e7; background: white; display: flex; gap: 8px; overflow-x: auto;">
+                        <!-- Suggested message buttons will appear here -->
+                    </div>
+                    
+                    <!-- Input Area -->
+                    <div style="padding: 12px; border-top: 1px solid #e4e4e7; background: white; display: flex; gap: 8px; align-items: center;">
+                        <input type="text" placeholder="Type a message..." style="flex: 1; padding: 10px; border: 1px solid #e4e4e7; border-radius: 20px; font-size: 14px; outline: none;" disabled>
+                        <button id="previewSendButton" style="width: 40px; height: 40px; border-radius: 50%; background: #0891b2; color: white; border: none; display: flex; align-items: center; justify-content: center; cursor: not-allowed;" disabled>
+                            <span class="material-icons-round" style="font-size: 20px;">send</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 15px; padding: 12px; background: #f4f4f5; border-radius: 8px; font-size: 12px; color: #71717a; text-align: center;">
+                    <span class="material-icons-round" style="vertical-align: middle; font-size: 16px;">info</span>
+                    Preview only - Not functional
+                </div>
+                
+                <!-- Widget Trigger Button Preview -->
+                <div style="margin-top: 30px; display: flex; justify-content: flex-end;">
+                    <div>
+                        <label style="display: block; margin-bottom: 10px; font-weight: 500; color: #52525b; font-size: 14px; text-align: right;">
+                            Widget Trigger Button
+                        </label>
+                        <div id="previewTriggerButton" style="width: 60px; height: 60px; border-radius: 50%; background: #0891b2; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); cursor: pointer; overflow: hidden;">
+                            <img id="previewTriggerAvatar" src="" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: none;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
