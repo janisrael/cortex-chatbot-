@@ -1,22 +1,82 @@
 <!-- Overview Tab -->
 <div id="overview-tab" class="tab-content active">
-    <!-- Statistics Section -->
-    <div class="stats-grid" id="statsGrid">
-        <div class="stat-card">
-            <div class="stat-value" id="totalDocs">-</div>
-            <div class="stat-label">Documents</div>
+    <div class="overview-top-grid">
+        <!-- Chatbot summary -->
+        <div class="card chatbot-summary-card">
+            <div class="chatbot-summary-header">
+                <div class="chatbot-avatar" id="overviewBotAvatar">
+                    <img id="overviewBotAvatarImg" src="/static/img/avatar/avatar_1.png" alt="Bot avatar">
+                </div>
+                <div>
+                    <h2 id="overviewBotName">Cortex</h2>
+                    <p id="overviewBotDescription">Customize your bot description from the Appearance tab.</p>
+                </div>
+            </div>
+            <div class="chatbot-summary-meta">
+                <div>
+                    <span class="meta-label">Persona</span>
+                    <span class="meta-value" id="overviewBotPersona">Virtual Assistant</span>
+                </div>
+                <div>
+                    <span class="meta-label">LLM</span>
+                    <span class="meta-value" id="overviewLLMModel">GPT-4o Mini</span>
+                </div>
+            </div>
+            <div class="persona-template-card" id="personaTemplateCard">
+                <div class="persona-icon">
+                    <span class="material-icons-round" id="overviewPersonaIcon">support_agent</span>
+                </div>
+                <div>
+                    <div class="persona-title" id="overviewPersonaTitle">Virtual Assistant</div>
+                    <div class="persona-description" id="overviewPersonaDescription">
+                        General-purpose helpful assistant
+                    </div>
+                </div>
+            </div>
+            <div class="chatbot-summary-footer">
+                <span class="chip" id="overviewWebsiteChip">Default Website</span>
+                <span class="chip" id="overviewKnowledgeChip">0 knowledge chunks</span>
+            </div>
         </div>
-        <div class="stat-card">
-            <div class="stat-value" id="totalFiles">-</div>
-            <div class="stat-label">Uploaded Files</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value" id="llmModelDisplay">-</div>
-            <div class="stat-label">LLM Model</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value" id="currentWebsite">-</div>
-            <div class="stat-label">Current Website</div>
+
+        <!-- Metrics -->
+        <div class="card knowledge-metrics-card">
+            <h2 style="display: flex; align-items: center; gap: 8px;">
+                <span class="material-icons-round" style="font-size: 24px;">analytics</span>
+                Knowledge Snapshot
+            </h2>
+            <div class="overview-metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <span class="material-icons-round">public</span>
+                    </div>
+                    <div class="metric-details">
+                        <div class="metric-label">Crawled Websites</div>
+                        <div class="metric-value" id="crawledSitesCount">-</div>
+                        <div class="metric-subtext" id="crawledSitesSubtext">Awaiting ingestion</div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <span class="material-icons-round">cloud_upload</span>
+                    </div>
+                    <div class="metric-details">
+                        <div class="metric-label">Uploaded Files</div>
+                        <div class="metric-value" id="uploadedFilesCount">-</div>
+                        <div class="metric-subtext" id="uploadedFilesSubtext">Synced to RAG</div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <span class="material-icons-round">help_center</span>
+                    </div>
+                    <div class="metric-details">
+                        <div class="metric-label">FAQ Entries</div>
+                        <div class="metric-value" id="faqEntriesCount">-</div>
+                        <div class="metric-subtext" id="faqEntriesSubtext">Add FAQ documents</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -50,13 +110,4 @@
             </div>
         </div>
     </div>
-
-    <!-- File List -->
-    <div class="card">
-        <h2><span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">folder</span> Recent Files</h2>
-        <div class="file-list" id="overviewFileList">
-            Loading files...
-        </div>
-    </div>
 </div>
-
