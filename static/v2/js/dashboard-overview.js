@@ -340,14 +340,15 @@ function updateOverviewMetrics(stats, crawledData, config) {
     const crawledList = Array.isArray(crawledData?.urls) ? crawledData.urls : [];
     const crawledCount = typeof crawledData?.total === 'number' ? crawledData.total : crawledList.length;
     const ingestedCount = crawledList.filter(url => url.status === 'ingested').length;
-    const faqCount = getFaqCountFromFiles(uploadedFiles);
+    const faqCount = stats.faq_count || 0;
+    const ingestedFaqCount = stats.ingested_faq_count || 0;
     
     setTextContent('crawledSitesCount', crawledCount ?? '—');
     setTextContent('uploadedFilesCount', uploadedFiles.length ?? '—');
     setTextContent('faqEntriesCount', faqCount ?? '—');
     setTextContent('crawledSitesSubtext', `${ingestedCount} ingested`);
     setTextContent('uploadedFilesSubtext', `${stats.total_documents || 0} knowledge chunks`);
-    setTextContent('faqEntriesSubtext', faqCount > 0 ? 'Auto-tagged from uploads' : 'Add FAQ documents');
+    setTextContent('faqEntriesSubtext', ingestedFaqCount > 0 ? `${ingestedFaqCount} ingested` : 'Add FAQ entries');
     
     updateChatbotOverviewCard(config, stats);
 }

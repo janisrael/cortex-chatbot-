@@ -891,6 +891,395 @@ def delete_crawled_url(crawled_id):
         return jsonify({"error": str(e)}), 500
 
 
+# ==================== FAQ Endpoints ====================
+
+@api_bp.route("/api/faqs", methods=["GET"])
+@login_required
+def get_faqs():
+    """Get all FAQs for the current user"""
+    try:
+        if not current_user.is_authenticated:
+            return jsonify({"error": "Authentication required"}), 401
+        
+        user_id = current_user.id
+        from models.faq import FAQ
+        
+        status = request.args.get('status', None)  # Optional filter by status
+        faqs = FAQ.get_all_by_user(user_id, status=status)
+        
+        # Convert datetime objects to ISO format strings
+        for faq in faqs:
+            if 'created_at' in faq and faq['created_at']:
+                if isinstance(faq['created_at'], datetime):
+                    faq['created_at'] = faq['created_at'].isoformat()
+            if 'updated_at' in faq and faq['updated_at']:
+                if isinstance(faq['updated_at'], datetime):
+                    faq['updated_at'] = faq['updated_at'].isoformat()
+            if 'ingested_at' in faq and faq['ingested_at']:
+                if isinstance(faq['ingested_at'], datetime):
+                    faq['ingested_at'] = faq['ingested_at'].isoformat()
+        
+        return jsonify({
+            "faqs": faqs,
+            "total": len(faqs)
+        })
+    except Exception as e:
+        print(f"❌ Get FAQs error: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+
+@api_bp.route("/api/faqs/<int:faq_id>", methods=["GET"])
+@login_required
+def get_faq(faq_id):
+    """Get a single FAQ by ID"""
+    try:
+        if not current_user.is_authenticated:
+            return jsonify({"error": "Authentication required"}), 401
+        
+        user_id = current_user.id
+        from models.faq import FAQ
+        
+        faq = FAQ.get_by_id(user_id, faq_id)
+        if not faq:
+            return jsonify({"error": "FAQ not found"}), 404
+        
+        # Convert datetime objects to ISO format strings
+        if 'created_at' in faq and faq['created_at']:
+            if isinstance(faq['created_at'], datetime):
+                faq['created_at'] = faq['created_at'].isoformat()
+        if 'updated_at' in faq and faq['updated_at']:
+            if isinstance(faq['updated_at'], datetime):
+                faq['updated_at'] = faq['updated_at'].isoformat()
+        if 'ingested_at' in faq and faq['ingested_at']:
+            if isinstance(faq['ingested_at'], datetime):
+                faq['ingested_at'] = faq['ingested_at'].isoformat()
+        
+        return jsonify(faq)
+    except Exception as e:
+        print(f"❌ Get FAQ error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@api_bp.route("/api/faqs", methods=["POST"])
+@login_required
+def create_faq():
+    """Create a new FAQ"""
+    try:
+        if not current_user.is_authenticated:
+            return jsonify({"error": "Authentication required"}), 401
+        
+        user_id = current_user.id
+        data = request.json
+        
+        question = data.get('question', '').strip()
+        answer = data.get('answer', '').strip()
+        category = data.get('category', 'company_details')
+        
+        if not question:
+            return jsonify({"error": "Question is required"}), 400
+        if not answer:
+            return jsonify({"error": "Answer is required"}), 400
+        
+        from models.faq import FAQ
+        
+        faq_id = FAQ.create(user_id, question, answer, category, status='draft')
+        
+        if faq_id:
+            faq = FAQ.get_by_id(user_id, faq_id)
+            # Convert datetime objects
+            if 'created_at' in faq and faq['created_at']:
+                if isinstance(faq['created_at'], datetime):
+                    faq['created_at'] = faq['created_at'].isoformat()
+            
+            return jsonify({
+                "id": faq_id,
+                "message": "FAQ created successfully",
+                "faq": faq
+            }), 201
+        else:
+            return jsonify({"error": "Failed to create FAQ"}), 500
+            
+    except Exception as e:
+        print(f"❌ Create FAQ error: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+
+@api_bp.route("/api/faqs/<int:faq_id>", methods=["PUT"])
+@login_required
+def update_faq(faq_id):
+    """Update an existing FAQ"""
+    try:
+        if not current_user.is_authenticated:
+            return jsonify({"error": "Authentication required"}), 401
+        
+        user_id = current_user.id
+        data = request.json
+        
+        from models.faq import FAQ
+        
+        # Check if FAQ exists and belongs to user
+        faq = FAQ.get_by_id(user_id, faq_id)
+        if not faq:
+            return jsonify({"error": "FAQ not found"}), 404
+        
+        # Get update fields
+        question = data.get('question')
+        answer = data.get('answer')
+        category = data.get('category')
+        
+        # Update FAQ
+        success = FAQ.update(user_id, faq_id, question=question, answer=answer, category=category)
+        
+        if success:
+            # Get updated FAQ
+            updated_faq = FAQ.get_by_id(user_id, faq_id)
+            # Convert datetime objects
+            if 'updated_at' in updated_faq and updated_faq['updated_at']:
+                if isinstance(updated_faq['updated_at'], datetime):
+                    updated_faq['updated_at'] = updated_faq['updated_at'].isoformat()
+            
+            return jsonify({
+                "message": "FAQ updated successfully",
+                "faq": updated_faq
+            })
+        else:
+            return jsonify({"error": "Failed to update FAQ"}), 500
+            
+    except Exception as e:
+        print(f"❌ Update FAQ error: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+
+@api_bp.route("/api/faqs/<int:faq_id>", methods=["DELETE"])
+@login_required
+def delete_faq(faq_id):
+    """Delete an FAQ (and remove from vectorstore if ingested)"""
+    try:
+        if not current_user.is_authenticated:
+            return jsonify({"error": "Authentication required"}), 401
+        
+        user_id = current_user.id
+        from models.faq import FAQ
+        from services.knowledge_service import remove_file_from_vectorstore
+        
+        faq = FAQ.get_by_id(user_id, faq_id)
+        if not faq:
+            return jsonify({"error": "FAQ not found"}), 404
+        
+        # If ingested, remove from vectorstore
+        if faq.get('status') == 'active' and faq.get('ingested_at'):
+            try:
+                source_file = f"FAQ_{faq_id}"
+                remove_file_from_vectorstore(user_id, source_file)
+            except Exception as e:
+                print(f"⚠️ Warning: Could not remove FAQ from vectorstore: {e}")
+        
+        # Delete from database (soft delete)
+        success = FAQ.delete(faq_id)
+        
+        if success:
+            return jsonify({
+                "message": "FAQ deleted successfully"
+            })
+        else:
+            return jsonify({"error": "Failed to delete FAQ"}), 500
+            
+    except Exception as e:
+        print(f"❌ Delete FAQ error: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+
+@api_bp.route("/api/faqs/<int:faq_id>/ingest", methods=["POST"])
+@login_required
+def ingest_faq(faq_id):
+    """Ingest FAQ to knowledge base (vectorstore)"""
+    try:
+        if not current_user.is_authenticated:
+            return jsonify({"error": "Authentication required"}), 401
+        
+        user_id = current_user.id
+        from models.faq import FAQ
+        from services.knowledge_service import get_user_vectorstore, embeddings
+        from langchain.text_splitter import RecursiveCharacterTextSplitter
+        from langchain.schema import Document
+        
+        # Get FAQ
+        faq = FAQ.get_by_id(user_id, faq_id)
+        if not faq:
+            return jsonify({"error": "FAQ not found"}), 404
+        
+        if faq['status'] == 'active':
+            return jsonify({"error": "FAQ already ingested"}), 400
+        
+        # Create document from FAQ
+        # Format: "Q: {question}\nA: {answer}"
+        page_content = f"Q: {faq['question']}\nA: {faq['answer']}"
+        
+        # For FAQs, we'll use a single chunk (preserves Q&A context)
+        # But if the answer is very long, we can split it
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=2000,  # Larger chunks for FAQs
+            chunk_overlap=200,
+            length_function=len
+        )
+        
+        doc = Document(
+            page_content=page_content,
+            metadata={
+                'source_file': f"FAQ_{faq_id}",
+                'upload_time': datetime.now().isoformat(),
+                'category': faq['category'],
+                'user_id': str(user_id),
+                'source_type': 'faq',
+                'faq_id': faq_id,
+                'question': faq['question']
+            }
+        )
+        
+        chunks = text_splitter.split_documents([doc])
+        
+        # Add to vectorstore
+        user_vectorstore = get_user_vectorstore(user_id)
+        if user_vectorstore is None:
+            print(f"❌ Failed to get vectorstore for user {user_id}")
+            return jsonify({"error": "Failed to access knowledge base. Please check embeddings and vectorstore initialization."}), 500
+        
+        try:
+            # Ensure directory and all files are writable before adding documents
+            kb_path = f"./chroma_db/user_{user_id}"
+            import os
+            if os.path.exists(kb_path):
+                # Use more permissive permissions to avoid readonly database errors
+                os.chmod(kb_path, 0o777)
+                # Fix permissions on all subdirectories and database files
+                for root, dirs, files in os.walk(kb_path):
+                    for d in dirs:
+                        try:
+                            os.chmod(os.path.join(root, d), 0o777)
+                        except:
+                            pass
+                    for f in files:
+                        try:
+                            os.chmod(os.path.join(root, f), 0o666)
+                        except:
+                            pass
+            
+            print(f"📝 Adding {len(chunks)} FAQ chunks to vectorstore...")
+            user_vectorstore.add_documents(chunks)
+            print(f"✅ Successfully added FAQ chunks to vectorstore")
+            
+            # Update status to 'active' and set ingested_at
+            FAQ.update_status(faq_id, 'active')
+            
+            return jsonify({
+                "message": f"FAQ ingested successfully. Added {len(chunks)} chunk(s).",
+                "chunks_added": len(chunks),
+                "status": "active"
+            })
+        except Exception as e:
+            print(f"❌ Error adding FAQ to vectorstore: {e}")
+            import traceback
+            traceback.print_exc()
+            return jsonify({"error": f"Failed to add FAQ to knowledge base: {str(e)}"}), 500
+            
+    except Exception as e:
+        print(f"❌ Ingest FAQ error: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+
+@api_bp.route("/api/faqs/bulk-ingest", methods=["POST"])
+@login_required
+def bulk_ingest_faqs():
+    """Bulk ingest multiple FAQs to knowledge base"""
+    try:
+        if not current_user.is_authenticated:
+            return jsonify({"error": "Authentication required"}), 401
+        
+        user_id = current_user.id
+        data = request.json
+        faq_ids = data.get('faq_ids', [])
+        
+        if not faq_ids:
+            return jsonify({"error": "No FAQ IDs provided"}), 400
+        
+        from models.faq import FAQ
+        from services.knowledge_service import get_user_vectorstore, embeddings
+        from langchain.text_splitter import RecursiveCharacterTextSplitter
+        from langchain.schema import Document
+        
+        user_vectorstore = get_user_vectorstore(user_id)
+        if user_vectorstore is None:
+            return jsonify({"error": "Failed to access knowledge base."}), 500
+        
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=2000,
+            chunk_overlap=200,
+            length_function=len
+        )
+        
+        total_chunks = 0
+        ingested_count = 0
+        errors = []
+        
+        for faq_id in faq_ids:
+            try:
+                faq = FAQ.get_by_id(user_id, faq_id)
+                if not faq:
+                    errors.append(f"FAQ {faq_id} not found")
+                    continue
+                
+                if faq['status'] == 'active':
+                    errors.append(f"FAQ {faq_id} already ingested")
+                    continue
+                
+                # Create document
+                page_content = f"Q: {faq['question']}\nA: {faq['answer']}"
+                doc = Document(
+                    page_content=page_content,
+                    metadata={
+                        'source_file': f"FAQ_{faq_id}",
+                        'upload_time': datetime.now().isoformat(),
+                        'category': faq['category'],
+                        'user_id': str(user_id),
+                        'source_type': 'faq',
+                        'faq_id': faq_id,
+                        'question': faq['question']
+                    }
+                )
+                
+                chunks = text_splitter.split_documents([doc])
+                user_vectorstore.add_documents(chunks)
+                FAQ.update_status(faq_id, 'active')
+                
+                total_chunks += len(chunks)
+                ingested_count += 1
+            except Exception as e:
+                errors.append(f"FAQ {faq_id}: {str(e)}")
+        
+        return jsonify({
+            "message": f"Bulk ingest completed. {ingested_count} FAQ(s) ingested, {total_chunks} chunk(s) added.",
+            "ingested_count": ingested_count,
+            "total_chunks": total_chunks,
+            "errors": errors if errors else None
+        })
+        
+    except Exception as e:
+        print(f"❌ Bulk ingest FAQs error: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+
 @api_bp.route("/api/backup-knowledge", methods=["POST"])
 @login_required
 def backup_knowledge():

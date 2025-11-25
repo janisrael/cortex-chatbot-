@@ -7,6 +7,7 @@ import sqlite3
 from models import User
 from models.prompt_preset import PromptPreset
 from models.crawled_url import CrawledUrl
+from models.faq import FAQ
 
 
 class MigrationManager:
@@ -113,6 +114,7 @@ class MigrationManager:
             (3, "003_create_prompt_presets", MigrationManager._migration_003_create_prompt_presets),
             (4, "004_create_crawled_urls", MigrationManager._migration_004_create_crawled_urls),
             (5, "005_create_chatbot_appearance", MigrationManager._migration_005_create_chatbot_appearance),
+            (6, "006_create_faqs", MigrationManager._migration_006_create_faqs),
         ]
         
         for version, name, migration_func in migrations:
@@ -189,6 +191,13 @@ class MigrationManager:
         from models.chatbot_appearance import ChatbotAppearance
         # This is handled by ChatbotAppearance.init_db(), so we just ensure it's called
         ChatbotAppearance.init_db()
+    
+    @staticmethod
+    def _migration_006_create_faqs():
+        """Create faqs table for storing user-specific FAQ entries"""
+        from models.faq import FAQ
+        # This is handled by FAQ.init_db(), so we just ensure it's called
+        FAQ.init_db()
 
 
 def run_migrations():

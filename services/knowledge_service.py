@@ -42,8 +42,10 @@ def get_user_vectorstore(user_id):
     kb_path = get_user_knowledge_base_path(user_id)
     print(f"📁 Creating vectorstore for user {user_id} at: {kb_path}")
     
-    # Create directory if it doesn't exist
+    # Create directory if it doesn't exist with proper permissions
     os.makedirs(kb_path, exist_ok=True)
+    # Ensure directory is writable
+    os.chmod(kb_path, 0o755)
     
     try:
         # Create/load vectorstore for this user
@@ -109,6 +111,22 @@ def get_user_vectorstore(user_id):
         # Step 3: Create Chroma vectorstore (ALWAYS runs if client exists)
         if client:
             try:
+                # Ensure all subdirectories and files are writable before creating vectorstore
+                # Use more permissive permissions to avoid readonly database errors
+                for root, dirs, files in os.walk(kb_path):
+                    for d in dirs:
+                        dir_path = os.path.join(root, d)
+                        try:
+                            os.chmod(dir_path, 0o777)
+                        except:
+                            pass
+                    for f in files:
+                        file_path = os.path.join(root, f)
+                        try:
+                            os.chmod(file_path, 0o666)
+                        except:
+                            pass
+                
                 user_vectorstore = Chroma(
                     client=client,
                     collection_name=collection_name,
@@ -192,10 +210,17 @@ def get_knowledge_stats(user_id):
         from services.file_service import list_user_files
         files = list_user_files(user_id)
         
+        # Get FAQ count
+        from models.faq import FAQ
+        faqs = FAQ.get_all_by_user(user_id, status=None)  # Get all non-deleted FAQs
+        ingested_faqs = [f for f in faqs if f.get('ingested_at')]
+        
         return {
             "total_documents": max(0, doc_count),
             "vector_store_status": db_status,
-            "uploaded_files": files
+            "uploaded_files": files,
+            "faq_count": len(faqs),
+            "ingested_faq_count": len(ingested_faqs)
         }
     except Exception as e:
         print(f"❌ Stats error: {e}")
