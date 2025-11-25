@@ -1229,10 +1229,49 @@
             .integration-step {
                 flex-direction: column;
             }
-            
+
             .integration-step-number {
                 margin-bottom: 10px;
                 margin-right: 0;
+            }
+
+            /* FAQ Management Mobile Styles */
+            .faq-item {
+                padding: 12px !important;
+                margin-bottom: 12px !important;
+            }
+
+            .faq-item > div:first-child {
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+
+            .faq-item > div:last-child {
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+
+            .faq-item button {
+                width: 100% !important;
+                justify-content: center !important;
+            }
+
+            #faqQuestion,
+            #faqAnswer,
+            #faqCategory {
+                font-size: 16px !important; /* Prevents zoom on iOS */
+            }
+
+            #faqEditModal .modal-content {
+                margin: 10% auto !important;
+                max-width: 95vw !important;
+                padding: 15px !important;
+            }
+
+            #editFaqQuestion,
+            #editFaqAnswer,
+            #editFaqCategory {
+                font-size: 16px !important; /* Prevents zoom on iOS */
             }
             
             .customization-options {

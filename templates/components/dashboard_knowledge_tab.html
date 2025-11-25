@@ -100,6 +100,86 @@
                 </div>
             </div>
         </div>
+
+        <!-- FAQ Management -->
+        <div class="card">
+            <h2><span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">help_center</span> FAQ Management</h2>
+            
+            <div class="alert alert-success" id="faqSuccess" style="display: none;"></div>
+            <div class="alert alert-error" id="faqError" style="display: none;"></div>
+
+            <!-- Add FAQ Form -->
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label for="faqQuestion">Question</label>
+                <input type="text" id="faqQuestion" class="form-control" placeholder="e.g., What is your return policy?" style="margin-bottom: 12px;">
+                
+                <label for="faqAnswer">Answer</label>
+                <textarea id="faqAnswer" class="form-control" rows="4" placeholder="e.g., We offer a 30-day return policy for all products..." style="margin-bottom: 12px; resize: vertical;"></textarea>
+                
+                <label for="faqCategory">Category</label>
+                <select id="faqCategory" class="form-control" style="margin-bottom: 12px;">
+                    <option value="company_details">Company Details</option>
+                    <option value="products_services">Products & Services</option>
+                    <option value="support">Support</option>
+                    <option value="pricing">Pricing</option>
+                    <option value="other">Other</option>
+                </select>
+                
+                <button class="btn" onclick="createFAQ()" id="createFaqBtn" style="width: 100%;">
+                    <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">add</span> Add FAQ
+                </button>
+            </div>
+
+            <!-- FAQ List -->
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="margin: 0; font-size: 18px;">
+                        <span class="material-icons-round" style="vertical-align: middle; font-size: 20px;">help_center</span> 
+                        FAQ Entries
+                    </h3>
+                    <button class="btn btn-secondary" onclick="refreshFAQList()" style="padding: 6px 12px; font-size: 12px;">
+                        <span class="material-icons-round" style="vertical-align: middle; font-size: 16px;">refresh</span> Refresh
+                    </button>
+                </div>
+                <div id="faqList">
+                    Loading FAQs...
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FAQ Edit Modal -->
+<div id="faqEditModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); overflow: auto;">
+    <div class="modal-content" style="background-color: #1e1e1e; margin: 5% auto; padding: 20px; border: 1px solid #333; border-radius: 8px; max-width: 700px; max-height: 90vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="margin: 0; color: white;">Edit FAQ</h2>
+            <button onclick="closeFAQEditModal()" style="background: none; border: none; color: white; font-size: 28px; cursor: pointer; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">&times;</button>
+        </div>
+        
+        <div class="form-group">
+            <label for="editFaqQuestion" style="color: white; display: block; margin-bottom: 8px;">Question</label>
+            <input type="text" id="editFaqQuestion" class="form-control" style="margin-bottom: 15px;">
+            
+            <label for="editFaqAnswer" style="color: white; display: block; margin-bottom: 8px;">Answer</label>
+            <textarea id="editFaqAnswer" class="form-control" rows="6" style="margin-bottom: 15px; resize: vertical;"></textarea>
+            
+            <label for="editFaqCategory" style="color: white; display: block; margin-bottom: 8px;">Category</label>
+            <select id="editFaqCategory" class="form-control" style="margin-bottom: 20px;">
+                <option value="company_details">Company Details</option>
+                <option value="products_services">Products & Services</option>
+                <option value="support">Support</option>
+                <option value="pricing">Pricing</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+        
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+            <button class="btn btn-secondary" onclick="closeFAQEditModal()" style="padding: 10px 20px;">Cancel</button>
+            <button class="btn" onclick="saveFAQEdit()" style="padding: 10px 20px; background: #0891b2; color: white;">
+                <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">save</span> Save Changes
+            </button>
+        </div>
     </div>
 </div>
 
