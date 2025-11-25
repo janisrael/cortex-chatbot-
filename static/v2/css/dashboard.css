@@ -1197,6 +1197,10 @@
         }
 
         @media (max-width: 768px) {
+            .container {
+                padding-bottom: 170px !important;
+            }
+            
             .dashboard-grid {
                 grid-template-columns: 1fr;
             }
@@ -1206,7 +1210,7 @@
             }
             
             .config-row {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr !important;
             }
 
             .tab-navigation {
@@ -1233,6 +1237,39 @@
             
             .customization-options {
                 grid-template-columns: 1fr;
+            }
+            
+            /* Integration Tab Mobile Fixes */
+            .preview-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .preview-actions {
+                flex-direction: column;
+                width: 100%;
+                gap: 10px;
+            }
+            
+            .preview-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .preview-window {
+                height: 300px;
+            }
+            
+            .code-block {
+                font-size: 11px;
+                padding: 12px;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .integration-step-content {
+                width: 100%;
             }
         }
 
@@ -1375,11 +1412,28 @@
         /* Mobile Responsive */
         @media (max-width: 1024px) {
             .appearance-container {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr !important;
             }
 
             .appearance-preview {
                 position: static;
                 margin-top: 30px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .appearance-container {
+                grid-template-columns: 1fr !important;
+                gap: 20px !important;
+            }
+
+            .appearance-preview {
+                position: static !important;
+                margin-top: 20px;
+                width: 90vw;
+            }
+            
+            input.gradient-color-input {
+                width: 40%;
             }
         }
