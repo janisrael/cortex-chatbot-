@@ -137,7 +137,13 @@ function renderFilesByCategory(categoriesWithFiles) {
                 
                 const fileName = document.createElement('div');
                 fileName.style.fontWeight = '500';
-                fileName.textContent = file.name;
+                // Safely get filename - handle both file.name and file.filename
+                const filename = file.filename || file.name || 'Unknown File';
+                // Fix if filename is just extension like ".pdf"
+                const safeFilename = (filename.startsWith('.') && filename.length < 10) 
+                    ? `Document${filename}` 
+                    : (filename && filename !== 'undefined' && filename !== 'null' ? filename : 'Unknown File');
+                fileName.textContent = safeFilename;
                 
                 const fileDetails = document.createElement('div');
                 fileDetails.style.cssText = 'color: #666; font-size: 11px;';

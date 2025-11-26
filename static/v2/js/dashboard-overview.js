@@ -275,6 +275,14 @@ async function refreshFileList() {
     return window.refreshFileList();
 }
 
+// Helper function to escape HTML
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = String(text);
+    return div.innerHTML;
+}
+
 function updateFileList(files) {
     // Update both overview file list and knowledge tab file list
     const overviewFileList = document.getElementById('overviewFileList');
@@ -290,22 +298,42 @@ function updateFileList(files) {
     const emptyMessage = '<div style="text-align: center; color: #999; padding: 20px;">No files uploaded yet</div>';
     
     const fileHTML = files.length === 0 ? emptyMessage : files.map((file, index) => {
-        const filename = file.filename || file.name;
+        // Safely extract filename - handle undefined, null, or empty values
+        let filename = file.filename || file.name || 'Unknown File';
+        // If filename is just an extension like ".pdf", use a default name
+        if (filename.startsWith('.') && filename.length < 10) {
+            filename = `Document${filename}`;
+        }
+        // Ensure filename is not undefined
+        if (!filename || filename === 'undefined' || filename === 'null') {
+            filename = 'Unknown File';
+        }
+        
         const category = file.category || 'company_details';
         const size = file.size || 0;
-        const uploaded = file.uploaded_at || file.modified || 'Unknown';
+        const uploaded = file.uploaded_at || file.modified || file.uploaded || 'Unknown';
         const fileId = `file-${index}-${Date.now()}`;
         
+        // Format uploaded date safely
+        let uploadedDate = 'Unknown';
+        try {
+            if (uploaded && uploaded !== 'Unknown') {
+                uploadedDate = new Date(uploaded).toLocaleDateString();
+            }
+        } catch (e) {
+            uploadedDate = 'Unknown';
+        }
+        
         // Escape filename and category for HTML
-        const safeFilename = filename.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-        const safeCategory = category.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        const safeFilename = String(filename).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        const safeCategory = String(category).replace(/'/g, "\\'").replace(/"/g, '&quot;');
         
         return `
         <div class="file-item" id="${fileId}" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #e1e5e9;">
             <div class="file-info" style="flex: 1;">
-                <div class="file-name" style="font-weight: 600; margin-bottom: 4px;">${filename}</div>
+                <div class="file-name" style="font-weight: 600; margin-bottom: 4px;">${escapeHtml(filename)}</div>
                 <div class="file-size" style="font-size: 12px; color: #666;">
-                    ${formatFileSize(size)} • ${category} • ${new Date(uploaded).toLocaleDateString()}
+                    ${typeof formatFileSize === 'function' ? formatFileSize(size) : (size ? (size / 1024).toFixed(1) + ' KB' : '0 B')} • ${escapeHtml(category)} • ${uploadedDate}
                 </div>
             </div>
             <button 
