@@ -4,159 +4,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terms of Service - Cortex AI</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/static/favicon-192x192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="/static/favicon-512x512.png">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Icons+Round&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/v2/css/dashboard.css?v=6">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Roboto Slab', sans-serif;
-            background: linear-gradient(135deg, #e0e5ec 0%, #f5f7fa 100%);
-            min-height: 100vh;
-            padding: 40px 20px;
-            color: #2d3748;
-            line-height: 1.7;
-        }
-
-        .container {
+        .legal-content {
             max-width: 900px;
             margin: 0 auto;
+            padding: 20px;
         }
-
-        /* Neumorphism Card */
-        .neumorphic-card {
-            background: #e0e5ec;
-            border-radius: 30px;
-            padding: 50px;
-            box-shadow: 
-                20px 20px 60px #bebebe,
-                -20px -20px 60px #ffffff;
+        
+        .legal-section {
             margin-bottom: 30px;
         }
-
-        .header {
-            text-align: center;
-            margin-bottom: 50px;
-            padding-bottom: 30px;
-            border-bottom: 2px solid rgba(45, 55, 72, 0.1);
-        }
-
-        .header h1 {
-            font-size: 42px;
-            font-weight: 700;
-            color: #1a202c;
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .header .last-updated {
-            color: #718096;
-            font-size: 14px;
-            font-weight: 400;
-        }
-
-        .section {
-            margin-bottom: 40px;
-        }
-
-        .section h2 {
-            font-size: 28px;
+        
+        .legal-section h2 {
+            font-size: 24px;
             font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 20px;
+            color: #0891b2;
+            margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 2px solid rgba(45, 55, 72, 0.1);
+            border-bottom: 2px solid #e1e5e9;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
-
-        .section h2 .material-icons-round {
-            font-size: 32px;
-            color: #0891b2;
-        }
-
-        .section h3 {
-            font-size: 20px;
+        
+        .legal-section h3 {
+            font-size: 18px;
             font-weight: 600;
-            color: #4a5568;
-            margin-top: 25px;
-            margin-bottom: 12px;
-        }
-
-        .section p {
-            font-size: 16px;
-            color: #4a5568;
-            margin-bottom: 15px;
-            text-align: justify;
-        }
-
-        .section ul, .section ol {
-            margin-left: 30px;
-            margin-bottom: 20px;
-            color: #4a5568;
-        }
-
-        .section li {
+            color: #1e293b;
+            margin-top: 20px;
             margin-bottom: 10px;
-            font-size: 16px;
         }
-
+        
+        .legal-section p {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #475569;
+            margin-bottom: 15px;
+        }
+        
+        .legal-section ul, .legal-section ol {
+            margin-left: 25px;
+            margin-bottom: 20px;
+            color: #475569;
+        }
+        
+        .legal-section li {
+            margin-bottom: 10px;
+            font-size: 15px;
+            line-height: 1.7;
+        }
+        
         .highlight-box {
             background: rgba(8, 145, 178, 0.1);
             border-left: 4px solid #0891b2;
             padding: 20px;
-            border-radius: 10px;
-            margin: 25px 0;
-            box-shadow: 
-                inset 5px 5px 10px rgba(0, 0, 0, 0.1),
-                inset -5px -5px 10px rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            margin: 20px 0;
         }
-
+        
         .warning-box {
             background: rgba(220, 53, 69, 0.1);
             border-left: 4px solid #dc3545;
             padding: 20px;
-            border-radius: 10px;
-            margin: 25px 0;
-            box-shadow: 
-                inset 5px 5px 10px rgba(0, 0, 0, 0.1),
-                inset -5px -5px 10px rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            margin: 20px 0;
         }
-
-        .contact-info {
-            background: #e0e5ec;
-            border-radius: 20px;
-            padding: 30px;
-            margin-top: 40px;
-            box-shadow: 
-                10px 10px 30px #bebebe,
-                -10px -10px 30px #ffffff;
+        
+        .highlight-box p, .warning-box p {
+            margin-bottom: 10px;
         }
-
-        .contact-info h3 {
-            color: #1a202c;
-            margin-bottom: 15px;
-        }
-
-        .contact-info p {
-            margin-bottom: 8px;
-        }
-
-        .contact-info a {
+        
+        .highlight-box a {
             color: #0891b2;
             text-decoration: none;
             font-weight: 500;
         }
-
-        .contact-info a:hover {
+        
+        .highlight-box a:hover {
             text-decoration: underline;
         }
-
+        
         .back-link {
             display: inline-flex;
             align-items: center;
@@ -164,303 +98,288 @@
             color: #0891b2;
             text-decoration: none;
             font-weight: 500;
-            margin-bottom: 30px;
-            padding: 12px 24px;
-            background: #e0e5ec;
-            border-radius: 15px;
-            box-shadow: 
-                5px 5px 15px #bebebe,
-                -5px -5px 15px #ffffff;
-            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid #e1e5e9;
+            transition: all 0.2s;
         }
-
+        
         .back-link:hover {
-            box-shadow: 
-                inset 5px 5px 15px #bebebe,
-                inset -5px -5px 15px #ffffff;
-        }
-
-        @media (max-width: 768px) {
-            .neumorphic-card {
-                padding: 30px 20px;
-                border-radius: 20px;
-            }
-
-            .header h1 {
-                font-size: 32px;
-            }
-
-            .section h2 {
-                font-size: 24px;
-            }
-
-            .section p, .section li {
-                font-size: 15px;
-            }
+            background: #f8fafc;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
         }
     </style>
 </head>
 <body>
+    {% include 'components/dashboard_header_v2.html' %}
+
     <div class="container">
-        <a href="/" class="back-link">
-            <span class="material-icons-round">arrow_back</span>
-            Back to Home
-        </a>
+        <div class="legal-content">
+            <a href="/dashboard" class="back-link">
+                <span class="material-icons-round" style="font-size: 18px;">arrow_back</span>
+                Back to Dashboard
+            </a>
 
-        <div class="neumorphic-card">
-            <div class="header">
-                <h1>Terms of Service</h1>
-                <p class="last-updated">Last Updated: November 25, 2025</p>
-            </div>
-
-            <div class="section">
-                <h2>
-                    <span class="material-icons-round">gavel</span>
-                    Agreement to Terms
-                </h2>
-                <p>
-                    By accessing or using Cortex AI ("Service"), you agree to be bound by these Terms of Service ("Terms"). If you disagree with any part of these terms, you may not access the Service.
-                </p>
-                <p>
-                    These Terms constitute a legally binding agreement between you and Cortex AI. Please read these Terms carefully before using our Service.
-                </p>
-            </div>
-
-            <div class="section">
-                <h2>
-                    <span class="material-icons-round">person</span>
-                    User Accounts and Registration
-                </h2>
-                <h3>Account Creation</h3>
-                <ul>
-                    <li>You must provide accurate, current, and complete information when creating an account.</li>
-                    <li>You are responsible for maintaining the confidentiality of your account credentials.</li>
-                    <li>You are responsible for all activities that occur under your account.</li>
-                    <li>You must notify us immediately of any unauthorized use of your account.</li>
-                </ul>
-
-                <h3>Account Eligibility</h3>
-                <ul>
-                    <li>You must be at least 18 years old to use this Service.</li>
-                    <li>You must have the legal capacity to enter into binding agreements.</li>
-                    <li>You may not create multiple accounts to circumvent service limitations.</li>
-                </ul>
-            </div>
-
-            <div class="section">
-                <h2>
-                    <span class="material-icons-round">description</span>
-                    Service Description
-                </h2>
-                <p>
-                    Cortex AI provides an AI-powered chatbot service that allows users to create, customize, and deploy chatbots for their websites and applications. The Service includes:
-                </p>
-                <ul>
-                    <li>Chatbot creation and customization tools</li>
-                    <li>Knowledge base management (file uploads, web crawling, FAQ management)</li>
-                    <li>Widget integration for websites</li>
-                    <li>Analytics and usage statistics</li>
-                    <li>API access for programmatic integration</li>
-                </ul>
-            </div>
-
-            <div class="section">
-                <h2>
-                    <span class="material-icons-round">verified_user</span>
-                    Acceptable Use
-                </h2>
-                <p>You agree not to use the Service to:</p>
-                <ul>
-                    <li>Violate any applicable laws, regulations, or third-party rights</li>
-                    <li>Transmit any harmful, offensive, or illegal content</li>
-                    <li>Impersonate any person or entity or misrepresent your affiliation</li>
-                    <li>Interfere with or disrupt the Service or servers</li>
-                    <li>Attempt to gain unauthorized access to any portion of the Service</li>
-                    <li>Use automated systems to access the Service without permission</li>
-                    <li>Reverse engineer, decompile, or disassemble any part of the Service</li>
-                    <li>Use the Service to create or distribute spam, malware, or phishing content</li>
-                </ul>
-
-                <div class="warning-box">
-                    <strong>Violation of Acceptable Use:</strong> Any violation of these terms may result in immediate termination of your account and legal action.
+            <div class="card">
+                <div style="text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #e1e5e9;">
+                    <h1 style="font-size: 32px; font-weight: 700; color: #1e293b; margin-bottom: 10px;">Terms of Service</h1>
+                    <p style="color: #64748b; font-size: 14px;">Last Updated: November 25, 2025</p>
                 </div>
-            </div>
 
-            <div class="section">
-                <h2>
-                    <span class="material-icons-round">copyright</span>
-                    Intellectual Property Rights
-                </h2>
-                <h3>Our Intellectual Property</h3>
-                <p>
-                    The Service, including its original content, features, and functionality, is owned by Cortex AI and is protected by international copyright, trademark, patent, trade secret, and other intellectual property laws.
-                </p>
-
-                <h3>Your Content</h3>
-                <p>
-                    You retain ownership of all content you upload, create, or provide through the Service ("Your Content"). By using the Service, you grant us a worldwide, non-exclusive, royalty-free license to use, store, and process Your Content solely for the purpose of providing the Service to you.
-                </p>
-
-                <div class="highlight-box">
-                    <strong>Content Responsibility:</strong> You are solely responsible for Your Content and warrant that you have all necessary rights to use and share such content.
-                </div>
-            </div>
-
-            <div class="section">
-                <h2>
-                    <span class="material-icons-round">payment</span>
-                    Payment and Billing
-                </h2>
-                <p>
-                    If you purchase a subscription or paid service:
-                </p>
-                <ul>
-                    <li>You agree to pay all fees associated with your subscription</li>
-                    <li>Fees are billed in advance on a recurring basis</li>
-                    <li>All fees are non-refundable except as required by law</li>
-                    <li>We reserve the right to change our pricing with 30 days' notice</li>
-                    <li>Failure to pay may result in suspension or termination of your account</li>
-                </ul>
-            </div>
-
-            <div class="section">
-                <h2>
-                    <span class="material-icons-round">cancel</span>
-                    Termination
-                </h2>
-                <h3>Termination by You</h3>
-                <p>
-                    You may terminate your account at any time by contacting us or using the account deletion feature in your dashboard.
-                </p>
-
-                <h3>Termination by Us</h3>
-                <p>
-                    We may terminate or suspend your account immediately, without prior notice, for conduct that we believe violates these Terms or is harmful to other users, us, or third parties.
-                </p>
-
-                <h3>Effect of Termination</h3>
-                <p>
-                    Upon termination, your right to use the Service will cease immediately. We may delete your account and data, though we will provide reasonable notice and opportunity to export your data when possible.
-                </p>
-            </div>
-
-            <div class="section">
-                <h2>
-                    <span class="material-icons-round">shield</span>
-                    Disclaimers and Limitation of Liability
-                </h2>
-                <h3>Service Disclaimer</h3>
-                <p>
-                    THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT.
-                </p>
-
-                <h3>Limitation of Liability</h3>
-                <p>
-                    TO THE MAXIMUM EXTENT PERMITTED BY LAW, CORTEX AI SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS OR REVENUES, WHETHER INCURRED DIRECTLY OR INDIRECTLY, OR ANY LOSS OF DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES.
-                </p>
-
-                <div class="warning-box">
-                    <strong>Maximum Liability:</strong> Our total liability to you for all claims arising from or related to the Service shall not exceed the amount you paid us in the twelve (12) months preceding the claim.
-                </div>
-            </div>
-
-            <div class="section">
-                <h2>
-                    <span class="material-icons-round">gavel</span>
-                    Indemnification
-                </h2>
-                <p>
-                    You agree to indemnify, defend, and hold harmless Cortex AI, its officers, directors, employees, and agents from and against any claims, liabilities, damages, losses, and expenses, including reasonable attorneys' fees, arising out of or in any way connected with:
-                </p>
-                <ul>
-                    <li>Your access to or use of the Service</li>
-                    <li>Your violation of these Terms</li>
-                    <li>Your violation of any third-party right, including intellectual property or privacy rights</li>
-                    <li>Your Content or any content you transmit through the Service</li>
-                </ul>
-            </div>
-
-            <div class="section">
-                <h2>
-                    <span class="material-icons-round">public</span>
-                    Governing Law and Dispute Resolution
-                </h2>
-                <p>
-                    These Terms shall be governed by and construed in accordance with the laws of [Your Jurisdiction], without regard to its conflict of law provisions.
-                </p>
-                <p>
-                    Any disputes arising from these Terms or the Service shall be resolved through binding arbitration in accordance with the rules of [Arbitration Organization], except where prohibited by law.
-                </p>
-            </div>
-
-            <div class="section">
-                <h2>
-                    <span class="material-icons-round">update</span>
-                    Changes to Terms
-                </h2>
-                <p>
-                    We reserve the right to modify these Terms at any time. We will notify you of any material changes by posting the new Terms on this page and updating the "Last Updated" date. Your continued use of the Service after such modifications constitutes acceptance of the updated Terms.
-                </p>
-            </div>
-
-            <div class="section">
-                <h2>
-                    <span class="material-icons-round">article</span>
-                    Miscellaneous
-                </h2>
-                <h3>Entire Agreement</h3>
-                <p>
-                    These Terms, together with our Privacy Policy, constitute the entire agreement between you and Cortex AI regarding the Service.
-                </p>
-
-                <h3>Severability</h3>
-                <p>
-                    If any provision of these Terms is found to be unenforceable or invalid, that provision shall be limited or eliminated to the minimum extent necessary, and the remaining provisions shall remain in full force and effect.
-                </p>
-
-                <h3>Waiver</h3>
-                <p>
-                    No waiver of any term of these Terms shall be deemed a further or continuing waiver of such term or any other term.
-                </p>
-            </div>
-
-            <div class="section">
-                <h2>
-                    <span class="material-icons-round">copyright</span>
-                    Ownership and Design Attribution
-                </h2>
-                <p>
-                    <strong>Cortex AI</strong> is owned and operated by <strong>Jan Francis Israel</strong>. All rights reserved.
-                </p>
-                <div class="highlight-box">
-                    <p><strong>Design Attribution:</strong></p>
+                <div class="legal-section">
+                    <h2>
+                        <span class="material-icons-round" style="font-size: 24px;">gavel</span>
+                        Agreement to Terms
+                    </h2>
                     <p>
-                        The user interface design of this website utilizes the <strong>Themesberg Neumorphism UI Bootstrap</strong> framework. 
-                        The neumorphism design elements, styling, and UI components are based on the Themesberg Neumorphism UI Kit, 
-                        which provides the visual design system and styling framework used throughout this application.
+                        By accessing or using Cortex AI ("Service"), you agree to be bound by these Terms of Service ("Terms"). If you disagree with any part of these terms, you may not access the Service.
                     </p>
-                    <p style="margin-top: 10px;">
-                        For more information about Themesberg Neumorphism UI, please visit: 
-                        <a href="https://themesberg.com/products/neumorphism-ui" target="_blank" rel="noopener noreferrer" style="color: #0891b2; text-decoration: none; font-weight: 500;">https://themesberg.com/products/neumorphism-ui</a>
+                    <p>
+                        These Terms constitute a legally binding agreement between you and Cortex AI. Please read these Terms carefully before using our Service.
                     </p>
                 </div>
-                <p>
-                    All content, functionality, and intellectual property of Cortex AI, except for the design framework attribution above, 
-                    are the exclusive property of Jan Francis Israel and are protected by copyright and other intellectual property laws.
-                </p>
-            </div>
 
-            <div class="contact-info">
-                <h3>
-                    <span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">email</span>                                            
-                    Contact Us
-                </h3>
-                <p>If you have any questions about these Terms of Service, please contact us:</p>                                                               
-                <p><strong>Email:</strong> <a href="mailto:legal@janisrael.com">legal@janisrael.com</a></p>                                                     
-                <p><strong>Website:</strong> <a href="https://cortex.janisrael.com">https://cortex.janisrael.com</a></p>                                        
+                <div class="legal-section">
+                    <h2>
+                        <span class="material-icons-round" style="font-size: 24px;">person</span>
+                        User Accounts and Registration
+                    </h2>
+                    <h3>Account Creation</h3>
+                    <ul>
+                        <li>You must provide accurate, current, and complete information when creating an account.</li>
+                        <li>You are responsible for maintaining the confidentiality of your account credentials.</li>
+                        <li>You are responsible for all activities that occur under your account.</li>
+                        <li>You must notify us immediately of any unauthorized use of your account.</li>
+                    </ul>
+
+                    <h3>Account Eligibility</h3>
+                    <ul>
+                        <li>You must be at least 18 years old to use this Service.</li>
+                        <li>You must have the legal capacity to enter into binding agreements.</li>
+                        <li>You may not create multiple accounts to circumvent service limitations.</li>
+                    </ul>
+                </div>
+
+                <div class="legal-section">
+                    <h2>
+                        <span class="material-icons-round" style="font-size: 24px;">description</span>
+                        Service Description
+                    </h2>
+                    <p>
+                        Cortex AI provides an AI-powered chatbot service that allows users to create, customize, and deploy chatbots for their websites and applications. The Service includes:
+                    </p>
+                    <ul>
+                        <li>Chatbot creation and customization tools</li>
+                        <li>Knowledge base management (file uploads, web crawling, FAQ management)</li>
+                        <li>Widget integration for websites</li>
+                        <li>Analytics and usage statistics</li>
+                        <li>API access for programmatic integration</li>
+                    </ul>
+                </div>
+
+                <div class="legal-section">
+                    <h2>
+                        <span class="material-icons-round" style="font-size: 24px;">verified_user</span>
+                        Acceptable Use
+                    </h2>
+                    <p>You agree not to use the Service to:</p>
+                    <ul>
+                        <li>Violate any applicable laws, regulations, or third-party rights</li>
+                        <li>Transmit any harmful, offensive, or illegal content</li>
+                        <li>Impersonate any person or entity or misrepresent your affiliation</li>
+                        <li>Interfere with or disrupt the Service or servers</li>
+                        <li>Attempt to gain unauthorized access to any portion of the Service</li>
+                        <li>Use automated systems to access the Service without permission</li>
+                        <li>Reverse engineer, decompile, or disassemble any part of the Service</li>
+                        <li>Use the Service to create or distribute spam, malware, or phishing content</li>
+                    </ul>
+
+                    <div class="warning-box">
+                        <strong>Violation of Acceptable Use:</strong> Any violation of these terms may result in immediate termination of your account and legal action.
+                    </div>
+                </div>
+
+                <div class="legal-section">
+                    <h2>
+                        <span class="material-icons-round" style="font-size: 24px;">copyright</span>
+                        Intellectual Property Rights
+                    </h2>
+                    <h3>Our Intellectual Property</h3>
+                    <p>
+                        The Service, including its original content, features, and functionality, is owned by Cortex AI and is protected by international copyright, trademark, patent, trade secret, and other intellectual property laws.
+                    </p>
+
+                    <h3>Your Content</h3>
+                    <p>
+                        You retain ownership of all content you upload, create, or provide through the Service ("Your Content"). By using the Service, you grant us a worldwide, non-exclusive, royalty-free license to use, store, and process Your Content solely for the purpose of providing the Service to you.
+                    </p>
+
+                    <div class="highlight-box">
+                        <strong>Content Responsibility:</strong> You are solely responsible for Your Content and warrant that you have all necessary rights to use and share such content.
+                    </div>
+                </div>
+
+                <div class="legal-section">
+                    <h2>
+                        <span class="material-icons-round" style="font-size: 24px;">payment</span>
+                        Payment and Billing
+                    </h2>
+                    <p>
+                        If you purchase a subscription or paid service:
+                    </p>
+                    <ul>
+                        <li>You agree to pay all fees associated with your subscription</li>
+                        <li>Fees are billed in advance on a recurring basis</li>
+                        <li>All fees are non-refundable except as required by law</li>
+                        <li>We reserve the right to change our pricing with 30 days' notice</li>
+                        <li>Failure to pay may result in suspension or termination of your account</li>
+                    </ul>
+                </div>
+
+                <div class="legal-section">
+                    <h2>
+                        <span class="material-icons-round" style="font-size: 24px;">cancel</span>
+                        Termination
+                    </h2>
+                    <h3>Termination by You</h3>
+                    <p>
+                        You may terminate your account at any time by contacting us or using the account deletion feature in your dashboard.
+                    </p>
+
+                    <h3>Termination by Us</h3>
+                    <p>
+                        We may terminate or suspend your account immediately, without prior notice, for conduct that we believe violates these Terms or is harmful to other users, us, or third parties.
+                    </p>
+
+                    <h3>Effect of Termination</h3>
+                    <p>
+                        Upon termination, your right to use the Service will cease immediately. We may delete your account and data, though we will provide reasonable notice and opportunity to export your data when possible.
+                    </p>
+                </div>
+
+                <div class="legal-section">
+                    <h2>
+                        <span class="material-icons-round" style="font-size: 24px;">shield</span>
+                        Disclaimers and Limitation of Liability
+                    </h2>
+                    <h3>Service Disclaimer</h3>
+                    <p>
+                        THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT.
+                    </p>
+
+                    <h3>Limitation of Liability</h3>
+                    <p>
+                        TO THE MAXIMUM EXTENT PERMITTED BY LAW, CORTEX AI SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS OR REVENUES, WHETHER INCURRED DIRECTLY OR INDIRECTLY, OR ANY LOSS OF DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES.
+                    </p>
+
+                    <div class="warning-box">
+                        <strong>Maximum Liability:</strong> Our total liability to you for all claims arising from or related to the Service shall not exceed the amount you paid us in the twelve (12) months preceding the claim.
+                    </div>
+                </div>
+
+                <div class="legal-section">
+                    <h2>
+                        <span class="material-icons-round" style="font-size: 24px;">gavel</span>
+                        Indemnification
+                    </h2>
+                    <p>
+                        You agree to indemnify, defend, and hold harmless Cortex AI, its officers, directors, employees, and agents from and against any claims, liabilities, damages, losses, and expenses, including reasonable attorneys' fees, arising out of or in any way connected with:
+                    </p>
+                    <ul>
+                        <li>Your access to or use of the Service</li>
+                        <li>Your violation of these Terms</li>
+                        <li>Your violation of any third-party right, including intellectual property or privacy rights</li>
+                        <li>Your Content or any content you transmit through the Service</li>
+                    </ul>
+                </div>
+
+                <div class="legal-section">
+                    <h2>
+                        <span class="material-icons-round" style="font-size: 24px;">public</span>
+                        Governing Law and Dispute Resolution
+                    </h2>
+                    <p>
+                        These Terms shall be governed by and construed in accordance with the laws of [Your Jurisdiction], without regard to its conflict of law provisions.
+                    </p>
+                    <p>
+                        Any disputes arising from these Terms or the Service shall be resolved through binding arbitration in accordance with the rules of [Arbitration Organization], except where prohibited by law.
+                    </p>
+                </div>
+
+                <div class="legal-section">
+                    <h2>
+                        <span class="material-icons-round" style="font-size: 24px;">update</span>
+                        Changes to Terms
+                    </h2>
+                    <p>
+                        We reserve the right to modify these Terms at any time. We will notify you of any material changes by posting the new Terms on this page and updating the "Last Updated" date. Your continued use of the Service after such modifications constitutes acceptance of the updated Terms.
+                    </p>
+                </div>
+
+                <div class="legal-section">
+                    <h2>
+                        <span class="material-icons-round" style="font-size: 24px;">article</span>
+                        Miscellaneous
+                    </h2>
+                    <h3>Entire Agreement</h3>
+                    <p>
+                        These Terms, together with our Privacy Policy, constitute the entire agreement between you and Cortex AI regarding the Service.
+                    </p>
+
+                    <h3>Severability</h3>
+                    <p>
+                        If any provision of these Terms is found to be unenforceable or invalid, that provision shall be limited or eliminated to the minimum extent necessary, and the remaining provisions shall remain in full force and effect.
+                    </p>
+
+                    <h3>Waiver</h3>
+                    <p>
+                        No waiver of any term of these Terms shall be deemed a further or continuing waiver of such term or any other term.
+                    </p>
+                </div>
+
+                <div class="legal-section">
+                    <h2>
+                        <span class="material-icons-round" style="font-size: 24px;">copyright</span>
+                        Ownership and Design Attribution
+                    </h2>
+                    <p>
+                        <strong>Cortex AI</strong> is owned and operated by <strong>Jan Francis Israel</strong>. All rights reserved.
+                    </p>
+                    <div class="highlight-box">
+                        <p><strong>Design Attribution:</strong></p>
+                        <p>
+                            The user interface design of this website utilizes the <strong>Themesberg Neumorphism UI Bootstrap</strong> framework. 
+                            The neumorphism design elements, styling, and UI components are based on the Themesberg Neumorphism UI Kit, 
+                            which provides the visual design system and styling framework used throughout this application.
+                        </p>
+                        <p style="margin-top: 10px;">
+                            For more information about Themesberg Neumorphism UI, please visit: 
+                            <a href="https://themesberg.com/products/neumorphism-ui" target="_blank" rel="noopener noreferrer">https://themesberg.com/products/neumorphism-ui</a>
+                        </p>
+                    </div>
+                    <p>
+                        All content, functionality, and intellectual property of Cortex AI, except for the design framework attribution above, 
+                        are the exclusive property of Jan Francis Israel and are protected by copyright and other intellectual property laws.
+                    </p>
+                </div>
+
+                <div class="card" style="margin-top: 30px; background: #f8fafc;">
+                    <h3 style="margin-top: 0; display: flex; align-items: center; gap: 8px;">
+                        <span class="material-icons-round" style="font-size: 20px;">email</span>
+                        Contact Us
+                    </h3>
+                    <p>If you have any questions about these Terms of Service, please contact us:</p>
+                    <p><strong>Email:</strong> <a href="mailto:legal@janisrael.com" style="color: #0891b2; text-decoration: none;">legal@janisrael.com</a></p>
+                    <p><strong>Website:</strong> <a href="https://cortex.janisrael.com" style="color: #0891b2; text-decoration: none;">https://cortex.janisrael.com</a></p>
+                </div>
             </div>
         </div>
     </div>
+
+    <script src="/static/v2/js/dashboard-core.js"></script>
+    <script src="/static/v2/js/dashboard-utils.js"></script>
 </body>
 </html>
-

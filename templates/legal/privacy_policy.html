@@ -4,148 +4,85 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Privacy Policy - Cortex AI</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/static/favicon-192x192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="/static/favicon-512x512.png">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Icons+Round&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/v2/css/dashboard.css?v=6">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Roboto Slab', sans-serif;
-            background: linear-gradient(135deg, #e0e5ec 0%, #f5f7fa 100%);
-            min-height: 100vh;
-            padding: 40px 20px;
-            color: #2d3748;
-            line-height: 1.7;
-        }
-
-        .container {
+        .legal-content {
             max-width: 900px;
             margin: 0 auto;
+            padding: 20px;
         }
-
-        /* Neumorphism Card */
-        .neumorphic-card {
-            background: #e0e5ec;
-            border-radius: 30px;
-            padding: 50px;
-            box-shadow: 
-                20px 20px 60px #bebebe,
-                -20px -20px 60px #ffffff;
+        
+        .legal-section {
             margin-bottom: 30px;
         }
-
-        .header {
-            text-align: center;
-            margin-bottom: 50px;
-            padding-bottom: 30px;
-            border-bottom: 2px solid rgba(45, 55, 72, 0.1);
-        }
-
-        .header h1 {
-            font-size: 42px;
-            font-weight: 700;
-            color: #1a202c;
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .header .last-updated {
-            color: #718096;
-            font-size: 14px;
-            font-weight: 400;
-        }
-
-        .section {
-            margin-bottom: 40px;
-        }
-
-        .section h2 {
-            font-size: 28px;
+        
+        .legal-section h2 {
+            font-size: 24px;
             font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 20px;
+            color: #0891b2;
+            margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 2px solid rgba(45, 55, 72, 0.1);
+            border-bottom: 2px solid #e1e5e9;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
-
-        .section h2 .material-icons-round {
-            font-size: 32px;
-            color: #0891b2;
-        }
-
-        .section h3 {
-            font-size: 20px;
+        
+        .legal-section h3 {
+            font-size: 18px;
             font-weight: 600;
-            color: #4a5568;
-            margin-top: 25px;
-            margin-bottom: 12px;
-        }
-
-        .section p {
-            font-size: 16px;
-            color: #4a5568;
-            margin-bottom: 15px;
-            text-align: justify;
-        }
-
-        .section ul, .section ol {
-            margin-left: 30px;
-            margin-bottom: 20px;
-            color: #4a5568;
-        }
-
-        .section li {
+            color: #1e293b;
+            margin-top: 20px;
             margin-bottom: 10px;
-            font-size: 16px;
         }
-
+        
+        .legal-section p {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #475569;
+            margin-bottom: 15px;
+        }
+        
+        .legal-section ul, .legal-section ol {
+            margin-left: 25px;
+            margin-bottom: 20px;
+            color: #475569;
+        }
+        
+        .legal-section li {
+            margin-bottom: 10px;
+            font-size: 15px;
+            line-height: 1.7;
+        }
+        
         .highlight-box {
             background: rgba(8, 145, 178, 0.1);
             border-left: 4px solid #0891b2;
             padding: 20px;
-            border-radius: 10px;
-            margin: 25px 0;
-            box-shadow: 
-                inset 5px 5px 10px rgba(0, 0, 0, 0.1),
-                inset -5px -5px 10px rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            margin: 20px 0;
         }
-
-        .contact-info {
-            background: #e0e5ec;
-            border-radius: 20px;
-            padding: 30px;
-            margin-top: 40px;
-            box-shadow: 
-                10px 10px 30px #bebebe,
-                -10px -10px 30px #ffffff;
+        
+        .highlight-box p {
+            margin-bottom: 10px;
         }
-
-        .contact-info h3 {
-            color: #1a202c;
-            margin-bottom: 15px;
-        }
-
-        .contact-info p {
-            margin-bottom: 8px;
-        }
-
-        .contact-info a {
+        
+        .highlight-box a {
             color: #0891b2;
             text-decoration: none;
             font-weight: 500;
         }
-
-        .contact-info a:hover {
+        
+        .highlight-box a:hover {
             text-decoration: underline;
         }
-
+        
         .back-link {
             display: inline-flex;
             align-items: center;
@@ -153,225 +90,210 @@
             color: #0891b2;
             text-decoration: none;
             font-weight: 500;
-            margin-bottom: 30px;
-            padding: 12px 24px;
-            background: #e0e5ec;
-            border-radius: 15px;
-            box-shadow: 
-                5px 5px 15px #bebebe,
-                -5px -5px 15px #ffffff;
-            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid #e1e5e9;
+            transition: all 0.2s;
         }
-
+        
         .back-link:hover {
-            box-shadow: 
-                inset 5px 5px 15px #bebebe,
-                inset -5px -5px 15px #ffffff;
-        }
-
-        @media (max-width: 768px) {
-            .neumorphic-card {
-                padding: 30px 20px;
-                border-radius: 20px;
-            }
-
-            .header h1 {
-                font-size: 32px;
-            }
-
-            .section h2 {
-                font-size: 24px;
-            }
-
-            .section p, .section li {
-                font-size: 15px;
-            }
+            background: #f8fafc;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
         }
     </style>
 </head>
 <body>
+    {% include 'components/dashboard_header_v2.html' %}
+
     <div class="container">
-        <a href="/" class="back-link">
-            <span class="material-icons-round">arrow_back</span>
-            Back to Home
-        </a>
+        <div class="legal-content">
+            <a href="/dashboard" class="back-link">
+                <span class="material-icons-round" style="font-size: 18px;">arrow_back</span>
+                Back to Dashboard
+            </a>
 
-        <div class="neumorphic-card">
-            <div class="header">
-                <h1>Privacy Policy</h1>
-                <p class="last-updated">Last Updated: November 25, 2025</p>
-            </div>
-
-            <div class="section">
-                <h2>
-                    <span class="material-icons-round">info</span>
-                    Introduction
-                </h2>
-                <p>
-                    Welcome to Cortex AI ("we," "our," or "us"). We are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our AI chatbot service and related services (collectively, the "Service").
-                </p>
-                <p>
-                    By using our Service, you agree to the collection and use of information in accordance with this policy. If you do not agree with our policies and practices, please do not use our Service.
-                </p>
-            </div>
-
-            <div class="section">
-                <h2>
-                    <span class="material-icons-round">data_object</span>
-                    Information We Collect
-                </h2>
-                
-                <h3>1. Information You Provide</h3>
-                <ul>
-                    <li><strong>Account Information:</strong> When you create an account, we collect your email address, username, and password.</li>
-                    <li><strong>Chatbot Configuration:</strong> We store your chatbot settings, including name, appearance, prompts, and knowledge base content.</li>
-                    <li><strong>Uploaded Content:</strong> Files, documents, and data you upload to train your chatbot are stored securely.</li>
-                    <li><strong>Conversation Data:</strong> Messages exchanged with your chatbot may be stored for service improvement and functionality.</li>
-                </ul>
-
-                <h3>2. Automatically Collected Information</h3>
-                <ul>
-                    <li><strong>Usage Data:</strong> We collect information about how you access and use our Service, including IP address, browser type, device information, and usage patterns.</li>
-                    <li><strong>Cookies and Tracking:</strong> We use cookies and similar tracking technologies to track activity on our Service and hold certain information.</li>
-                </ul>
-
-                <div class="highlight-box">
-                    <strong>Note:</strong> All data is stored in a user-isolated environment. Your data is not shared with other users or third parties without your explicit consent.
+            <div class="card">
+                <div style="text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #e1e5e9;">
+                    <h1 style="font-size: 32px; font-weight: 700; color: #1e293b; margin-bottom: 10px;">Privacy Policy</h1>
+                    <p style="color: #64748b; font-size: 14px;">Last Updated: November 25, 2025</p>
                 </div>
-            </div>
 
-            <div class="section">
-                <h2>
-                    <span class="material-icons-round">security</span>
-                    How We Use Your Information
-                </h2>
-                <p>We use the information we collect for the following purposes:</p>
-                <ul>
-                    <li>To provide, maintain, and improve our Service</li>
-                    <li>To process your transactions and manage your account</li>
-                    <li>To personalize your experience and customize your chatbot</li>
-                    <li>To communicate with you about your account and our services</li>
-                    <li>To detect, prevent, and address technical issues and security threats</li>
-                    <li>To comply with legal obligations and enforce our terms</li>
-                </ul>
-            </div>
-
-            <div class="section">
-                <h2>
-                    <span class="material-icons-round">share</span>
-                    Data Sharing and Disclosure
-                </h2>
-                <p>We do not sell, trade, or rent your personal information to third parties. We may share your information only in the following circumstances:</p>
-                <ul>
-                    <li><strong>Service Providers:</strong> We may share data with trusted third-party service providers who assist in operating our Service, subject to strict confidentiality agreements.</li>
-                    <li><strong>Legal Requirements:</strong> We may disclose information if required by law or in response to valid legal requests.</li>
-                    <li><strong>Business Transfers:</strong> In the event of a merger, acquisition, or sale of assets, your information may be transferred as part of that transaction.</li>
-                    <li><strong>With Your Consent:</strong> We may share information with your explicit permission.</li>
-                </ul>
-            </div>
-
-            <div class="section">
-                <h2>
-                    <span class="material-icons-round">lock</span>
-                    Data Security
-                </h2>
-                <p>
-                    We implement industry-standard security measures to protect your information, including encryption, secure servers, and access controls. However, no method of transmission over the Internet or electronic storage is 100% secure. While we strive to use commercially acceptable means to protect your data, we cannot guarantee absolute security.
-                </p>
-            </div>
-
-            <div class="section">
-                <h2>
-                    <span class="material-icons-round">settings</span>
-                    Your Rights and Choices
-                </h2>
-                <p>You have the following rights regarding your personal information:</p>
-                <ul>
-                    <li><strong>Access:</strong> You can access and review your personal information through your account dashboard.</li>
-                    <li><strong>Correction:</strong> You can update or correct your information at any time.</li>
-                    <li><strong>Deletion:</strong> You can request deletion of your account and associated data.</li>
-                    <li><strong>Data Portability:</strong> You can export your data in a machine-readable format.</li>
-                    <li><strong>Opt-Out:</strong> You can opt out of certain data collection practices through your account settings.</li>
-                </ul>
-            </div>
-
-            <div class="section">
-                <h2>
-                    <span class="material-icons-round">cookie</span>
-                    Cookies and Tracking Technologies
-                </h2>
-                <p>
-                    We use cookies and similar technologies to enhance your experience, analyze usage, and assist in our marketing efforts. You can control cookie preferences through your browser settings. However, disabling cookies may limit certain functionalities of our Service.
-                </p>
-            </div>
-
-            <div class="section">
-                <h2>
-                    <span class="material-icons-round">child_care</span>
-                    Children's Privacy
-                </h2>
-                <p>
-                    Our Service is not intended for children under the age of 13. We do not knowingly collect personal information from children under 13. If you become aware that a child has provided us with personal information, please contact us immediately, and we will take steps to delete such information.
-                </p>
-            </div>
-
-            <div class="section">
-                <h2>
-                    <span class="material-icons-round">public</span>
-                    International Data Transfers
-                </h2>
-                <p>
-                    Your information may be transferred to and processed in countries other than your country of residence. These countries may have data protection laws that differ from those in your country. By using our Service, you consent to the transfer of your information to these countries.
-                </p>
-            </div>
-
-            <div class="section">
-                <h2>
-                    <span class="material-icons-round">update</span>
-                    Changes to This Privacy Policy
-                </h2>
-                <p>
-                    We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last Updated" date. You are advised to review this Privacy Policy periodically for any changes.
-                </p>
-            </div>
-
-            <div class="section">
-                <h2>
-                    <span class="material-icons-round">copyright</span>
-                    Ownership and Design Attribution
-                </h2>
-                <p>
-                    <strong>Cortex AI</strong> is owned and operated by <strong>Jan Francis Israel</strong>. All rights reserved.
-                </p>
-                <div class="highlight-box">
-                    <p><strong>Design Attribution:</strong></p>
+                <div class="legal-section">
+                    <h2>
+                        <span class="material-icons-round" style="font-size: 24px;">info</span>
+                        Introduction
+                    </h2>
                     <p>
-                        The user interface design of this website utilizes the <strong>Themesberg Neumorphism UI Bootstrap</strong> framework. 
-                        The neumorphism design elements, styling, and UI components are based on the Themesberg Neumorphism UI Kit, 
-                        which provides the visual design system and styling framework used throughout this application.
+                        Welcome to Cortex AI ("we," "our," or "us"). We are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our AI chatbot service and related services (collectively, the "Service").
                     </p>
-                    <p style="margin-top: 10px;">
-                        For more information about Themesberg Neumorphism UI, please visit: 
-                        <a href="https://themesberg.com/products/neumorphism-ui" target="_blank" rel="noopener noreferrer" style="color: #0891b2; text-decoration: none; font-weight: 500;">https://themesberg.com/products/neumorphism-ui</a>
+                    <p>
+                        By using our Service, you agree to the collection and use of information in accordance with this policy. If you do not agree with our policies and practices, please do not use our Service.
                     </p>
                 </div>
-                <p>
-                    All content, functionality, and intellectual property of Cortex AI, except for the design framework attribution above, 
-                    are the exclusive property of Jan Francis Israel and are protected by copyright and other intellectual property laws.
-                </p>
-            </div>
 
-            <div class="contact-info">
-                <h3>
-                    <span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">email</span>                                            
-                    Contact Us
-                </h3>
-                <p>If you have any questions about this Privacy Policy, please contact us:</p>                                                                  
-                <p><strong>Email:</strong> <a href="mailto:privacy@janisrael.com">privacy@janisrael.com</a></p>                                                 
-                <p><strong>Website:</strong> <a href="https://cortex.janisrael.com">https://cortex.janisrael.com</a></p>                                        
+                <div class="legal-section">
+                    <h2>
+                        <span class="material-icons-round" style="font-size: 24px;">data_object</span>
+                        Information We Collect
+                    </h2>
+                    
+                    <h3>1. Information You Provide</h3>
+                    <ul>
+                        <li><strong>Account Information:</strong> When you create an account, we collect your email address, username, and password.</li>
+                        <li><strong>Chatbot Configuration:</strong> We store your chatbot settings, including name, appearance, prompts, and knowledge base content.</li>
+                        <li><strong>Uploaded Content:</strong> Files, documents, and data you upload to train your chatbot are stored securely.</li>
+                        <li><strong>Conversation Data:</strong> Messages exchanged with your chatbot may be stored for service improvement and functionality.</li>
+                    </ul>
+
+                    <h3>2. Automatically Collected Information</h3>
+                    <ul>
+                        <li><strong>Usage Data:</strong> We collect information about how you access and use our Service, including IP address, browser type, device information, and usage patterns.</li>
+                        <li><strong>Cookies and Tracking:</strong> We use cookies and similar tracking technologies to track activity on our Service and hold certain information.</li>
+                    </ul>
+
+                    <div class="highlight-box">
+                        <strong>Note:</strong> All data is stored in a user-isolated environment. Your data is not shared with other users or third parties without your explicit consent.
+                    </div>
+                </div>
+
+                <div class="legal-section">
+                    <h2>
+                        <span class="material-icons-round" style="font-size: 24px;">security</span>
+                        How We Use Your Information
+                    </h2>
+                    <p>We use the information we collect for the following purposes:</p>
+                    <ul>
+                        <li>To provide, maintain, and improve our Service</li>
+                        <li>To process your transactions and manage your account</li>
+                        <li>To personalize your experience and customize your chatbot</li>
+                        <li>To communicate with you about your account and our services</li>
+                        <li>To detect, prevent, and address technical issues and security threats</li>
+                        <li>To comply with legal obligations and enforce our terms</li>
+                    </ul>
+                </div>
+
+                <div class="legal-section">
+                    <h2>
+                        <span class="material-icons-round" style="font-size: 24px;">share</span>
+                        Data Sharing and Disclosure
+                    </h2>
+                    <p>We do not sell, trade, or rent your personal information to third parties. We may share your information only in the following circumstances:</p>
+                    <ul>
+                        <li><strong>Service Providers:</strong> We may share data with trusted third-party service providers who assist in operating our Service, subject to strict confidentiality agreements.</li>
+                        <li><strong>Legal Requirements:</strong> We may disclose information if required by law or in response to valid legal requests.</li>
+                        <li><strong>Business Transfers:</strong> In the event of a merger, acquisition, or sale of assets, your information may be transferred as part of that transaction.</li>
+                        <li><strong>With Your Consent:</strong> We may share information with your explicit permission.</li>
+                    </ul>
+                </div>
+
+                <div class="legal-section">
+                    <h2>
+                        <span class="material-icons-round" style="font-size: 24px;">lock</span>
+                        Data Security
+                    </h2>
+                    <p>
+                        We implement industry-standard security measures to protect your information, including encryption, secure servers, and access controls. However, no method of transmission over the Internet or electronic storage is 100% secure. While we strive to use commercially acceptable means to protect your data, we cannot guarantee absolute security.
+                    </p>
+                </div>
+
+                <div class="legal-section">
+                    <h2>
+                        <span class="material-icons-round" style="font-size: 24px;">settings</span>
+                        Your Rights and Choices
+                    </h2>
+                    <p>You have the following rights regarding your personal information:</p>
+                    <ul>
+                        <li><strong>Access:</strong> You can access and review your personal information through your account dashboard.</li>
+                        <li><strong>Correction:</strong> You can update or correct your information at any time.</li>
+                        <li><strong>Deletion:</strong> You can request deletion of your account and associated data.</li>
+                        <li><strong>Data Portability:</strong> You can export your data in a machine-readable format.</li>
+                        <li><strong>Opt-Out:</strong> You can opt out of certain data collection practices through your account settings.</li>
+                    </ul>
+                </div>
+
+                <div class="legal-section">
+                    <h2>
+                        <span class="material-icons-round" style="font-size: 24px;">cookie</span>
+                        Cookies and Tracking Technologies
+                    </h2>
+                    <p>
+                        We use cookies and similar technologies to enhance your experience, analyze usage, and assist in our marketing efforts. You can control cookie preferences through your browser settings. However, disabling cookies may limit certain functionalities of our Service.
+                    </p>
+                </div>
+
+                <div class="legal-section">
+                    <h2>
+                        <span class="material-icons-round" style="font-size: 24px;">child_care</span>
+                        Children's Privacy
+                    </h2>
+                    <p>
+                        Our Service is not intended for children under the age of 13. We do not knowingly collect personal information from children under 13. If you become aware that a child has provided us with personal information, please contact us immediately, and we will take steps to delete such information.
+                    </p>
+                </div>
+
+                <div class="legal-section">
+                    <h2>
+                        <span class="material-icons-round" style="font-size: 24px;">public</span>
+                        International Data Transfers
+                    </h2>
+                    <p>
+                        Your information may be transferred to and processed in countries other than your country of residence. These countries may have data protection laws that differ from those in your country. By using our Service, you consent to the transfer of your information to these countries.
+                    </p>
+                </div>
+
+                <div class="legal-section">
+                    <h2>
+                        <span class="material-icons-round" style="font-size: 24px;">update</span>
+                        Changes to This Privacy Policy
+                    </h2>
+                    <p>
+                        We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last Updated" date. You are advised to review this Privacy Policy periodically for any changes.
+                    </p>
+                </div>
+
+                <div class="legal-section">
+                    <h2>
+                        <span class="material-icons-round" style="font-size: 24px;">copyright</span>
+                        Ownership and Design Attribution
+                    </h2>
+                    <p>
+                        <strong>Cortex AI</strong> is owned and operated by <strong>Jan Francis Israel</strong>. All rights reserved.
+                    </p>
+                    <div class="highlight-box">
+                        <p><strong>Design Attribution:</strong></p>
+                        <p>
+                            The user interface design of this website utilizes the <strong>Themesberg Neumorphism UI Bootstrap</strong> framework. 
+                            The neumorphism design elements, styling, and UI components are based on the Themesberg Neumorphism UI Kit, 
+                            which provides the visual design system and styling framework used throughout this application.
+                        </p>
+                        <p style="margin-top: 10px;">
+                            For more information about Themesberg Neumorphism UI, please visit: 
+                            <a href="https://themesberg.com/products/neumorphism-ui" target="_blank" rel="noopener noreferrer">https://themesberg.com/products/neumorphism-ui</a>
+                        </p>
+                    </div>
+                    <p>
+                        All content, functionality, and intellectual property of Cortex AI, except for the design framework attribution above, 
+                        are the exclusive property of Jan Francis Israel and are protected by copyright and other intellectual property laws.
+                    </p>
+                </div>
+
+                <div class="card" style="margin-top: 30px; background: #f8fafc;">
+                    <h3 style="margin-top: 0; display: flex; align-items: center; gap: 8px;">
+                        <span class="material-icons-round" style="font-size: 20px;">email</span>
+                        Contact Us
+                    </h3>
+                    <p>If you have any questions about this Privacy Policy, please contact us:</p>
+                    <p><strong>Email:</strong> <a href="mailto:privacy@janisrael.com" style="color: #0891b2; text-decoration: none;">privacy@janisrael.com</a></p>
+                    <p><strong>Website:</strong> <a href="https://cortex.janisrael.com" style="color: #0891b2; text-decoration: none;">https://cortex.janisrael.com</a></p>
+                </div>
             </div>
         </div>
     </div>
+
+    <script src="/static/v2/js/dashboard-core.js"></script>
+    <script src="/static/v2/js/dashboard-utils.js"></script>
 </body>
 </html>
-

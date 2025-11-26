@@ -49,13 +49,19 @@ def health_check():
 
 
 @dashboard_bp.route("/privacy-policy")
+@login_required
 def privacy_policy():
     """Privacy Policy page"""
-    return render_template("legal/privacy_policy.html")
+    if not current_user.is_authenticated:
+        return redirect(url_for('auth.login'))
+    return render_template("legal/privacy_policy.html", user=current_user)
 
 
 @dashboard_bp.route("/terms-of-service")
+@login_required
 def terms_of_service():
     """Terms of Service page"""
-    return render_template("legal/terms_of_service.html")
+    if not current_user.is_authenticated:
+        return redirect(url_for('auth.login'))
+    return render_template("legal/terms_of_service.html", user=current_user)
 
