@@ -76,22 +76,29 @@ function renderFAQList(faqs) {
     }
     
     faqList.innerHTML = faqs.map(faq => {
-        const status = faq.status || 'draft';
+        // Safely extract all values with defaults
+        const faqId = faq && faq.id ? String(faq.id) : '0';
+        const status = (faq && faq.status) ? String(faq.status) : 'draft';
         const statusBadge = getStatusBadge(status);
-        const category = faq.category || 'company_details';
+        const category = (faq && faq.category) ? String(faq.category) : 'company_details';
         const categoryLabel = getCategoryLabel(category);
         const isIngested = status === 'active' && faq.ingested_at;
         
+        // Safely get question and answer
+        const question = (faq && faq.question) ? String(faq.question) : 'No question';
+        const answer = (faq && faq.answer) ? String(faq.answer) : 'No answer';
+        const answerPreview = answer.length > 150 ? answer.substring(0, 150) + '...' : answer;
+        
         return `
-            <div class="faq-item" data-faq-id="${faq.id}" style="background: #2a2a2a; border: 1px solid #333; border-radius: 8px; padding: 16px; margin-bottom: 12px;">
+            <div class="faq-item" data-faq-id="${faqId}" style="background: #2a2a2a; border: 1px solid #333; border-radius: 8px; padding: 16px; margin-bottom: 12px;">
                 <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
                     <div style="flex: 1;">
                         <div style="font-weight: 600; color: #fff; margin-bottom: 8px; font-size: 16px;">
                             <span class="material-icons-round" style="vertical-align: middle; font-size: 18px; margin-right: 6px; color: #0891b2;">help_outline</span>
-                            ${escapeHtml(faq.question)}
+                            ${escapeHtml(question)}
                         </div>
                         <div style="color: #ccc; font-size: 14px; line-height: 1.5; margin-bottom: 8px;">
-                            ${escapeHtml(faq.answer.length > 150 ? faq.answer.substring(0, 150) + '...' : faq.answer)}
+                            ${escapeHtml(answerPreview)}
                         </div>
                         <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                             <span style="background: #444; color: #ccc; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${categoryLabel}</span>
@@ -100,11 +107,11 @@ function renderFAQList(faqs) {
                     </div>
                 </div>
                 <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; padding-top: 12px; border-top: 1px solid #333;">
-                    <button class="btn btn-secondary" onclick="editFAQ(${faq.id})" style="padding: 6px 12px; font-size: 12px;">
+                    <button class="btn btn-secondary" onclick="editFAQ(${faqId})" style="padding: 6px 12px; font-size: 12px;">
                         <span class="material-icons-round" style="vertical-align: middle; font-size: 16px;">edit</span> Edit
                     </button>
                     ${!isIngested ? `
-                        <button class="btn" onclick="ingestFAQ(${faq.id})" style="padding: 6px 12px; font-size: 12px; background: #0891b2; color: white;">
+                        <button class="btn" onclick="ingestFAQ(${faqId})" style="padding: 6px 12px; font-size: 12px; background: #0891b2; color: white;">
                             <span class="material-icons-round" style="vertical-align: middle; font-size: 16px;">cloud_upload</span> Ingest
                         </button>
                     ` : `
@@ -112,7 +119,7 @@ function renderFAQList(faqs) {
                             <span class="material-icons-round" style="vertical-align: middle; font-size: 16px;">check_circle</span> Ingested
                         </button>
                     `}
-                    <button class="btn btn-danger" onclick="deleteFAQ(${faq.id})" style="padding: 6px 12px; font-size: 12px;">
+                    <button class="btn btn-danger" onclick="deleteFAQ(${faqId})" style="padding: 6px 12px; font-size: 12px;">
                         <span class="material-icons-round" style="vertical-align: middle; font-size: 16px;">delete</span> Delete
                     </button>
                 </div>
@@ -471,8 +478,9 @@ function showFAQError(message) {
 
 // Escape HTML
 function escapeHtml(text) {
+    if (!text) return '';
     const div = document.createElement('div');
-    div.textContent = text;
+    div.textContent = String(text);
     return div.innerHTML;
 }
 
