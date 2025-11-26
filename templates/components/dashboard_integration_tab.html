@@ -23,26 +23,15 @@
                 <div class="integration-step-number"></div>
                 <div class="integration-step-content">
                     <h3>Customize the Widget</h3>
-                    <p>You can customize the widget's appearance and behavior by modifying the configuration options:</p>
-                    
-                    <div class="customization-options">
-                        <div class="option-card">
-                            <h4>Simple Integration</h4>
-                            <p>The widget automatically uses your chatbot name and settings configured in the Prompt Editor tab.</p>
-                            <p style="margin-top: 10px; color: #666; font-size: 14px;">
-                                <strong>Note:</strong> Since you have 1 chatbot per account, no configuration is needed. Just paste the code snippet!
-                            </p>
-                        </div>
-                        <div class="option-card">
-                            <h4>How It Works</h4>
-                            <ul style="text-align: left; margin-top: 10px;">
-                                <li>The script loads your chatbot automatically</li>
-                                <li>Uses your configured chatbot name</li>
-                                <li>Uses your knowledge base and prompt</li>
-                                <li>Works on any website where you paste the code</li>
-                            </ul>
-                        </div>
-                    </div>
+                    <p>The embed automatically uses your saved configuration—no code editing required. Just make sure the following tabs are updated before you paste the snippet:</p>
+                    <ul style="margin: 15px 0; color: #666; font-size: 14px; text-align: left;">
+                        <li><strong>Appearance tab:</strong> Colors, avatar, launcher shape, greeting text.</li>
+                        <li><strong>Prompt tab:</strong> Persona, tone, response instructions.</li>
+                        <li><strong>Knowledge Base:</strong> Uploaded files, crawled pages, FAQ entries.</li>
+                    </ul>
+                    <p style="color: #666; font-size: 14px;">
+                        Once you click “Save” on each tab, those settings flow directly into the widget—simply paste the snippet into your site and the latest branding + behavior will follow.
+                    </p>
                 </div>
             </div>
 
@@ -50,17 +39,23 @@
                 <div class="integration-step-number"></div>
                 <div class="integration-step-content">
                     <h3>Test the Integration</h3>
-                    <p>After adding the code to your website, test that the widget appears and functions correctly.</p>
-                    
+                    <p>After installing the snippet, verify the widget in a real environment:</p>
+                    <ol style="margin: 15px 0; color: #666; font-size: 14px; text-align: left;">
+                        <li>Open the page on desktop and mobile, confirm the launcher appears, opens, and closes.</li>
+                        <li>Send at least one test question and confirm it uses your latest knowledge base + prompt.</li>
+                        <li>Ensure the button position and colors match your brand on all breakpoints.</li>
+                    </ol>
+                    <p style="color: #666; font-size: 14px;">Use the live preview below for quick checks, then test on your staging/production site for final verification.</p>
+
                     <div class="preview-container">
                         <div class="preview-header">
                             <h4>Widget Preview</h4>
                             <div class="preview-actions">
                                         <button class="btn btn-secondary" onclick="refreshPreview()">
-                                            <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">refresh</span> Refresh
+                                            <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">refresh</span> Refresh Preview
                                         </button>
                                 <button class="btn" onclick="openPreview()">
-                                    ↗️ Open Full Preview
+                                    ↗️ Open Preview in New Tab
                                 </button>
                             </div>
                         </div>
@@ -101,34 +96,6 @@
             </div>
         </div>
 
-        <div class="card">
-                    <h2><span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">build</span> Advanced Integration</h2>
-            <p>For more complex integration needs, you can use our JavaScript API:</p>
-            
-            <div class="code-block">
-                <code id="apiSnippet">// Programmatically open the chat widget
-window.openAIChat();
-
-// Programmatically close the chat widget  
-window.closeAIChat();
-
-// Listen for chat events
-window.addEventListener('aiChatLoaded', function() {
-    console.log('Chat widget loaded');
-});
-
-window.addEventListener('aiChatOpened', function() {
-    console.log('Chat widget opened');
-});
-
-window.addEventListener('aiChatClosed', function() {
-    console.log('Chat widget closed');
-});</code>
-            </div>
-                    <button class="copy-btn" onclick="copySnippet('apiSnippet', this)">
-                        <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">content_copy</span> Copy API Examples
-                    </button>
-        </div>
     </div>
 </div>
 
