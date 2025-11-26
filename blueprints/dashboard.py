@@ -47,3 +47,15 @@ def health_check():
             "error": str(e)
         }), 500
 
+
+@dashboard_bp.route("/privacy-policy")
+def privacy_policy():
+    """Privacy Policy page"""
+    return render_template("legal/privacy_policy.html")
+
+
+@dashboard_bp.route("/terms-of-service")
+def terms_of_service():
+    """Terms of Service page"""
+    return render_template("legal/terms_of_service.html")
+
