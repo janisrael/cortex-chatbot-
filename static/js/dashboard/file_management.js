@@ -6,7 +6,14 @@
 async function initializeFileManagement() {
     try {
         await loadCategories();
-        await loadFilesByCategory();
+        // Use refreshFileList instead of loadFilesByCategory for consistency
+        // refreshFileList uses updateFileList which has the new design with status icons
+        if (typeof refreshFileList === 'function') {
+            await refreshFileList();
+        } else {
+            // Fallback to old method if refreshFileList not available
+            await loadFilesByCategory();
+        }
         await refreshCrawledUrls(); // Load crawled URLs
         await loadKnowledgeStats(); // Load stats cards
         setupFileUpload();
