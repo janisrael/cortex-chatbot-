@@ -5,27 +5,45 @@
 
 async function loadLLMConfig() {
     try {
-        // Fetch actual LLM config from backend
-        const response = await fetch('/api/llm-config');
-        const data = await response.json();
+        // Fetch both system LLM config and user-specific config
+        const [systemResponse, userResponse] = await Promise.all([
+            fetch('/api/llm-config'),
+            fetch('/api/user/chatbot-config')
+        ]);
+        
+        const systemData = await systemResponse.json();
+        const userData = userResponse.ok ? await userResponse.json() : {};
+        const userConfig = userData.config || userData || {};
+        
+        // Use user's saved provider and model if available, otherwise use system defaults
+        const userProvider = userConfig.llm_provider;
+        const userModel = userConfig.llm_model;
         
         llmConfig = {
-            global_provider: data.llm_option || 'openai',
+            global_provider: systemData.llm_option || 'openai',
             openai: {
-                has_api_key: data.has_openai_key || false,
-                api_key_masked: data.openai_key_masked || '',
-                default_model: data.openai_model || 'gpt-4o-mini',
-                temperature: data.openai_temperature || 1.0
+                has_api_key: systemData.has_openai_key || false,
+                api_key_masked: systemData.openai_key_masked || '',
+                default_model: systemData.openai_model || 'gpt-4o-mini',
+                temperature: systemData.openai_temperature || 1.0
             },
             // Ollama removed - local LLM support removed
-            effective_provider: data.llm_option || 'openai',
-            effective_model: data.current_model || 'gpt-4o-mini',
+            // Use user's saved provider/model, fallback to system defaults
+            effective_provider: userProvider || systemData.llm_option || 'openai',
+            effective_model: userModel || systemData.current_model || 'gpt-4o-mini',
             // Website overrides removed (v2 uses user-based system)
             is_fallback: false  // API call succeeded, not using fallback
         };
         
+        console.log(`📋 Loaded LLM config: ${llmConfig.effective_provider} / ${llmConfig.effective_model} (user: ${userProvider}/${userModel || 'none'})`);
+        
         populateLLMConfig();
         updateLLMStatus();
+        
+        // Update active LLM status display if function exists
+        if (typeof updateActiveLLMStatus === 'function') {
+            updateActiveLLMStatus(llmConfig.effective_provider, llmConfig.effective_model);
+        }
     } catch (error) {
         console.error('Failed to load LLM config:', error);
         // Fallback to default values if API fails
@@ -147,11 +165,13 @@ async function loadAdvancedSettings() {
 }
 
 // Save advanced chatbot settings
+// Includes parameter validation before saving
 async function saveAdvancedSettings() {
     const saveBtn = document.getElementById('saveAdvancedBtn');
     if (!saveBtn) return;
     
-    const originalText = saveBtn.textContent;
+    const originalText = saveBtn.innerHTML;
+    const originalDisabled = saveBtn.disabled;
     
     saveBtn.disabled = true;
     saveBtn.innerHTML = '<span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">save</span> Saving...';
@@ -159,14 +179,58 @@ async function saveAdvancedSettings() {
     hideAlert('llmError');
     
     try {
+        // Get and validate parameters
+        const temperature = parseFloat(document.getElementById('chatbotTemperature')?.value);
+        const maxTokens = parseInt(document.getElementById('chatbotMaxTokens')?.value);
+        const topP = parseFloat(document.getElementById('chatbotTopP')?.value);
+        const frequencyPenalty = parseFloat(document.getElementById('chatbotFrequencyPenalty')?.value);
+        const presencePenalty = parseFloat(document.getElementById('chatbotPresencePenalty')?.value);
+        const responseStyle = document.getElementById('chatbotResponseStyle')?.value || 'balanced';
+        const systemInstructions = document.getElementById('chatbotSystemInstructions')?.value || '';
+        
+        // Validate parameter ranges
+        const errors = [];
+        
+        if (isNaN(temperature) || temperature < 0 || temperature > 2) {
+            errors.push('Temperature must be between 0.0 and 2.0');
+        }
+        
+        if (isNaN(maxTokens) || maxTokens < 50 || maxTokens > 4000) {
+            errors.push('Max Tokens must be between 50 and 4000');
+        }
+        
+        if (isNaN(topP) || topP < 0 || topP > 1) {
+            errors.push('Top P must be between 0.0 and 1.0');
+        }
+        
+        if (isNaN(frequencyPenalty) || frequencyPenalty < -2 || frequencyPenalty > 2) {
+            errors.push('Frequency Penalty must be between -2.0 and 2.0');
+        }
+        
+        if (isNaN(presencePenalty) || presencePenalty < -2 || presencePenalty > 2) {
+            errors.push('Presence Penalty must be between -2.0 and 2.0');
+        }
+        
+        // If validation errors, show them and don't save
+        if (errors.length > 0) {
+            const errorMsg = 'Invalid settings: ' + errors.join(', ');
+            if (typeof showErrorNotification === 'function') {
+                showErrorNotification(errorMsg);
+            } else {
+                showAlert('llmError', errorMsg);
+            }
+            return; // Exit - don't save
+        }
+        
+        // All validations passed, prepare config data
         const configData = {
-            temperature: parseFloat(document.getElementById('chatbotTemperature')?.value) || 0.3,
-            max_tokens: parseInt(document.getElementById('chatbotMaxTokens')?.value) || 2000,
-            top_p: parseFloat(document.getElementById('chatbotTopP')?.value) || 1.0,
-            frequency_penalty: parseFloat(document.getElementById('chatbotFrequencyPenalty')?.value) || 0.0,
-            presence_penalty: parseFloat(document.getElementById('chatbotPresencePenalty')?.value) || 0.0,
-            response_style: document.getElementById('chatbotResponseStyle')?.value || 'balanced',
-            system_instructions: document.getElementById('chatbotSystemInstructions')?.value || ''
+            temperature: temperature || 0.3,
+            max_tokens: maxTokens || 2000,
+            top_p: topP || 1.0,
+            frequency_penalty: frequencyPenalty || 0.0,
+            presence_penalty: presencePenalty || 0.0,
+            response_style: responseStyle,
+            system_instructions: systemInstructions
         };
         
         const response = await fetch('/api/user/chatbot-config', {
@@ -174,24 +238,50 @@ async function saveAdvancedSettings() {
             headers: {
                 'Content-Type': 'application/json'
             },
+            credentials: 'same-origin',
             body: JSON.stringify(configData)
         });
         
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Failed to save settings');
+        // Check if response is JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            throw new Error(`Server returned non-JSON response. Status: ${response.status}.`);
         }
         
-        showAlert('llmSuccess', 'Advanced chatbot settings saved successfully!');
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.error || 'Failed to save settings');
+        }
+        
+        // Success!
+        if (typeof showSuccessNotification === 'function') {
+            showSuccessNotification('Advanced chatbot settings saved successfully!');
+        } else {
+            showAlert('llmSuccess', 'Advanced chatbot settings saved successfully!');
+        }
+        
         await loadAdvancedSettings();
         
     } catch (error) {
         console.error('Failed to save advanced settings:', error);
-        showAlert('llmError', 'Failed to save settings: ' + error.message);
+        let errorMsg = `Failed to save settings: ${error.message}`;
+        
+        // Handle JSON parse errors
+        if (error.message.includes('JSON') || error.message.includes('Unexpected token')) {
+            errorMsg = 'Failed to save settings: Server returned an invalid response. Please check your login status and try again.';
+        }
+        
+        if (typeof showErrorNotification === 'function') {
+            showErrorNotification(errorMsg);
+        } else {
+            showAlert('llmError', errorMsg);
+        }
     } finally {
         if (saveBtn) {
-            saveBtn.disabled = false;
-            saveBtn.innerHTML = '<span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">save</span> Save Advanced Settings';
+            saveBtn.disabled = originalDisabled;
+            saveBtn.innerHTML = originalText;
         }
     }
 }
@@ -292,48 +382,88 @@ function updateLLMStatus() {
 }
 
 async function testLLMConnection() {
-    const testBtn = event.target;
+    const testBtn = document.getElementById('testLLMBtn') || (event && event.target);
+    if (!testBtn) return;
+    
     const originalText = testBtn.innerHTML;
     
     testBtn.disabled = true;
-    testBtn.innerHTML = '⏳ Testing...';
+    testBtn.innerHTML = '<span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">hourglass_empty</span> Testing...';
     hideAlert('llmSuccess');
     hideAlert('llmError');
     
     try {
         console.log('Testing LLM connection...');
         
+        // Get API key from provider settings if available
+        const apiKeyField = document.getElementById('llmApiKey');
+        let apiKey = null;
+        if (apiKeyField && apiKeyField.value && !apiKeyField.value.includes('...')) {
+            apiKey = apiKeyField.value;
+        }
+        
         const response = await fetch('/api/test-llm', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
+            credentials: 'same-origin',
             body: JSON.stringify({
                 provider: llmConfig.effective_provider || 'openai',
-                model: llmConfig.effective_model || 'gpt-4o-mini'
+                model: llmConfig.effective_model || 'gpt-4o-mini',
+                api_key: apiKey  // Send API key if provided
             })
         });
+        
+        // Check if response is JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            throw new Error(`Server returned non-JSON response. Status: ${response.status}. Please check if you're logged in.`);
+        }
         
         const result = await response.json();
         console.log('Test result:', result);
         
         if (response.ok && result.status === 'success') {
-            const message = `Connection successful! Model: ${result.model}, Response time: ${result.response_time}ms`;
+            const message = `Connection successful! Model: ${result.model}${result.response_time ? `, Response time: ${result.response_time}ms` : ''}`;
             console.log('Success:', message);
-            showAlert('llmSuccess', message);
             
-            // Auto-hide success message after 5 seconds
-            setTimeout(() => hideAlert('llmSuccess'), 5000);
+            // Show floating notification
+            if (typeof showSuccessNotification !== 'undefined') {
+                showSuccessNotification(message);
+            } else {
+                showAlert('llmSuccess', message);
+                setTimeout(() => hideAlert('llmSuccess'), 5000);
+            }
         } else {
-            const errorMsg = `Connection failed: ${result.error || 'Unknown error'}`;
+            const errorMsg = `Connection failed: ${result.error || result.message || 'Unknown error'}`;
             console.error('Error:', errorMsg);
-            showAlert('llmError', errorMsg);
+            
+            // Show floating notification
+            if (typeof showErrorNotification !== 'undefined') {
+                showErrorNotification(errorMsg);
+            } else {
+                showAlert('llmError', errorMsg);
+            }
         }
         
     } catch (error) {
-        const errorMsg = `Connection test failed: ${error.message}`;
+        let errorMsg = `Connection test failed: ${error.message}`;
+        
+        // Handle JSON parse errors
+        if (error.message.includes('JSON') || error.message.includes('Unexpected token')) {
+            errorMsg = 'Connection test failed: Server returned an invalid response. Please check your login status and try again.';
+        }
+        
         console.error('Exception:', errorMsg);
-        showAlert('llmError', errorMsg);
+        
+        // Show floating notification
+        if (typeof showErrorNotification !== 'undefined') {
+            showErrorNotification(errorMsg);
+        } else {
+            showAlert('llmError', errorMsg);
+        }
     } finally {
         testBtn.disabled = false;
         testBtn.innerHTML = originalText;

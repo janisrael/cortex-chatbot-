@@ -12,6 +12,6 @@
   "response_style": "balanced",
   "system_instructions": "",
   "llm_provider": "openai",
-  "llm_model": "gpt-4o-mini",
-  "llm_api_key": null
+  "llm_model": "gpt-4-turbo",
+  "llm_api_key": "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"
 }

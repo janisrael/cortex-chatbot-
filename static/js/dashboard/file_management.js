@@ -8,9 +8,64 @@ async function initializeFileManagement() {
         await loadCategories();
         await loadFilesByCategory();
         await refreshCrawledUrls(); // Load crawled URLs
+        await loadKnowledgeStats(); // Load stats cards
         setupFileUpload();
     } catch (error) {
         console.error('Failed to initialize file management:', error);
+    }
+}
+
+async function loadKnowledgeStats() {
+    try {
+        const response = await fetch('/api/knowledge-stats', {
+            credentials: 'same-origin'
+        });
+        
+        if (!response.ok) {
+            console.error('Failed to load knowledge stats');
+            return;
+        }
+        
+        const stats = await response.json();
+        
+        // Update Files Card
+        const filesCountEl = document.getElementById('knowledgeFilesCount');
+        const filesLimitEl = document.getElementById('knowledgeFilesLimit');
+        if (filesCountEl) {
+            const fileCount = stats.file_count || 0;
+            const maxFiles = stats.max_files || 100;
+            filesCountEl.textContent = `${fileCount}/${maxFiles}`;
+        }
+        if (filesLimitEl) {
+            filesLimitEl.textContent = `Limit: ${stats.max_files || 100} files`;
+        }
+        
+        // Update Crawled Websites Card
+        const crawledCountEl = document.getElementById('knowledgeCrawledCount');
+        const crawledLimitEl = document.getElementById('knowledgeCrawledLimit');
+        if (crawledCountEl) {
+            const crawledCount = stats.crawled_count || 0;
+            const maxCrawled = stats.max_crawled || 200;
+            crawledCountEl.textContent = `${crawledCount}/${maxCrawled}`;
+        }
+        if (crawledLimitEl) {
+            crawledLimitEl.textContent = `Limit: ${stats.max_crawled || 200} websites`;
+        }
+        
+        // Update FAQ Card
+        const faqCountEl = document.getElementById('knowledgeFaqCount');
+        const faqLimitEl = document.getElementById('knowledgeFaqLimit');
+        if (faqCountEl) {
+            const faqCount = stats.faq_count || 0;
+            const maxFaqs = stats.max_faqs || 500;
+            faqCountEl.textContent = `${faqCount}/${maxFaqs}`;
+        }
+        if (faqLimitEl) {
+            faqLimitEl.textContent = `Limit: ${stats.max_faqs || 500} FAQs`;
+        }
+        
+    } catch (error) {
+        console.error('Failed to load knowledge stats:', error);
     }
 }
 
@@ -26,6 +81,15 @@ async function loadCategories() {
     }
 }
 
+// Category icons mapping
+const CATEGORY_ICONS = {
+    'company_details': 'business',
+    'sales_training': 'school',
+    'product_info': 'inventory',
+    'policies_legal': 'gavel',
+    'faq': 'help_center'
+};
+
 function renderCategoryTabs() {
     const tabsContainer = document.getElementById('categoryTabs');
     if (!tabsContainer) return;
@@ -36,16 +100,20 @@ function renderCategoryTabs() {
         const tab = document.createElement('div');
         tab.className = 'category-tab' + (categoryId === selectedCategory ? ' active' : '');
         tab.onclick = () => selectCategory(categoryId);
+        tab.title = categoryInfo.description; // Tooltip with description
         
+        // Icon
+        const iconDiv = document.createElement('span');
+        iconDiv.className = 'material-icons-round category-icon';
+        iconDiv.textContent = CATEGORY_ICONS[categoryId] || 'folder';
+        
+        // Name
         const nameDiv = document.createElement('div');
+        nameDiv.className = 'category-name';
         nameDiv.textContent = categoryInfo.name;
         
-        const descDiv = document.createElement('div');
-        descDiv.className = 'category-description';
-        descDiv.textContent = categoryInfo.description;
-        
+        tab.appendChild(iconDiv);
         tab.appendChild(nameDiv);
-        tab.appendChild(descDiv);
         tabsContainer.appendChild(tab);
     });
 }
@@ -169,13 +237,26 @@ function toggleCategoryFiles(categoryId) {
     }
 }
 
+let fileUploadInitialized = false;
+
 function setupFileUpload() {
     const fileUpload = document.getElementById('fileUpload');
     const fileInput = document.getElementById('fileInput');
     
     if (!fileUpload || !fileInput) return;
+    
+    // Prevent multiple initializations
+    if (fileUploadInitialized) {
+        console.log('File upload already initialized, skipping...');
+        return;
+    }
+    fileUploadInitialized = true;
 
-    fileUpload.addEventListener('click', () => fileInput.click());
+    fileUpload.addEventListener('click', () => {
+        if (!fileInput.disabled) {
+            fileInput.click();
+        }
+    });
 
     fileUpload.addEventListener('dragover', (e) => {
         e.preventDefault();
@@ -189,63 +270,127 @@ function setupFileUpload() {
     fileUpload.addEventListener('drop', (e) => {
         e.preventDefault();
         fileUpload.classList.remove('dragover');
-        handleFileUpload(e.dataTransfer.files);
+        if (e.dataTransfer.files.length > 0) {
+            handleFileUpload(e.dataTransfer.files);
+        }
     });
 
     fileInput.addEventListener('change', (e) => {
-        handleFileUpload(e.target.files);
+        if (e.target.files && e.target.files.length > 0) {
+            handleFileUpload(e.target.files);
+        }
     });
 }
 
+let isUploading = false;
+
 async function handleFileUpload(files) {
+    // Prevent multiple simultaneous uploads
+    if (isUploading) {
+        console.log('Upload already in progress, ignoring...');
+        return;
+    }
+    
+    if (!files || files.length === 0) {
+        return;
+    }
+    
+    isUploading = true;
     const uploadLoading = document.getElementById('uploadLoading');
     const uploadSuccess = document.getElementById('uploadSuccess');
     const uploadError = document.getElementById('uploadError');
+    const fileInput = document.getElementById('fileInput');
+    
+    // Disable file input during upload
+    if (fileInput) {
+        fileInput.disabled = true;
+    }
     
     if (uploadSuccess) uploadSuccess.style.display = 'none';
     if (uploadError) uploadError.style.display = 'none';
+    if (uploadLoading) uploadLoading.style.display = 'block';
     
-    for (let file of files) {
-        if (uploadLoading) uploadLoading.style.display = 'block';
+    try {
+        // Get AI cleaning preference
+        const aiCleaningCheckbox = document.getElementById('fileAiCleaningEnabled');
+        const useAiCleaning = aiCleaningCheckbox ? aiCleaningCheckbox.checked : true;
         
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('category', selectedCategory);
-        if (currentWebsiteId !== 'default') {
-            formData.append('website_id', currentWebsiteId);
-        }
+        for (let file of files) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('category', selectedCategory || 'company_details');
+            formData.append('use_ai_cleaning', useAiCleaning); // Add AI cleaning preference
+            if (currentWebsiteId !== 'default') {
+                formData.append('website_id', currentWebsiteId);
+            }
 
-        try {
-            const response = await fetch('/api/upload', {
-                method: 'POST',
-                body: formData
-            });
-            
-            const result = await response.json();
-            
-            if (response.ok) {
-                if (uploadSuccess) {
-                    uploadSuccess.textContent = result.message;
-                    uploadSuccess.style.display = 'block';
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    body: formData
+                });
+                
+                // Check if response is JSON
+                const contentType = response.headers.get('content-type');
+                let result;
+                
+                if (contentType && contentType.includes('application/json')) {
+                    result = await response.json();
+                } else {
+                    const text = await response.text();
+                    throw new Error(`Server returned non-JSON response. Status: ${response.status}. Please check your login status.`);
                 }
-                setTimeout(() => {
-                    loadFilesByCategory();
-                }, 1000);
-            } else {
-                throw new Error(result.error);
-            }
-            
-        } catch (error) {
-            if (uploadError) {
-                uploadError.textContent = 'Failed to upload ' + file.name + ': ' + error.message;
-                uploadError.style.display = 'block';
+                
+                if (response.ok) {
+                    const message = result.message || `File "${file.name}" uploaded successfully. Please review and ingest.`;
+                    
+                    // Show toast notification
+                    if (typeof showSuccessNotification === 'function') {
+                        showSuccessNotification(message, 5000);
+                    } else if (uploadSuccess) {
+                        uploadSuccess.textContent = message;
+                        uploadSuccess.style.display = 'block';
+                    }
+                } else {
+                    throw new Error(result.error || `Upload failed with status ${response.status}`);
+                }
+                
+            } catch (error) {
+                console.error('Upload error:', error);
+                const errorMessage = 'Failed to upload ' + file.name + ': ' + error.message;
+                
+                // Show toast notification
+                if (typeof showErrorNotification === 'function') {
+                    showErrorNotification(errorMessage, 6000);
+                } else if (uploadError) {
+                    uploadError.textContent = errorMessage;
+                    uploadError.style.display = 'block';
+                }
             }
         }
+        
+        // Refresh file list and stats after all uploads complete
+        if (typeof refreshFileList === 'function') {
+            await refreshFileList();
+        } else if (typeof loadFilesByCategory === 'function') {
+            await loadFilesByCategory();
+        }
+        
+        // Refresh knowledge stats
+        if (typeof loadKnowledgeStats === 'function') {
+            await loadKnowledgeStats();
+        }
+        
+    } finally {
+        // Re-enable file input and clear it
+        if (fileInput) {
+            fileInput.disabled = false;
+            fileInput.value = '';
+        }
+        if (uploadLoading) uploadLoading.style.display = 'none';
+        isUploading = false;
     }
-    
-    if (uploadLoading) uploadLoading.style.display = 'none';
-    const fileInput = document.getElementById('fileInput');
-    if (fileInput) fileInput.value = '';
 }
 
 // ====================================
@@ -388,6 +533,10 @@ async function ingestCrawledContent() {
             closeCrawlPreview();
             await refreshCrawledUrls();
             await refreshFileList(); // Refresh file list too
+            // Refresh knowledge stats
+            if (typeof loadKnowledgeStats === 'function') {
+                await loadKnowledgeStats();
+            }
         } else {
             throw new Error(result.error || 'Failed to ingest');
         }
@@ -509,5 +658,173 @@ window.onclick = function(event) {
     if (event.target === modal) {
         closeCrawlPreview();
     }
+    const fileModal = document.getElementById('filePreviewModal');
+    if (event.target === fileModal) {
+        closeFilePreview();
+    }
+}
+
+// ====================================
+// FILE PREVIEW AND INGEST FUNCTIONS
+// ====================================
+let filePreviewData = null;
+
+async function viewFile(fileId) {
+    try {
+        const response = await fetch(`/api/files/${fileId}`);
+        const data = await response.json();
+        
+        if (response.ok) {
+            filePreviewData = data;
+            showFilePreview(data);
+        } else {
+            alert('Failed to load file: ' + data.error);
+        }
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+
+function showFilePreview(data) {
+    const modal = document.getElementById('filePreviewModal');
+    const fileNameSpan = document.getElementById('previewFileName');
+    const categorySpan = document.getElementById('previewFileCategory');
+    const wordCountSpan = document.getElementById('previewFileWordCount');
+    const charCountSpan = document.getElementById('previewFileCharCount');
+    const textArea = document.getElementById('previewFileText');
+    
+    if (fileNameSpan) fileNameSpan.textContent = data.filename || 'N/A';
+    if (categorySpan) categorySpan.textContent = data.category || 'N/A';
+    if (wordCountSpan) wordCountSpan.textContent = (data.word_count || 0).toLocaleString();
+    if (charCountSpan) charCountSpan.textContent = (data.char_count || 0).toLocaleString();
+    if (textArea) textArea.value = data.extracted_text || '';
+    
+    if (modal) modal.style.display = 'block';
+}
+
+function closeFilePreview() {
+    const modal = document.getElementById('filePreviewModal');
+    if (modal) modal.style.display = 'none';
+    filePreviewData = null;
+}
+
+async function ingestFileContent() {
+    const textArea = document.getElementById('previewFileText');
+    if (!textArea || !filePreviewData) return;
+    
+    const editedText = textArea.value.trim();
+    if (!editedText) {
+        alert('Text cannot be empty');
+        return;
+    }
+    
+    const fileId = filePreviewData.id;
+    const uploadSuccess = document.getElementById('uploadSuccess');
+    const uploadError = document.getElementById('uploadError');
+    
+    if (uploadError) uploadError.style.display = 'none';
+    
+    try {
+        const response = await fetch(`/api/files/${fileId}/ingest`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                text: editedText
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            const message = result.message || 'File ingested successfully to knowledge base';
+            
+            // Show toast notification
+            if (typeof showSuccessNotification === 'function') {
+                showSuccessNotification(message, 5000);
+            } else if (uploadSuccess) {
+                uploadSuccess.textContent = message;
+                uploadSuccess.style.display = 'block';
+            }
+            
+            closeFilePreview();
+            await refreshFileList();
+            if (typeof refreshCrawledUrls === 'function') {
+                await refreshCrawledUrls();
+            }
+            // Refresh knowledge stats
+            if (typeof loadKnowledgeStats === 'function') {
+                await loadKnowledgeStats();
+            }
+        } else {
+            throw new Error(result.error || 'Failed to ingest');
+        }
+    } catch (error) {
+        const errorMessage = 'Failed to ingest: ' + error.message;
+        
+        // Show toast notification
+        if (typeof showErrorNotification === 'function') {
+            showErrorNotification(errorMessage, 6000);
+        } else if (uploadError) {
+            uploadError.textContent = errorMessage;
+            uploadError.style.display = 'block';
+        }
+    }
+}
+
+async function deleteFileById(fileId) {
+    if (!confirm('Are you sure you want to delete this file?')) {
+        return;
+    }
+    
+    const uploadSuccess = document.getElementById('uploadSuccess');
+    const uploadError = document.getElementById('uploadError');
+    
+    if (uploadError) uploadError.style.display = 'none';
+    
+    try {
+        const response = await fetch(`/api/files/${fileId}`, {
+            method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            const message = result.message || 'File deleted successfully';
+            
+            // Show toast notification
+            if (typeof showSuccessNotification === 'function') {
+                showSuccessNotification(message, 4000);
+            } else if (uploadSuccess) {
+                uploadSuccess.textContent = message;
+                uploadSuccess.style.display = 'block';
+            }
+            
+            await refreshFileList();
+            // Refresh knowledge stats
+            if (typeof loadKnowledgeStats === 'function') {
+                await loadKnowledgeStats();
+            }
+        } else {
+            throw new Error(result.error || 'Failed to delete');
+        }
+    } catch (error) {
+        const errorMessage = 'Error deleting file: ' + error.message;
+        
+        // Show toast notification
+        if (typeof showErrorNotification === 'function') {
+            showErrorNotification(errorMessage, 6000);
+        } else if (uploadError) {
+            uploadError.textContent = errorMessage;
+            uploadError.style.display = 'block';
+        }
+    }
+}
+
+// Make functions globally accessible
+if (typeof window !== 'undefined') {
+    window.viewFile = viewFile;
+    window.closeFilePreview = closeFilePreview;
+    window.ingestFileContent = ingestFileContent;
+    window.deleteFileById = deleteFileById;
 }
 

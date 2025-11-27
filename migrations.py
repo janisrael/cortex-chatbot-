@@ -8,6 +8,7 @@ from models import User
 from models.prompt_preset import PromptPreset
 from models.crawled_url import CrawledUrl
 from models.faq import FAQ
+from models.uploaded_file import UploadedFile
 
 
 class MigrationManager:
@@ -115,6 +116,7 @@ class MigrationManager:
             (4, "004_create_crawled_urls", MigrationManager._migration_004_create_crawled_urls),
             (5, "005_create_chatbot_appearance", MigrationManager._migration_005_create_chatbot_appearance),
             (6, "006_create_faqs", MigrationManager._migration_006_create_faqs),
+            (7, "007_create_uploaded_files", MigrationManager._migration_007_create_uploaded_files),
         ]
         
         for version, name, migration_func in migrations:
@@ -198,6 +200,13 @@ class MigrationManager:
         from models.faq import FAQ
         # This is handled by FAQ.init_db(), so we just ensure it's called
         FAQ.init_db()
+    
+    @staticmethod
+    def _migration_007_create_uploaded_files():
+        """Create uploaded_files table for storing uploaded file data with status tracking"""
+        from models.uploaded_file import UploadedFile
+        # This is handled by UploadedFile.init_db(), so we just ensure it's called
+        UploadedFile.init_db()
 
 
 def run_migrations():

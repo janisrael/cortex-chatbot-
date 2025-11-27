@@ -6,6 +6,48 @@
         <div class="alert alert-success" id="llmSuccess"></div>
         <div class="alert alert-error" id="llmError"></div>
 
+        <!-- LLM Status & Testing Section (Top) -->
+        <div class="config-section">
+            <div class="llm-status-test-grid">
+                <!-- Column 1: Active LLM Status -->
+                <div class="llm-status-card">
+                    <div class="llm-status-header">
+                        <h3 class="section-title">Active LLM</h3>
+                    </div>
+                    <div class="llm-status-content" id="activeLLMStatus">
+                        <div class="llm-status-icon-wrapper">
+                            <img id="activeLLMLogo" src="" alt="" style="display: none; width: 100%; height: 100%; object-fit: contain;">
+                            <span class="material-icons-round llm-provider-icon" id="activeLLMIcon">smart_toy</span>
+                        </div>
+                        <div class="llm-status-info">
+                            <div class="llm-provider-name" id="activeLLMProvider">OpenAI</div>
+                            <div class="llm-model-name" id="activeLLMModel">gpt-4o-mini</div>
+                        </div>
+                        <div class="llm-status-indicator">
+                            <span class="status-dot active" id="llmStatusDot" style="background-color: rgb(40, 167, 69);"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 2: Test Configuration -->
+                <div class="llm-test-card">
+                    <div class="llm-test-header">
+                        <h3 class="section-title">Test Configuration</h3>
+                    </div>
+                    <div class="llm-test-content">
+                        <button class="btn btn-success" onclick="testLLM()" id="testLLMBtn" style="width: 100%;">
+                            <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">science</span> Test Current Configuration
+                        </button>
+                        <div class="loading" id="llmLoading" style="display: none;">
+                            <div class="spinner"></div>
+                            Processing LLM request...
+                        </div>
+                        <div class="test-response" id="testResponse"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Website Selector - HIDDEN (v2 uses user-based system, not website-based) -->
         <!-- <div class="website-selector-section" style="display: none;">
             <label class="section-label">Configure LLM for Website</label>
@@ -32,12 +74,8 @@
                 <div class="form-group">
                     <label for="llmProvider">Provider</label>
                     <select id="llmProvider" class="form-control" onchange="onProviderChange()">
+                        <!-- Options will be populated dynamically by JavaScript with free tier labels -->
                         <option value="openai">OpenAI (Default)</option>
-                        <option value="claude">Anthropic Claude</option>
-                        <option value="gemini">Google Gemini</option>
-                        <option value="deepseek">DeepSeek</option>
-                        <option value="groq">Groq (Llama)</option>
-                        <option value="together">Together AI (Llama)</option>
                     </select>
                     <small style="color: #71717a; font-size: 12px;">Select your preferred AI provider</small>
                 </div>
@@ -51,9 +89,14 @@
             </div>
 
             <div class="form-group">
-                <label for="llmApiKey">API Key (Optional)</label>
-                <input type="password" id="llmApiKey" class="form-control" 
-                       placeholder="Leave empty to use system default API key">
+                <label for="llmApiKey">API Key</label>
+                <div class="input-with-clear">
+                    <input type="password" id="llmApiKey" class="form-control" 
+                           placeholder="Leave empty to use system default API key">
+                    <button type="button" class="input-clear-btn" id="llmApiKeyClear" onclick="clearApiKeyInput()" style="display: none;">
+                        <span class="material-icons-round">close</span>
+                    </button>
+                </div>
                 <small style="color: #71717a; font-size: 12px;">Provide your own API key for the selected provider, or leave empty to use the system default</small>
             </div>
 
@@ -61,7 +104,7 @@
                 <button class="btn" onclick="saveLLMProviderConfig()" id="saveLLMProviderBtn">
                     <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">save</span> Save Provider Settings
                 </button>
-                <button class="btn btn-secondary" onclick="testLLMProvider()" id="testLLMProviderBtn">
+                <button class="btn btn-secondary" onclick="if(typeof testLLMProvider==='function'){testLLMProvider();}else{console.error('testLLMProvider not found');alert('Test function not loaded. Please refresh the page.');}" id="testLLMProviderBtn">
                     <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">science</span> Test Connection
                 </button>
             </div>
@@ -138,29 +181,6 @@
             </div>
         </div>
 
-        <!-- Testing Section -->
-        <div class="config-section">
-            <div class="testing-header">
-                <h3 class="section-title">LLM Testing</h3>
-                <span class="status-indicator" id="llmStatusIndicator">
-                    <span class="status-dot" id="llmStatusDot"></span>
-                    <span id="llmStatusText">Loading...</span>
-                </span>
-            </div>
-
-            <div class="config-actions">
-                <button class="btn btn-success" onclick="testLLM()" id="testLLMBtn">
-                    <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">science</span> Test Current Configuration
-                </button>
-            </div>
-
-            <div class="loading" id="llmLoading">
-                <div class="spinner"></div>
-                Processing LLM request...
-            </div>
-
-            <div class="test-response" id="testResponse"></div>
-        </div>
     </div>
 </div>
 

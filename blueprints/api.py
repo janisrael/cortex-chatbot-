@@ -19,7 +19,7 @@ api_bp = Blueprint('api', __name__)
 @api_bp.route("/api/upload", methods=["POST"])
 @login_required
 def upload_file_multi():
-    """File upload endpoint - user-specific"""
+    """File upload endpoint - saves file and extracts text for preview (does not auto-ingest)"""
     try:
         if not current_user.is_authenticated:
             return jsonify({"error": "Authentication required"}), 401
@@ -38,21 +38,92 @@ def upload_file_multi():
         
         user_id = current_user.id
         
+        # Check file count limit (100 files per user)
+        from models.uploaded_file import UploadedFile
+        existing_files = UploadedFile.get_all_by_user(user_id)
+        MAX_FILES_PER_USER = 100
+        
+        # Count only non-deleted files
+        active_files = [f for f in existing_files if f.get('status') != 'deleted']
+        
+        if len(active_files) >= MAX_FILES_PER_USER:
+            return jsonify({
+                "error": f"File upload limit reached. Maximum {MAX_FILES_PER_USER} files per user. Please delete some files before uploading new ones."
+            }), 400
+        
         # Save file
         filepath, filename = save_uploaded_file(user_id, file, category)
         
-        # Process file for user-specific knowledge base
-        success = process_file_for_user(filepath, filename, category, user_id)
+        # Get AI cleaning preference (default: True)
+        use_ai_cleaning = request.form.get('use_ai_cleaning', 'true').lower() == 'true'
         
-        if success:
+        # Extract text for preview (does not ingest)
+        from services.file_service import extract_text_from_file
+        from services.ai_text_cleaning import clean_text_with_ai
+        
+        extracted_text = extract_text_from_file(filepath, filename)
+        
+        if extracted_text is None:
+            return jsonify({"error": "Failed to extract text from file"}), 500
+        
+        # Log extraction results for debugging
+        print(f"📊 Extraction results for {filename}:")
+        print(f"   - Text length (raw): {len(extracted_text)} characters")
+        print(f"   - Word count (raw): {len(extracted_text.split())} words")
+        
+        # Apply AI cleaning to extract only essential content (if enabled)
+        # Uses system OpenAI credentials for AI-powered features
+        if use_ai_cleaning:
+            try:
+                print("🤖 Applying AI cleaning to uploaded file using system OpenAI...")
+                extracted_text = clean_text_with_ai(extracted_text)
+                print(f"   - Text length (cleaned): {len(extracted_text)} characters")
+                print(f"   - Word count (cleaned): {len(extracted_text.split())} words")
+            except Exception as e:
+                print(f"⚠️ AI cleaning failed, using original text: {e}")
+                import traceback
+                traceback.print_exc()
+                # Continue with original text if AI cleaning fails
+        else:
+            print("ℹ️ AI cleaning disabled by user")
+        
+        # Calculate word and character counts (after cleaning)
+        word_count = len(extracted_text.split())
+        char_count = len(extracted_text)
+        
+        # Save to database with status='preview'
+        file_id = UploadedFile.create(
+            user_id=user_id,
+            filename=filename,
+            filepath=filepath,
+            category=category,
+            extracted_text=extracted_text,
+            word_count=word_count,
+            char_count=char_count,
+            status='preview'
+        )
+        
+        if file_id:
+            # Get updated file count (refresh from DB)
+            updated_files = UploadedFile.get_all_by_user(user_id)
+            updated_active_files = [f for f in updated_files if f.get('status') != 'deleted']
+            remaining_files = MAX_FILES_PER_USER - len(updated_active_files)
+            
             return jsonify({
-                "message": f"File uploaded successfully to your knowledge base",
+                "message": f"File uploaded successfully. Please review and ingest to add to knowledge base. ({remaining_files} files remaining)",
                 "user_id": user_id,
                 "category": category,
-                "filename": filename
+                "filename": filename,
+                "file_id": file_id,
+                "word_count": word_count,
+                "char_count": char_count,
+                "status": "preview",
+                "file_count": len(existing_files) + 1,
+                "max_files": MAX_FILES_PER_USER,
+                "remaining_files": remaining_files
             })
         else:
-            return jsonify({"error": "Failed to process file"}), 500
+            return jsonify({"error": "Failed to save file information"}), 500
             
     except Exception as e:
         import traceback
@@ -64,48 +135,252 @@ def upload_file_multi():
 @api_bp.route("/api/files", methods=["GET"])
 @login_required
 def list_user_files_endpoint():
-    """List all uploaded files for the current user"""
+    """List all uploaded files for the current user (from database with status)"""
     try:
         if not current_user.is_authenticated:
             return jsonify({"error": "Authentication required"}), 401
         
         user_id = current_user.id
-        files = list_user_files(user_id)
+        from models.uploaded_file import UploadedFile
+        
+        # Get files from database (includes status)
+        db_files = UploadedFile.get_all_by_user(user_id)
+        
+        # Format files for response
+        files = []
+        for db_file in db_files:
+            # Convert datetime objects to ISO format
+            uploaded_at = db_file.get('uploaded_at')
+            if uploaded_at and hasattr(uploaded_at, 'isoformat'):
+                uploaded_at = uploaded_at.isoformat()
+            elif uploaded_at:
+                uploaded_at = str(uploaded_at)
+            
+            ingested_at = db_file.get('ingested_at')
+            if ingested_at and hasattr(ingested_at, 'isoformat'):
+                ingested_at = ingested_at.isoformat()
+            elif ingested_at:
+                ingested_at = str(ingested_at)
+            
+            # Get file size from filesystem
+            filepath = db_file.get('filepath')
+            size = 0
+            if filepath and os.path.exists(filepath):
+                size = os.path.getsize(filepath)
+            
+            files.append({
+                "id": db_file.get('id'),
+                "filename": db_file.get('filename'),
+                "category": db_file.get('category'),
+                "size": size,
+                "uploaded_at": uploaded_at,
+                "status": db_file.get('status', 'preview'),
+                "word_count": db_file.get('word_count', 0),
+                "char_count": db_file.get('char_count', 0),
+                "path": filepath
+            })
         
         return jsonify({
             "files": files,
             "total": len(files)
         })
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
 
-@api_bp.route("/api/files/<path:filename>", methods=["DELETE"])
+@api_bp.route("/api/files/<int:file_id>", methods=["GET"])
 @login_required
-def delete_user_file_endpoint(filename):
+def get_file_preview(file_id):
+    """Get file details for preview"""
+    try:
+        if not current_user.is_authenticated:
+            return jsonify({"error": "Authentication required"}), 401
+        
+        user_id = current_user.id
+        from models.uploaded_file import UploadedFile
+        
+        file_data = UploadedFile.get_by_id(user_id, file_id)
+        if not file_data:
+            return jsonify({"error": "File not found"}), 404
+        
+        # Convert datetime objects to ISO format
+        uploaded_at = file_data.get('uploaded_at')
+        if uploaded_at and hasattr(uploaded_at, 'isoformat'):
+            uploaded_at = uploaded_at.isoformat()
+        elif uploaded_at:
+            uploaded_at = str(uploaded_at)
+        
+        ingested_at = file_data.get('ingested_at')
+        if ingested_at and hasattr(ingested_at, 'isoformat'):
+            ingested_at = ingested_at.isoformat()
+        elif ingested_at:
+            ingested_at = str(ingested_at)
+        
+        return jsonify({
+            "id": file_data.get('id'),
+            "filename": file_data.get('filename'),
+            "category": file_data.get('category'),
+            "extracted_text": file_data.get('extracted_text', ''),
+            "word_count": file_data.get('word_count', 0),
+            "char_count": file_data.get('char_count', 0),
+            "status": file_data.get('status', 'preview'),
+            "uploaded_at": uploaded_at,
+            "ingested_at": ingested_at,
+            "filepath": file_data.get('filepath')
+        })
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+
+@api_bp.route("/api/files/<int:file_id>/ingest", methods=["POST"])
+@login_required
+def ingest_uploaded_file(file_id):
+    """Ingest uploaded file to knowledge base (vectorstore)"""
+    try:
+        if not current_user.is_authenticated:
+            return jsonify({"error": "Authentication required"}), 401
+        
+        user_id = current_user.id
+        data = request.json
+        
+        from models.uploaded_file import UploadedFile
+        from services.knowledge_service import get_user_vectorstore, embeddings
+        from langchain.text_splitter import RecursiveCharacterTextSplitter
+        from langchain.schema import Document
+        from datetime import datetime
+        
+        # Get uploaded file
+        uploaded_file = UploadedFile.get_by_id(user_id, file_id)
+        if not uploaded_file:
+            return jsonify({"error": "File not found"}), 404
+        
+        if uploaded_file['status'] == 'ingested':
+            return jsonify({"error": "File already ingested"}), 400
+        
+        # Get text (user may have edited it)
+        text = data.get('text', uploaded_file.get('extracted_text'))
+        if not text:
+            return jsonify({"error": "No text to ingest"}), 400
+        
+        # Update text if edited
+        if text != uploaded_file.get('extracted_text'):
+            UploadedFile.update_text(file_id, text)
+        
+        # RAG Process Explanation:
+        # 1. Text is split into chunks (not converted to JSON - we use vector embeddings)
+        # 2. Each chunk is converted to a vector embedding (numerical representation)
+        # 3. Embeddings are stored in ChromaDB vector database
+        # 4. During queries, the question is also converted to an embedding
+        # 5. Similar embeddings are retrieved (semantic search)
+        # 6. Cleaner text = better embeddings = better retrieval accuracy
+        
+        # Split into chunks
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1000,
+            chunk_overlap=200,
+            length_function=len
+        )
+        
+        doc = Document(
+            page_content=text,
+            metadata={
+                'source_file': uploaded_file['filename'],
+                'upload_time': datetime.now().isoformat(),
+                'category': uploaded_file['category'],  # ✅ Category is tagged in metadata for filtering/search
+                'user_id': str(user_id),
+                'source_type': 'file_upload',
+                'file_id': file_id
+            }
+        )
+        
+        chunks = text_splitter.split_documents([doc])
+        
+        # Add to vectorstore
+        user_vectorstore = get_user_vectorstore(user_id)
+        if user_vectorstore is None:
+            print(f"❌ Failed to get vectorstore for user {user_id}")
+            return jsonify({"error": "Failed to access knowledge base. Please check embeddings and vectorstore initialization."}), 500
+        
+        try:
+            # Ensure write permissions
+            kb_path = f"./chroma_db/user_{user_id}"
+            if os.path.exists(kb_path):
+                os.chmod(kb_path, 0o777)
+                for root, dirs, files in os.walk(kb_path):
+                    for d in dirs:
+                        os.chmod(os.path.join(root, d), 0o777)
+                    for f in files:
+                        os.chmod(os.path.join(root, f), 0o666)
+            
+            print(f"📝 Adding {len(chunks)} chunks to vectorstore...")
+            user_vectorstore.add_documents(chunks)
+            print(f"✅ Successfully added chunks to vectorstore")
+            
+            # Update status to 'ingested'
+            UploadedFile.update_status(file_id, 'ingested')
+            
+            return jsonify({
+                "message": f"File '{uploaded_file['filename']}' ingested successfully. Added {len(chunks)} chunks.",
+                "chunks_added": len(chunks),
+                "status": "ingested"
+            })
+        except Exception as e:
+            print(f"❌ Error adding documents to vectorstore: {e}")
+            import traceback
+            traceback.print_exc()
+            return jsonify({"error": f"Failed to add documents to knowledge base: {str(e)}"}), 500
+            
+    except Exception as e:
+        print(f"❌ Ingest uploaded file error: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+
+@api_bp.route("/api/files/<int:file_id>", methods=["DELETE"])
+@login_required
+def delete_user_file_endpoint(file_id):
     """Delete a file and remove its knowledge from vectorstore"""
     try:
         if not current_user.is_authenticated:
             return jsonify({"error": "Authentication required"}), 401
         
         user_id = current_user.id
-        category = request.args.get('category', 'company_details')
+        from models.uploaded_file import UploadedFile
         
-        # Remove from vectorstore first
-        remove_file_from_vectorstore(user_id, filename)
+        # Get file info
+        file_data = UploadedFile.get_by_id(user_id, file_id)
+        if not file_data:
+            return jsonify({"error": "File not found"}), 404
+        
+        filename = file_data['filename']
+        category = file_data['category']
+        
+        # Remove from vectorstore if ingested
+        if file_data['status'] == 'ingested':
+            remove_file_from_vectorstore(user_id, filename)
+        
+        # Delete from database (soft delete)
+        UploadedFile.delete(file_id)
         
         # Delete the physical file
-        success = delete_user_file(user_id, filename, category)
+        filepath = file_data.get('filepath')
+        if filepath and os.path.exists(filepath):
+            try:
+                os.remove(filepath)
+            except Exception as e:
+                print(f"⚠️ Could not delete physical file: {e}")
         
-        if success:
-            print(f"✅ Deleted file: {filename}")
-            return jsonify({
-                "message": f"File '{filename}' and its knowledge base entries deleted successfully",
-                "filename": filename,
-                "category": category
-            })
-        else:
-            return jsonify({"error": "File not found"}), 404
+        print(f"✅ Deleted file: {filename}")
+        return jsonify({
+            "message": f"File '{filename}' and its knowledge base entries deleted successfully",
+            "filename": filename,
+            "category": category
+        })
     except Exception as e:
         import traceback
         error_details = traceback.format_exc()
@@ -272,16 +547,51 @@ def save_user_chatbot_config_endpoint():
 @api_bp.route("/api/knowledge-stats", methods=["GET"])
 @login_required
 def knowledge_stats():
-    """Get knowledge base statistics for current user"""
+    """Get knowledge base statistics for current user with limits"""
     try:
         user_id = current_user.id
         stats = get_knowledge_stats(user_id)
+        
+        # Get file count with limit
+        from models.uploaded_file import UploadedFile
+        MAX_FILES_PER_USER = 100
+        uploaded_files = UploadedFile.get_all_by_user(user_id)
+        file_count = len(uploaded_files)
+        
+        # Get crawled URLs count
+        from models.crawled_url import CrawledUrl
+        crawled_urls = CrawledUrl.get_all_by_user(user_id)
+        crawled_count = len(crawled_urls)
+        MAX_CRAWLED_URLS = 200  # Set limit for crawled URLs
+        
+        # Get FAQ count
+        from models.faq import FAQ
+        faqs = FAQ.get_all_by_user(user_id, status=None)
+        faq_count = len(faqs)
+        MAX_FAQS = 500  # Set limit for FAQs
+        
+        # Add limits and counts to stats
+        stats['file_count'] = file_count
+        stats['max_files'] = MAX_FILES_PER_USER
+        stats['crawled_count'] = crawled_count
+        stats['max_crawled'] = MAX_CRAWLED_URLS
+        stats['faq_count'] = faq_count
+        stats['max_faqs'] = MAX_FAQS
+        
         return jsonify(stats)
     except Exception as e:
         print(f"❌ Stats error: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({
             "total_documents": 0,
             "vector_store_status": "error",
+            "file_count": 0,
+            "max_files": 100,
+            "crawled_count": 0,
+            "max_crawled": 200,
+            "faq_count": 0,
+            "max_faqs": 500,
             "error": str(e)
         }), 500
 
@@ -1576,4 +1886,146 @@ def submit_feedback():
         import traceback
         traceback.print_exc()
         return jsonify({"error": "Failed to submit feedback. Please try again."}), 500
+
+
+@api_bp.route("/api/test-llm", methods=["POST"])
+@login_required
+def test_llm():
+    """Test LLM connection with current configuration"""
+    try:
+        if not current_user.is_authenticated:
+            return jsonify({"error": "Authentication required"}), 401
+        
+        data = request.get_json()
+        provider = data.get('provider', 'openai')
+        model = data.get('model', 'gpt-4o-mini')
+        api_key = data.get('api_key')  # Optional: user-provided API key
+        
+        # Only use provided API key if it's valid (not masked/placeholder)
+        if api_key and ('...' in api_key or len(api_key) < 10):
+            api_key = None
+        
+        import time
+        from services.llm_service import LLMProvider
+        
+        # Get LLM instance
+        try:
+            llm = LLMProvider.get_llm(
+                provider=provider,
+                model=model,
+                api_key=api_key,  # Use provided key or fall back to environment
+                temperature=0.3,
+                max_tokens=50  # Small test response
+            )
+        except ValueError as e:
+            # Handle missing API key with helpful message
+            error_msg = str(e)
+            if "API key required" in error_msg:
+                if provider == "claude":
+                    error_msg = "Anthropic API key required. Please provide your API key in the 'API Key' field or set ANTHROPIC_API_KEY in your environment. Get your key at: https://console.anthropic.com/"
+                elif provider == "gemini":
+                    error_msg = "Google API key required. Please provide your API key in the 'API Key' field or set GOOGLE_API_KEY in your environment. Get your key at: https://makersuite.google.com/app/apikey"
+                elif provider == "groq":
+                    error_msg = "Groq API key required. Please provide your API key in the 'API Key' field or set GROQ_API_KEY in your environment. Get your key at: https://console.groq.com/"
+                elif provider == "deepseek":
+                    error_msg = "DeepSeek API key required. Please provide your API key in the 'API Key' field or set DEEPSEEK_API_KEY in your environment. Get your key at: https://platform.deepseek.com/"
+                elif provider == "together":
+                    error_msg = "Together AI API key required. Please provide your API key in the 'API Key' field or set TOGETHER_API_KEY in your environment. Get your key at: https://api.together.xyz/"
+            
+            return jsonify({
+                "status": "error",
+                "error": error_msg
+            }), 400
+        except Exception as e:
+            error_msg = str(e)
+            
+            # Handle ModelProfile import errors (version compatibility)
+            if "ModelProfile" in error_msg or "cannot import name" in error_msg:
+                error_msg = (
+                    "LangChain version compatibility issue. "
+                    "Please run: pip install --upgrade langchain-anthropic langchain-core "
+                    "and restart your Flask application."
+                )
+            # Handle other initialization errors
+            elif "Failed to initialize" in error_msg or "Failed to import" in error_msg:
+                # Keep the original error but make it more readable
+                if provider == "claude":
+                    error_msg = f"Failed to initialize Anthropic Claude: {error_msg}"
+                else:
+                    error_msg = f"Failed to initialize {provider}: {error_msg}"
+            
+            return jsonify({
+                "status": "error",
+                "error": error_msg
+            }), 400
+        
+        # Test connection with a simple prompt
+        start_time = time.time()
+        try:
+            response = llm.invoke("Say 'OK' if you can read this.")
+            response_time = int((time.time() - start_time) * 1000)  # Convert to milliseconds
+            
+            # Extract response text
+            if hasattr(response, 'content'):
+                response_text = response.content
+            elif isinstance(response, str):
+                response_text = response
+            else:
+                response_text = str(response)
+            
+            return jsonify({
+                "status": "success",
+                "message": "Connection test successful",
+                "model": model,
+                "provider": provider,
+                "response_time": response_time,
+                "response_preview": response_text[:100] if response_text else "No response"
+            }), 200
+            
+        except Exception as e:
+            response_time = int((time.time() - start_time) * 1000)
+            error_msg = str(e)
+            
+            # Handle authentication errors (invalid API key)
+            if "401" in error_msg or "authentication" in error_msg.lower() or ("invalid" in error_msg.lower() and "key" in error_msg.lower()):
+                if provider == "claude":
+                    error_msg = "Invalid Anthropic API key. Please check your API key and try again. Get your key at: https://console.anthropic.com/"
+                elif provider == "gemini":
+                    error_msg = "Invalid Google API key. Please check your API key and try again. Get your key at: https://makersuite.google.com/app/apikey"
+                elif provider == "groq":
+                    error_msg = "Invalid Groq API key. Please check your API key and try again. Get your key at: https://console.groq.com/"
+                elif provider == "deepseek":
+                    error_msg = "Invalid DeepSeek API key. Please check your API key and try again. Get your key at: https://platform.deepseek.com/"
+                elif provider == "together":
+                    error_msg = "Invalid Together AI API key. Please check your API key and try again. Get your key at: https://api.together.xyz/"
+                else:
+                    error_msg = f"Invalid API key for {provider}. Please check your API key and try again."
+            # Handle rate limit errors
+            elif "429" in error_msg or "rate limit" in error_msg.lower():
+                error_msg = f"Rate limit exceeded for {provider}. Please wait a moment and try again."
+            # Handle forbidden/access errors
+            elif "403" in error_msg or "forbidden" in error_msg.lower():
+                error_msg = f"Access forbidden for {provider}. Please check your API key permissions."
+            # Handle other API errors
+            elif "error" in error_msg.lower() and ("code" in error_msg.lower() or "type" in error_msg.lower()):
+                # Try to extract a cleaner error message
+                if provider == "claude":
+                    error_msg = f"Anthropic API error. Please check your API key and account status. Details: {error_msg[:200]}"
+                else:
+                    error_msg = f"{provider.capitalize()} API error: {error_msg[:200]}"
+            
+            return jsonify({
+                "status": "error",
+                "error": error_msg,
+                "response_time": response_time
+            }), 500
+        
+    except Exception as e:
+        print(f"❌ LLM test error: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            "status": "error",
+            "error": f"Test failed: {str(e)}"
+        }), 500
 
