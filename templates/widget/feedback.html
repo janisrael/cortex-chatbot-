@@ -458,17 +458,33 @@
                 const result = await response.json();
                 
                 if (response.ok) {
-                    successMessage.style.display = 'block';
+                    // Use toast notification if available, otherwise fallback to inline message
+                    if (typeof showSuccessNotification === 'function') {
+                        showSuccessNotification('Feedback submitted successfully! Thank you for your input.', 4000);
+                    } else {
+                        successMessage.style.display = 'block';
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
                     this.reset();
-                    // Scroll to top to show success message
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 } else {
-                    errorText.textContent = result.error || 'Failed to submit feedback. Please try again.';
-                    errorMessage.style.display = 'block';
+                    const errorMsg = result.error || 'Failed to submit feedback. Please try again.';
+                    // Use toast notification if available, otherwise fallback to inline message
+                    if (typeof showErrorNotification === 'function') {
+                        showErrorNotification(errorMsg, 6000);
+                    } else {
+                        errorText.textContent = errorMsg;
+                        errorMessage.style.display = 'block';
+                    }
                 }
             } catch (error) {
-                errorText.textContent = 'Network error. Please check your connection and try again.';
-                errorMessage.style.display = 'block';
+                const errorMsg = 'Network error. Please check your connection and try again.';
+                // Use toast notification if available, otherwise fallback to inline message
+                if (typeof showErrorNotification === 'function') {
+                    showErrorNotification(errorMsg, 6000);
+                } else {
+                    errorText.textContent = errorMsg;
+                    errorMessage.style.display = 'block';
+                }
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<span class="material-icons-round" style="font-size: 20px;">send</span> Send';
@@ -478,6 +494,7 @@
 
     {% include 'components/floating_share_widget.html' %}
     
+    <script src="/static/v2/js/notification-system.js"></script>
     <script src="/static/v2/js/dashboard-core.js"></script>
     <script src="/static/v2/js/dashboard-utils.js"></script>
     <script src="/static/v2/js/floating-share-widget.js"></script>
