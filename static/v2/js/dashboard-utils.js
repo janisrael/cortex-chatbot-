@@ -90,10 +90,19 @@ function initializeHamburgerMenu() {
     const navLinks = document.getElementById('navLinks');
     const headerContent = document.querySelector('.header-content');
     
-    if (!hamburger || !navLinks || !headerContent) return;
+    if (!hamburger || !navLinks || !headerContent) {
+        console.warn('⚠️ Hamburger menu elements not found');
+        return;
+    }
     
-    hamburger.addEventListener('click', function() {
-        hamburger.classList.toggle('active');
+    // Remove any existing event listeners by cloning and replacing
+    const newHamburger = hamburger.cloneNode(true);
+    hamburger.parentNode.replaceChild(newHamburger, hamburger);
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    
+    hamburgerBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        hamburgerBtn.classList.toggle('active');
         headerContent.classList.toggle('menu-active');
     });
     
@@ -103,29 +112,34 @@ function initializeHamburgerMenu() {
     
     if (userInfo) {
         userInfo.addEventListener('click', function() {
-            hamburger.classList.remove('active');
+            hamburgerBtn.classList.remove('active');
             headerContent.classList.remove('menu-active');
         });
     }
     
     if (logoutBtn) {
         logoutBtn.addEventListener('click', function() {
-            hamburger.classList.remove('active');
+            hamburgerBtn.classList.remove('active');
             headerContent.classList.remove('menu-active');
         });
     }
     
     // Close menu when clicking outside (but not on Widget Preview)
     document.addEventListener('click', function(event) {
-        const clickedOnHamburger = hamburger.contains(event.target);
+        const clickedOnHamburger = hamburgerBtn.contains(event.target);
         const clickedOnWidgetPreview = navLinks.contains(event.target);
         const clickedInsideMenu = (userInfo && userInfo.contains(event.target)) || (logoutBtn && logoutBtn.contains(event.target));
         
         if (!clickedOnHamburger && !clickedOnWidgetPreview && !clickedInsideMenu) {
-            hamburger.classList.remove('active');
+            hamburgerBtn.classList.remove('active');
             headerContent.classList.remove('menu-active');
         }
     });
     
     console.log('✅ Hamburger menu initialized');
 }
+
+// Auto-initialize hamburger menu on DOMContentLoaded for all pages
+document.addEventListener('DOMContentLoaded', function() {
+    initializeHamburgerMenu();
+});
