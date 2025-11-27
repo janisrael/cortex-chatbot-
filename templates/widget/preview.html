@@ -4,31 +4,116 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ bot_name }} - Widget Preview</title>
-    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/static/favicon-192x192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="/static/favicon-512x512.png">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Icons+Round&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/widget_preview.css">
+    <link rel="stylesheet" href="/static/v2/css/dashboard.css?v=6">
+    <style>
+        .preview-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .preview-card {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .card-icon {
+            font-size: 64px;
+            color: #0891b2;
+            margin-bottom: 20px;
+        }
+        
+        .preview-card h2 {
+            color: #1e293b;
+            margin-bottom: 15px;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .card-description {
+            color: #475569;
+            font-size: 16px;
+            line-height: 1.7;
+            margin-bottom: 30px;
+        }
+        
+        .instruction-box {
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 30px 0;
+            border: 1px solid #e1e5e9;
+        }
+        
+        .instruction-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .instruction-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .instruction-item .material-icons-round {
+            font-size: 32px;
+            color: #0891b2;
+            flex-shrink: 0;
+        }
+        
+        .instruction-item h3 {
+            color: #1e293b;
+            margin-bottom: 5px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .instruction-item p {
+            color: #64748b;
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        .info-card {
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border: 1px solid #e1e5e9;
+            text-align: left;
+        }
+        
+        .info-card h3 {
+            color: #0891b2;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+        }
+        
+        .info-card p {
+            color: #475569;
+            font-size: 15px;
+            line-height: 1.7;
+            margin: 0;
+        }
+    </style>
 </head>
 <body>
-    <!-- Header with max-width -->
-    <header class="preview-header">
-        <div class="header-container">
-            <div class="header-left">
-                <h1>{{ bot_name }} Widget Preview</h1>
-            </div>
-            <div class="header-right">
-                <a href="/dashboard" class="back-btn">
-                    <span class="material-icons-round">dashboard</span>
-                    <span class="btn-text">Dashboard</span>
-                </a>
-            </div>
-        </div>
-    </header>
+    {% include 'components/dashboard_header_v2.html' %}
 
-    <!-- Main Content -->
-    <main class="preview-main">
-        <div class="preview-container">
-            <!-- Neumorphism Card -->
-            <div class="preview-card">
+    <div class="container">
+        <div class="preview-content">
+            <div class="card preview-card">
                 <div class="card-icon">
                     <span class="material-icons-round">smart_toy</span>
                 </div>
@@ -63,10 +148,9 @@
                 </div>
             </div>
 
-            <!-- Info Card -->
-            <div class="info-card">
+            <div class="card info-card">
                 <h3>
-                    <span class="material-icons-round">info</span>
+                    <span class="material-icons-round" style="font-size: 20px;">info</span>
                     How It Works
                 </h3>
                 <p>
@@ -74,11 +158,14 @@
                     The widget automatically connects to your knowledge base and uses your configured chatbot settings.
                 </p>
             </div>
+
+            {% include 'components/dashboard_footer.html' %}
         </div>
-    </main>
+    </div>
 
     <!-- Load the chatbot widget with user's API key -->
     <script src="/static/embed.js?api_key={{ api_key }}"></script>
+    <script src="/static/v2/js/dashboard-core.js"></script>
+    <script src="/static/v2/js/dashboard-utils.js"></script>
 </body>
 </html>
-
