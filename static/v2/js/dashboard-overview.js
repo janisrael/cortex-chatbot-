@@ -427,13 +427,13 @@ function updateFileList(files) {
             statusBadge = '<span class="status-badge status-preview" style="background: #f59e0b; color: #000; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 8px; font-weight: 500;">Preview</span>';
         }
         
-        const wordCount = file.word_count || 0;
-        const charCount = file.char_count || 0;
+        const wordCount = (file.word_count !== undefined && file.word_count !== null) ? file.word_count : 0;
+        const charCount = (file.char_count !== undefined && file.char_count !== null) ? file.char_count : 0;
         
         return `
-        <div class="file-item" id="file-${fileId}" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 12px; border-bottom: 1px solid #e1e5e9; background: white; border-radius: 8px; margin-bottom: 8px; gap: 12px; position: relative;">
+        <div class="file-item" id="file-${fileId}" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 12px; border-bottom: 1px solid #e1e5e9; background: white; border-radius: 8px; margin-bottom: 8px; gap: 12px; position: relative !important;">
             <!-- Status Icon with Circle Background (Top Left) -->
-            <div class="file-status-icon" style="width: 40px; height: 40px; border-radius: 50%; background: ${statusIconBg}; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">
+            <div class="file-status-icon" style="width: 40px; height: 40px; border-radius: 50%; background: ${statusIconBg}; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; position: relative; z-index: 1;">
                 <span class="material-icons-round" style="font-size: 22px; color: white;">${statusIcon}</span>
             </div>
             

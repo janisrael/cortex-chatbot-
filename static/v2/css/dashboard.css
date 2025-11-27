@@ -1362,6 +1362,7 @@
             border: 1px solid #e1e5e9;
             gap: 12px;
             transition: all 0.2s ease;
+            position: relative; /* Required for absolute positioning of status icons on mobile */
         }
 
         .file-item:hover {
