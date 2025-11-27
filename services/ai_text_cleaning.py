@@ -63,7 +63,9 @@ def clean_text_with_ai(raw_text, llm=None):
         return raw_text
     
     # Create prompt for AI cleaning
-    prompt = f"""You are a content extraction assistant. Your task is to clean and restructure the following text extracted from a website, keeping ONLY the essential content and removing all unnecessary elements.
+    prompt = f"""You are a content extraction assistant. Your task is to clean and restructure the following text extracted from a website, keeping ONLY the essential content that actually exists in the source text.
+
+CRITICAL RULE: ONLY EXTRACT WHAT IS ACTUALLY IN THE SOURCE TEXT. DO NOT ADD, INVENT, OR CREATE ANY INFORMATION THAT IS NOT PRESENT IN THE ORIGINAL TEXT.
 
 REMOVE:
 - Navigation menus and links (except important content links)
@@ -77,39 +79,39 @@ REMOVE:
 - Advertisement text
 - Cookie notices and legal disclaimers (unless they are the main content)
 
-KEEP (CRITICAL - DO NOT REMOVE):
+KEEP (ONLY IF PRESENT IN SOURCE TEXT):
 - Main article/content text
 - Important headings and subheadings
 - Key information and facts
 - Educational content
 - Product/service descriptions
 - Core message and value proposition
-- **ALL CONTACT INFORMATION** (phone numbers, email addresses, physical addresses, website URLs)
-- **FOOTER CONTACT DETAILS** (extract and preserve phone, email, address, booking links from footers)
-- Important links to other pages (not navigation)
-- Business hours and location details
-- Pricing information (if relevant)
-- Booking/reservation links and information
+- Contact information (phone numbers, email addresses, physical addresses, website URLs) - ONLY if they exist in the source
+- Business hours and location details - ONLY if present in source
+- Pricing information - ONLY if present in source
+- Booking/reservation links - ONLY if present in source
 
-SPECIAL INSTRUCTIONS FOR CONTACT INFORMATION:
-- Extract ALL phone numbers, email addresses, and physical addresses
-- Preserve website URLs and booking links
-- If contact info is in footer, extract it and include it in a "Contact Information" section at the end
-- Format contact information clearly (e.g., "Phone: +1-555-1234", "Email: info@example.com", "Address: 123 Main St")
-- Keep all reservation/booking links and contact methods
+STRICT RULES FOR CONTACT INFORMATION:
+- ONLY extract contact information that is ACTUALLY PRESENT in the source text
+- DO NOT add example phone numbers, emails, or addresses
+- DO NOT create placeholder contact information
+- DO NOT add "(example)" or similar annotations
+- DO NOT create a "Contact Information" section if no contact details exist in the source
+- If contact info exists in the source, preserve it exactly as it appears (or format it clearly if it's scattered)
+- If NO contact information exists in the source, do NOT mention contact information at all
 
 RESTRUCTURE:
 - Use clear, concise headings
 - Organize content logically
 - Remove redundant information
-- Keep only the most important details
+- Keep only the most important details that exist in the source
 - Maintain readability and flow
-- Add a "Contact Information" section at the end if contact details were found in footer
+- Only add a "Contact Information" section if contact details ACTUALLY EXIST in the source text
 
 INPUT TEXT:
 {raw_text[:8000]}  # Limit to avoid token limits
 
-OUTPUT: Clean, restructured content with only essential information. Include a "Contact Information" section at the end if contact details were found. Be concise but comprehensive."""
+OUTPUT: Clean, restructured content with ONLY the information that exists in the source text. Do not add, invent, or create any information. If no contact information exists in the source, do not include any contact information section."""
 
     try:
         # Use LLM to clean the text
