@@ -3,7 +3,6 @@ name: Deploy to AWS
 on:
   push:
     branches:
-      - main
       - v2
       - v2-appearance  # Also deploy to production
   workflow_dispatch:
@@ -113,7 +112,7 @@ jobs:
     name: Deploy to Production
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/v2' || github.ref == 'refs/heads/v2-appearance'
+    if: github.ref == 'refs/heads/v2' || github.ref == 'refs/heads/v2-appearance'
     
     steps:
       - name: Checkout code
