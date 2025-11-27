@@ -197,9 +197,15 @@ def get_knowledge_stats(user_id):
         
         if user_vectorstore:
             try:
-                # Try to get document count
+                # Try to get document count using invoke() (LangChain 0.3.x API)
                 retriever = user_vectorstore.as_retriever(search_kwargs={"k": 10000})
-                test_docs = retriever.get_relevant_documents("")
+                # Use a generic query to retrieve all documents (k=10000 should get all)
+                # Use invoke() instead of get_relevant_documents() for LangChain 0.3.x
+                if hasattr(retriever, 'invoke'):
+                    test_docs = retriever.invoke("document")
+                else:
+                    # Fallback for older LangChain versions
+                    test_docs = retriever.get_relevant_documents("document")
                 doc_count = len(test_docs) if test_docs else 0
                 db_status = "active"
             except Exception as e:
