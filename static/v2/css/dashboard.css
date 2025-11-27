@@ -79,7 +79,7 @@
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1),
                 0 2px 8px rgba(255, 255, 255, 0.2) inset,
                 0 -1px 4px rgba(0, 0, 0, 0.1) inset;
-    padding: 10px 20px !important;
+    /* padding: 10px 20px !important; */
     border-radius: 12px !important;
     display: inline-flex !important;
     align-items: center;
@@ -183,12 +183,12 @@
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    border: 3px solid #0891b2;
+    /* border: 3px solid #0891b2; */
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
-    background: #f8fafc;
+    /* overflow: hidden; */
+    background: transparent;
 }
 
 .chatbot-avatar img {
@@ -369,33 +369,28 @@
     }
 
     .nav-links {
+        display: flex !important;
         width: 100%;
-        display: none;
-        flex-direction: column;
-        gap: 10px;
-        margin-top: 10px;
-        background: rgba(255,255,255,0.15);
-        padding: 12px;
-        border-radius: 12px;
-        order: 3;
-    }
-
-    .nav-links.active {
-        display: flex;
+        order: 0;
     }
 
     .nav-links a {
         width: 100%;
-        text-align: left;
-        padding: 10px 12px;
-        border: 1px solid rgba(255,255,255,0.25);
-        background: rgba(0,0,0,0.08);
+        padding: 8px 16px;
+        justify-content: center;
     }
 
     .user-info,
     .logout-btn {
         width: 100%;
         justify-content: center;
+        display: none !important;
+        order: 1;
+    }
+
+    .header-content.menu-active .user-info,
+    .header-content.menu-active .logout-btn {
+        display: flex !important;
     }
 }
 
@@ -539,9 +534,12 @@
         }
 
         textarea.form-control {
-            height: 420px;
+            height: 150px;
             resize: vertical;
             font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        }
+        #promptEditor {
+            height: 450px;
         }
 
         .btn {
@@ -921,6 +919,11 @@
         }
 
         @media (max-width: 768px) {
+            .header h1 {
+                font-size: 18px;
+                font-weight: 600;
+            }
+            
             .preset-grid {
                 grid-template-columns: 1fr;
                 gap: 12px;
@@ -1220,7 +1223,7 @@
         .preview-window {
             border: 1px solid #ddd;
             border-radius: 8px;
-            height: 400px;
+            height: 730px;
             overflow: hidden;
         }
 
@@ -1404,10 +1407,10 @@
 
         .preset-avatar-item {
             width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: 2px solid #e4e4e7;
-            background: #f4f4f5;
+            /* height: 60px; */
+            /* border-radius: 50%; */
+            /* border: 2px solid #e4e4e7; */
+            /* background: #f4f4f5; */
             display: flex;
             align-items: center;
             justify-content: center;

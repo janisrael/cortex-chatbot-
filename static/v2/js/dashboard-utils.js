@@ -88,28 +88,42 @@ function initializeUtils() {
 function initializeHamburgerMenu() {
     const hamburger = document.getElementById('hamburgerBtn');
     const navLinks = document.getElementById('navLinks');
+    const headerContent = document.querySelector('.header-content');
     
-    if (!hamburger || !navLinks) return;
+    if (!hamburger || !navLinks || !headerContent) return;
     
     hamburger.addEventListener('click', function() {
         hamburger.classList.toggle('active');
-        navLinks.classList.toggle('active');
+        headerContent.classList.toggle('menu-active');
     });
     
-    // Close menu when clicking a link
-    const links = navLinks.querySelectorAll('a');
-    links.forEach(link => {
-        link.addEventListener('click', function() {
+    // Close menu when clicking user info or logout
+    const userInfo = document.querySelector('.user-info');
+    const logoutBtn = document.querySelector('.logout-btn');
+    
+    if (userInfo) {
+        userInfo.addEventListener('click', function() {
             hamburger.classList.remove('active');
-            navLinks.classList.remove('active');
+            headerContent.classList.remove('menu-active');
         });
-    });
+    }
     
-    // Close menu when clicking outside
-    document.addEventListener('click', function(event) {
-        if (!hamburger.contains(event.target) && !navLinks.contains(event.target)) {
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function() {
             hamburger.classList.remove('active');
-            navLinks.classList.remove('active');
+            headerContent.classList.remove('menu-active');
+        });
+    }
+    
+    // Close menu when clicking outside (but not on Widget Preview)
+    document.addEventListener('click', function(event) {
+        const clickedOnHamburger = hamburger.contains(event.target);
+        const clickedOnWidgetPreview = navLinks.contains(event.target);
+        const clickedInsideMenu = (userInfo && userInfo.contains(event.target)) || (logoutBtn && logoutBtn.contains(event.target));
+        
+        if (!clickedOnHamburger && !clickedOnWidgetPreview && !clickedInsideMenu) {
+            hamburger.classList.remove('active');
+            headerContent.classList.remove('menu-active');
         }
     });
     

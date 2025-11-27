@@ -15,7 +15,50 @@
         .legal-content {
             max-width: 1200px;
             margin: 0 auto;
+            /* padding: 20px; */
+        }
+        
+        .legal-section {
+            margin-bottom: 30px;
+        }
+        
+        .legal-section h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #0891b2;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e1e5e9;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .legal-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .legal-section p {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #475569;
+            margin-bottom: 15px;
+        }
+        
+        .highlight-box {
+            background: rgba(8, 145, 178, 0.1);
+            border-left: 4px solid #0891b2;
             padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .highlight-box p {
+            margin-bottom: 10px;
         }
         
         .back-link {
@@ -88,6 +131,115 @@
             font-size: 13px;
         }
         
+        .radio-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+        
+        .radio-option {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            min-height: 100px;
+        }
+        
+        .radio-option:hover {
+            border-color: #0891b2;
+            background: linear-gradient(135deg, rgba(8, 145, 178, 0.05) 0%, rgba(15, 118, 110, 0.05) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(8, 145, 178, 0.15);
+        }
+        
+        .radio-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+            margin: 0;
+            pointer-events: none;
+        }
+        
+        .radio-option-icon {
+            font-size: 32px;
+            color: #64748b;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(8, 145, 178, 0.05);
+        }
+        
+        .radio-option-label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: 500;
+            color: #1e293b;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .radio-option input[type="radio"]:checked ~ .radio-option-icon {
+            color: #0891b2;
+            background: linear-gradient(135deg, rgba(8, 145, 178, 0.15) 0%, rgba(15, 118, 110, 0.15) 100%);
+            transform: scale(1.1);
+        }
+        
+        .radio-option input[type="radio"]:checked ~ .radio-option-label {
+            color: #0891b2;
+            font-weight: 600;
+        }
+        
+        .radio-option:has(input[type="radio"]:checked) {
+            border-color: #0891b2;
+            background: linear-gradient(135deg, rgba(8, 145, 178, 0.1) 0%, rgba(15, 118, 110, 0.1) 100%);
+            box-shadow: 0 4px 16px rgba(8, 145, 178, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .radio-option:has(input[type="radio"]:checked) .radio-option-icon {
+            color: #0891b2;
+        }
+        
+        @media (max-width: 768px) {
+            .radio-group {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .radio-option {
+                flex-direction: row;
+                justify-content: flex-start;
+                text-align: left;
+                padding: 16px;
+                min-height: auto;
+            }
+            
+            .radio-option-icon {
+                font-size: 24px;
+                width: 40px;
+                height: 40px;
+            }
+            
+            .radio-option-label {
+                font-size: 15px;
+            }
+        }
+        
         .submit-btn {
             background: linear-gradient(135deg, #0891b2 0%, #0f766e 100%);
             color: white;
@@ -133,6 +285,9 @@
             color: #dc2626;
             display: none;
         }
+        label.radio-option {
+            display: flex;
+        }
     </style>
 </head>
 <body>
@@ -163,17 +318,41 @@
 
                 <form id="feedbackForm" class="feedback-form">
                     <div class="form-group">
-                        <label for="feedbackType">
+                        <label>
                             <span class="material-icons-round" style="font-size: 18px; vertical-align: middle;">category</span>
-                            Type of Feedback
+                            Feedback Type
                         </label>
-                        <select id="feedbackType" name="type" required>
-                            <option value="">Select a type...</option>
-                            <option value="bug">Bug Report</option>
-                            <option value="feature">Feature Request / Idea</option>
-                            <option value="comment">General Comment</option>
-                            <option value="improvement">Improvement Suggestion</option>
-                        </select>
+                        <div class="radio-group">
+                            <label class="radio-option" for="typeBug">
+                                <input type="radio" id="typeBug" name="type" value="bug" checked>
+                                <span class="radio-option-icon">
+                                    <span class="material-icons-round">bug_report</span>
+                                </span>
+                                <span class="radio-option-label">Bug and Error</span>
+                            </label>
+                            <label class="radio-option" for="typeFeature">
+                                <input type="radio" id="typeFeature" name="type" value="feature">
+                                <span class="radio-option-icon">
+                                    <span class="material-icons-round">lightbulb</span>
+                                </span>
+                                <span class="radio-option-label">Feature</span>
+                            </label>
+                            <label class="radio-option" for="typeOpinion">
+                                <input type="radio" id="typeOpinion" name="type" value="opinion">
+                                <span class="radio-option-icon">
+                                    <span class="material-icons-round">chat_bubble_outline</span>
+                                </span>
+                                <span class="radio-option-label">Opinion</span>
+                            </label>
+                            <label class="radio-option" for="typeOther">
+                                <input type="radio" id="typeOther" name="type" value="other">
+                                <span class="radio-option-icon">
+                                    <span class="material-icons-round">more_horiz</span>
+                                </span>
+                                <span class="radio-option-label">Others</span>
+                            </label>
+                        </div>
+                        <small>Select the type of feedback you're submitting</small>
                     </div>
 
                     <div class="form-group">
@@ -188,25 +367,16 @@
                     <div class="form-group">
                         <label for="feedbackMessage">
                             <span class="material-icons-round" style="font-size: 18px; vertical-align: middle;">description</span>
-                            Details
+                            Comment
                         </label>
                         <textarea id="feedbackMessage" name="message" required placeholder="Please provide as much detail as possible. For bugs, include steps to reproduce. For features, explain the use case."></textarea>
                         <small>Include any relevant information that will help us understand your feedback</small>
                     </div>
 
-                    <div class="form-group">
-                        <label for="feedbackEmail">
-                            <span class="material-icons-round" style="font-size: 18px; vertical-align: middle;">email</span>
-                            Your Email (Optional)
-                        </label>
-                        <input type="email" id="feedbackEmail" name="email" placeholder="your.email@example.com">
-                        <small>We'll only use this to follow up on your feedback if needed</small>
-                    </div>
-
                     <div style="text-align: center; margin-top: 30px;">
                         <button type="submit" class="submit-btn" id="submitBtn">
                             <span class="material-icons-round" style="font-size: 20px;">send</span>
-                            Submit Feedback
+                            Send
                         </button>
                     </div>
                 </form>
@@ -265,11 +435,12 @@
             submitBtn.innerHTML = '<span class="material-icons-round" style="font-size: 20px;">hourglass_empty</span> Submitting...';
             
             const formData = new FormData(this);
+            const selectedType = formData.get('type') || 'bug'; // Default to 'bug' if not selected
             const data = {
-                type: formData.get('type'),
+                type: selectedType,
                 subject: formData.get('subject'),
                 message: formData.get('message'),
-                email: formData.get('email') || '{{ user.email if user else "" }}',
+                email: '{{ user.email if user else "" }}',
                 username: '{{ user.username if user else "Anonymous" }}'
             };
             
@@ -299,7 +470,7 @@
                 errorMessage.style.display = 'block';
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = '<span class="material-icons-round" style="font-size: 20px;">send</span> Submit Feedback';
+                submitBtn.innerHTML = '<span class="material-icons-round" style="font-size: 20px;">send</span> Send';
             }
         });
     </script>
@@ -308,4 +479,3 @@
     <script src="/static/v2/js/dashboard-utils.js"></script>
 </body>
 </html>
-
