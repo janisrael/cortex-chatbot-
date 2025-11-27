@@ -1886,7 +1886,13 @@ def submit_feedback():
         
         if not email_sent:
             print(f"⚠️ Failed to send feedback email for {feedback_type} from {username}")
-            # Still return success to user even if email fails
+            import traceback
+            traceback.print_exc()
+            # Return error to user so they know email wasn't sent
+            return jsonify({
+                "error": "Feedback received but email notification failed. Please contact support directly.",
+                "type": feedback_type
+            }), 500
         
         return jsonify({
             "message": "Feedback submitted successfully",
