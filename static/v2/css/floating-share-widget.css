@@ -1,0 +1,168 @@
+/* Floating Social Share Widget */
+/* From Uiverse.io by MijailVillegas - Adapted for Cortex AI */
+
+.floating-share-widget {
+  position: fixed;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 9998;
+  max-width: fit-content;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: center;
+  gap: 1rem;
+  backdrop-filter: blur(15px);
+  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.192),
+    inset 0 0 5px rgba(255, 255, 255, 0.274), 0 5px 5px rgba(0, 0, 0, 0.164);
+  transition: 0.5s;
+  background: rgba(255, 255, 255, 0.1);
+  animation: fadeIn 0.5s ease-out;
+}
+
+.floating-share-widget:hover {
+  background: rgba(173, 173, 173, 0.05);
+}
+
+.floating-share-widget ul {
+  padding: 10px;
+  display: flex;
+  list-style: none;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  align-content: center;
+  flex-wrap: wrap;
+  flex-direction: column;
+  margin: 0;
+}
+
+.floating-share-widget ul li {
+  cursor: pointer;
+  position: relative;
+}
+
+.floating-share-widget .svg {
+  transition: all 0.3s;
+  padding: 10px;
+  height: 40px;
+  width: 40px;
+  border-radius: 100%;
+  color: #0891b2;
+  fill: currentColor;
+  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.3),
+    inset 0 0 5px rgba(255, 255, 255, 0.5), 0 5px 5px rgba(0, 0, 0, 0.164);
+}
+
+.floating-share-widget .text {
+  opacity: 0;
+  border-radius: 5px;
+  font-weight: bold;
+  padding: 5px 10px;
+  transition: all 0.3s;
+  color: #0891b2;
+  background-color: rgba(255, 255, 255, 0.3);
+  position: absolute;
+  z-index: 9999;
+  right: 80px;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  font-family: 'Roboto Slab', sans-serif;
+  font-size: 14px;
+  box-shadow: -5px 0 1px rgba(153, 153, 153, 0.2),
+    -10px 0 1px rgba(153, 153, 153, 0.2),
+    inset 0 0 20px rgba(255, 255, 255, 0.3),
+    inset 0 0 5px rgba(255, 255, 255, 0.5), 0 5px 5px rgba(0, 0, 0, 0.082);
+  pointer-events: none;
+}
+
+/* Isometric projection effect */
+.floating-share-widget .iso-pro {
+  transition: 0.5s;
+}
+
+.floating-share-widget .iso-pro:hover a > .svg {
+  transform: translate(15px, -15px);
+  border-radius: 100%;
+}
+
+.floating-share-widget .iso-pro:hover .text {
+  opacity: 1;
+  transform: translateY(-50%) translateX(-10px) skew(-5deg);
+}
+
+.floating-share-widget .iso-pro:hover .svg {
+  transform: translate(5px, -5px);
+}
+
+.floating-share-widget .iso-pro span {
+  opacity: 0;
+  position: absolute;
+  color: #0891b2;
+  border-color: #0891b2;
+  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.3),
+    inset 0 0 5px rgba(255, 255, 255, 0.5), 0 5px 5px rgba(0, 0, 0, 0.164);
+  border-radius: 50%;
+  transition: all 0.3s;
+  height: 40px;
+  width: 40px;
+  top: 0;
+  left: 0;
+}
+
+.floating-share-widget .iso-pro:hover span {
+  opacity: 1;
+}
+
+.floating-share-widget .iso-pro:hover span:nth-child(1) {
+  opacity: 0.2;
+}
+
+.floating-share-widget .iso-pro:hover span:nth-child(2) {
+  opacity: 0.4;
+  transform: translate(5px, -5px);
+}
+
+.floating-share-widget .iso-pro:hover span:nth-child(3) {
+  opacity: 0.6;
+  transform: translate(10px, -10px);
+}
+
+/* Animation for fade in */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsive: Hide on mobile */
+@media (max-width: 768px) {
+  .floating-share-widget {
+    display: none;
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .floating-share-widget {
+    right: 10px;
+  }
+  
+  .floating-share-widget .svg {
+    height: 40px;
+    width: 40px;
+    padding: 10px;
+  }
+  
+  .floating-share-widget .iso-pro span {
+    height: 40px;
+    width: 40px;
+  }
+}
+

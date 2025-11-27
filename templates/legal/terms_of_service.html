@@ -11,11 +11,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Icons+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/v2/css/dashboard.css?v=9">
+    <link rel="stylesheet" href="/static/v2/css/floating-share-widget.css">
     <style>
         .legal-content {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+           
         }
         
         .legal-section {
@@ -366,14 +367,30 @@
                     </p>
                 </div>
 
-                <div class="card" style="margin-top: 30px; background: #f8fafc;">
-                    <h3 style="margin-top: 0; display: flex; align-items: center; gap: 8px;">
-                        <span class="material-icons-round" style="font-size: 20px;">email</span>
-                        Contact Us
-                    </h3>
-                    <p>If you have any questions about these Terms of Service, please contact us:</p>
-                    <p><strong>Email:</strong> <a href="mailto:janfrancisisrael@gmail.com" style="color: #0891b2; text-decoration: none;">janfrancisisrael@gmail.com</a></p>
-                    <p><strong>Website:</strong> <a href="https://cortex.janisrael.com" style="color: #0891b2; text-decoration: none;">https://cortex.janisrael.com</a></p>
+                <div class="card" style="margin-top: 30px; background: white; border: 2px solid #e1e5e9; border-radius: 16px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: all 0.3s ease;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                        <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #0891b2, #0e7490); display: flex; align-items: center; justify-content: center;">
+                            <span class="material-icons-round" style="font-size: 28px; color: white;">email</span>
+                        </div>
+                        <h3 style="margin: 0; font-size: 20px; font-weight: 600; color: #1e293b;">Contact Us</h3>
+                    </div>
+                    <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin-bottom: 20px;">If you have any questions about these Terms of Service, please contact us:</p>
+                    <div style="background: #f8f9fa; border-radius: 10px; padding: 16px; border-left: 4px solid #0891b2;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <span class="material-icons-round" style="font-size: 20px; color: #0891b2;">mail</span>
+                            <div>
+                                <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Email</div>
+                                <a href="mailto:janfrancisisrael@gmail.com" style="color: #0891b2; text-decoration: none; font-weight: 600; font-size: 14px;">janfrancisisrael@gmail.com</a>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span class="material-icons-round" style="font-size: 20px; color: #0891b2;">language</span>
+                            <div>
+                                <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Website</div>
+                                <a href="https://cortex.janisrael.com" target="_blank" rel="noopener noreferrer" style="color: #0891b2; text-decoration: none; font-weight: 600; font-size: 14px;">https://cortex.janisrael.com</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -412,7 +429,10 @@
         </footer>
     </div>
 
+    {% include 'components/floating_share_widget.html' %}
+    
     <script src="/static/v2/js/dashboard-core.js"></script>
     <script src="/static/v2/js/dashboard-utils.js"></script>
+    <script src="/static/v2/js/floating-share-widget.js"></script>
 </body>
 </html>
