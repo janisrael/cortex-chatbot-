@@ -1326,7 +1326,7 @@
             margin-bottom: 15px;
         }
 
-        .file-list {
+        .file-list, .crawled-urls-list {
             max-height: 400px;
             overflow-y: auto;
             border: 1px solid #e1e5e9;
@@ -1352,7 +1352,7 @@
             background: #64748b;
         }
 
-        .file-item {
+        .file-item, .crawled-url-item {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;

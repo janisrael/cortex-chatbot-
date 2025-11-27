@@ -91,31 +91,31 @@ const CATEGORY_ICONS = {
 };
 
 function renderCategoryTabs() {
+    // Render for file upload section
     const tabsContainer = document.getElementById('categoryTabs');
-    if (!tabsContainer) return;
-    
-    tabsContainer.innerHTML = '';
-    
-    Object.entries(categories).forEach(([categoryId, categoryInfo]) => {
-        const tab = document.createElement('div');
-        tab.className = 'category-tab' + (categoryId === selectedCategory ? ' active' : '');
-        tab.onclick = () => selectCategory(categoryId);
-        tab.title = categoryInfo.description; // Tooltip with description
-        
-        // Icon
-        const iconDiv = document.createElement('span');
-        iconDiv.className = 'material-icons-round category-icon';
-        iconDiv.textContent = CATEGORY_ICONS[categoryId] || 'folder';
-        
-        // Name
-        const nameDiv = document.createElement('div');
-        nameDiv.className = 'category-name';
-        nameDiv.textContent = categoryInfo.name;
-        
-        tab.appendChild(iconDiv);
-        tab.appendChild(nameDiv);
-        tabsContainer.appendChild(tab);
-    });
+    if (tabsContainer) {
+        tabsContainer.innerHTML = '';
+        Object.entries(categories).forEach(([categoryId, categoryInfo]) => {
+            const tab = document.createElement('div');
+            tab.className = 'category-tab' + (categoryId === selectedCategory ? ' active' : '');
+            tab.onclick = () => selectCategory(categoryId);
+            tab.title = categoryInfo.description; // Tooltip with description
+            
+            // Icon
+            const iconDiv = document.createElement('span');
+            iconDiv.className = 'material-icons-round category-icon';
+            iconDiv.textContent = CATEGORY_ICONS[categoryId] || 'folder';
+            
+            // Name
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'category-name';
+            nameDiv.textContent = categoryInfo.name;
+            
+            tab.appendChild(iconDiv);
+            tab.appendChild(nameDiv);
+            tabsContainer.appendChild(tab);
+        });
+    }
 }
 
 function selectCategory(categoryId) {
@@ -421,9 +421,14 @@ async function crawlUrl() {
     let url = urlInput.value.trim();
     
     if (!url) {
+        const errorMessage = 'Please enter a valid URL';
         if (crawlError) {
-            crawlError.textContent = 'Please enter a valid URL';
+            crawlError.textContent = errorMessage;
             crawlError.style.display = 'block';
+        }
+        // Show toast notification
+        if (typeof showErrorNotification === 'function') {
+            showErrorNotification(errorMessage, 4000);
         }
         return;
     }
@@ -463,18 +468,49 @@ async function crawlUrl() {
             
             // Refresh crawled URLs list
             await refreshCrawledUrls();
+            
+            // Show success toast notification
+            const message = `URL crawled successfully. ${result.word_count || 0} words extracted.`;
+            if (typeof showSuccessNotification === 'function') {
+                showSuccessNotification(message, 5000);
+            }
         } else {
             throw new Error(result.error || 'Failed to crawl URL');
         }
     } catch (error) {
+        const errorMessage = 'Failed to crawl URL: ' + error.message;
         if (crawlError) {
-            crawlError.textContent = 'Failed to crawl URL: ' + error.message;
+            crawlError.textContent = errorMessage;
             crawlError.style.display = 'block';
+        }
+        // Show toast notification
+        if (typeof showErrorNotification === 'function') {
+            showErrorNotification(errorMessage, 6000);
         }
     }
     
     if (crawlBtn) crawlBtn.disabled = false;
     if (crawlLoading) crawlLoading.style.display = 'none';
+}
+
+function recrawlUrl() {
+    // UI placeholder - functionality to be implemented
+    const urlInput = document.getElementById('urlInput');
+    if (!urlInput || !urlInput.value.trim()) {
+        const errorMessage = 'Please enter a URL first';
+        if (typeof showErrorNotification === 'function') {
+            showErrorNotification(errorMessage, 4000);
+        } else {
+            alert(errorMessage);
+        }
+        return;
+    }
+    const message = 'Recrawl functionality coming soon!';
+    if (typeof showSuccessNotification === 'function') {
+        showSuccessNotification(message, 3000);
+    } else {
+        alert(message);
+    }
 }
 
 function showCrawlPreview(data) {
@@ -504,7 +540,12 @@ async function ingestCrawledContent() {
     
     const editedText = textArea.value.trim();
     if (!editedText) {
-        alert('Text cannot be empty');
+        const errorMessage = 'Text cannot be empty';
+        if (typeof showErrorNotification === 'function') {
+            showErrorNotification(errorMessage, 4000);
+        } else {
+            alert(errorMessage);
+        }
         return;
     }
     
@@ -526,9 +567,14 @@ async function ingestCrawledContent() {
         const result = await response.json();
         
         if (response.ok) {
+            const message = result.message || 'URL content ingested successfully!';
             if (crawlSuccess) {
-                crawlSuccess.textContent = result.message;
+                crawlSuccess.textContent = message;
                 crawlSuccess.style.display = 'block';
+            }
+            // Show toast notification
+            if (typeof showSuccessNotification === 'function') {
+                showSuccessNotification(message, 5000);
             }
             closeCrawlPreview();
             await refreshCrawledUrls();
@@ -541,9 +587,14 @@ async function ingestCrawledContent() {
             throw new Error(result.error || 'Failed to ingest');
         }
     } catch (error) {
+        const errorMessage = 'Failed to ingest: ' + error.message;
         if (crawlError) {
-            crawlError.textContent = 'Failed to ingest: ' + error.message;
+            crawlError.textContent = errorMessage;
             crawlError.style.display = 'block';
+        }
+        // Show toast notification
+        if (typeof showErrorNotification === 'function') {
+            showErrorNotification(errorMessage, 6000);
         }
     }
 }
@@ -566,29 +617,52 @@ async function refreshCrawledUrls() {
         }
         
         const html = data.urls.map(url => {
-            const statusBadge = url.status === 'ingested' 
-                ? '<span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 8px;">Ingested</span>'
-                : '<span style="background: #ffc107; color: #000; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 8px;">Preview</span>';
+            // Status icon and badge
+            let statusIcon = '';
+            let statusBadge = '';
+            let statusBg = '';
+            
+            if (url.status === 'ingested') {
+                statusIcon = '<span class="material-icons-round" style="font-size: 22px; color: white;">check_circle</span>';
+                statusBadge = '<span class="status-badge status-ingested" style="background: #22c55e; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 8px; font-weight: 500;">Ingest</span>';
+                statusBg = '#22c55e';
+            } else if (url.status === 'preview') {
+                statusIcon = '<span class="material-icons-round" style="font-size: 22px; color: white;">visibility</span>';
+                statusBadge = '<span class="status-badge status-preview" style="background: #f59e0b; color: #000; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 8px; font-weight: 500;">Preview</span>';
+                statusBg = '#f59e0b';
+            } else {
+                statusIcon = '<span class="material-icons-round" style="font-size: 22px; color: white;">error</span>';
+                statusBadge = '<span class="status-badge status-error" style="background: #dc3545; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 8px; font-weight: 500;">Error</span>';
+                statusBg = '#dc3545';
+            }
             
             const crawledDate = url.crawled_at ? new Date(url.crawled_at).toLocaleDateString() : 'N/A';
+            const displayUrl = url.url.length > 60 ? url.url.substring(0, 60) + '...' : url.url;
             
             return `
-                <div class="crawled-url-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #333; background: #252525; border-radius: 4px; margin-bottom: 8px;">
-                    <div style="flex: 1;">
-                        <div style="font-weight: 600; margin-bottom: 4px; color: white;">${url.url}</div>
-                        <div style="font-size: 12px; color: #999;">
+                <div class="crawled-url-item" id="crawled-url-${url.id}" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 12px; border-bottom: 1px solid #e1e5e9; background: white; border-radius: 8px; margin-bottom: 8px; gap: 12px; position: relative;">
+                    <!-- Status Icon with Circle Background (Top Left) -->
+                    <div class="url-status-icon" style="width: 40px; height: 40px; border-radius: 50%; background: ${statusBg}; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">
+                        ${statusIcon}
+                    </div>
+                    
+                    <div class="url-info" style="flex: 1; min-width: 0;">
+                        <div class="url-name" style="font-weight: 600; margin-bottom: 6px; color: #1e293b; font-size: 14px; word-break: break-all;">${displayUrl}</div>
+                        <div class="url-size" style="font-size: 12px; color: #64748b; display: flex; flex-wrap: wrap; align-items: center; gap: 4px; flex-direction: inherit;">
                             ${statusBadge}
-                            ${url.word_count.toLocaleString()} words • 
-                            ${url.char_count.toLocaleString()} chars • 
-                            ${crawledDate}
+                            <span>${url.word_count.toLocaleString()} words</span>
+                            <span>•</span>
+                            <span>${url.char_count.toLocaleString()} chars</span>
+                            <span>•</span>
+                            <span>${crawledDate}</span>
                         </div>
                     </div>
-                    <div style="display: flex; gap: 8px;">
-                        <button class="btn btn-secondary" onclick="viewCrawledUrl(${url.id})" style="padding: 6px 12px; font-size: 12px;">
-                            <span class="material-icons-round" style="font-size: 16px; vertical-align: middle;">visibility</span> View
+                    <div class="url-actions" style="display: flex; gap: 8px; flex-shrink: 0;">
+                        <button class="btn btn-secondary view-url-btn" data-url-id="${url.id}" onclick="viewCrawledUrl(${url.id})" style="padding: 6px 12px; font-size: 12px; white-space: nowrap;" title="View URL preview">
+                            <span class="material-icons-round" style="font-size: 16px; vertical-align: middle;">visibility</span> <span class="btn-text">View</span>
                         </button>
-                        <button class="btn btn-danger" onclick="deleteCrawledUrl(${url.id})" style="padding: 6px 12px; font-size: 12px; background: #dc3545; color: white;">
-                            <span class="material-icons-round" style="font-size: 16px; vertical-align: middle;">delete</span> Delete
+                        <button class="btn btn-danger delete-url-btn" data-url-id="${url.id}" onclick="deleteCrawledUrl(${url.id})" style="padding: 6px 12px; font-size: 12px; background: #dc3545; color: white; white-space: nowrap;" title="Delete URL and remove from knowledge base">
+                            <span class="material-icons-round" style="font-size: 16px; vertical-align: middle;">delete</span> <span class="btn-text">Delete</span>
                         </button>
                     </div>
                 </div>
@@ -611,15 +685,25 @@ async function viewCrawledUrl(crawledId) {
             crawledPreviewData = data;
             showCrawlPreview(data);
         } else {
-            alert('Failed to load crawled URL: ' + data.error);
+            const errorMessage = 'Failed to load crawled URL: ' + data.error;
+            if (typeof showErrorNotification === 'function') {
+                showErrorNotification(errorMessage, 5000);
+            } else {
+                alert(errorMessage);
+            }
         }
     } catch (error) {
-        alert('Error: ' + error.message);
+        const errorMessage = 'Error: ' + error.message;
+        if (typeof showErrorNotification === 'function') {
+            showErrorNotification(errorMessage, 5000);
+        } else {
+            alert(errorMessage);
+        }
     }
 }
 
 async function deleteCrawledUrl(crawledId) {
-    if (!confirm('Are you sure you want to delete this crawled URL?')) {
+    if (!confirm('Are you sure you want to delete this crawled URL? This will also remove it from the knowledge base.')) {
         return;
     }
     
@@ -636,18 +720,32 @@ async function deleteCrawledUrl(crawledId) {
         const result = await response.json();
         
         if (response.ok) {
+            const message = result.message || 'Crawled URL deleted successfully';
             await refreshCrawledUrls();
             if (crawlSuccess) {
-                crawlSuccess.textContent = result.message;
+                crawlSuccess.textContent = message;
                 crawlSuccess.style.display = 'block';
+            }
+            // Show toast notification
+            if (typeof showSuccessNotification === 'function') {
+                showSuccessNotification(message, 5000);
+            }
+            // Refresh knowledge stats
+            if (typeof loadKnowledgeStats === 'function') {
+                await loadKnowledgeStats();
             }
         } else {
             throw new Error(result.error || 'Failed to delete');
         }
     } catch (error) {
+        const errorMessage = 'Error: ' + error.message;
         if (crawlError) {
-            crawlError.textContent = 'Error: ' + error.message;
+            crawlError.textContent = errorMessage;
             crawlError.style.display = 'block';
+        }
+        // Show toast notification
+        if (typeof showErrorNotification === 'function') {
+            showErrorNotification(errorMessage, 6000);
         }
     }
 }
