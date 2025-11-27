@@ -55,7 +55,7 @@
                                             <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">refresh</span> Refresh Preview
                                         </button>
                                 <button class="btn" onclick="openPreview()">
-                                    ↗️ Open Preview in New Tab
+                                    <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">open_in_new</span> Open Preview in New Tab
                                 </button>
                             </div>
                         </div>
@@ -67,32 +67,143 @@
             </div>
         </div>
 
-        <div class="card">
-                    <h2><span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">help</span> Frequently Asked Questions</h2>
+        <div class="card" style="margin-top: 30px;">
+            <h2><span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">help_center</span> Frequently Asked Questions</h2>
             
-            <div class="faq-item">
-                <div class="faq-question">Do I need a website ID?</div>
-                <div class="faq-answer">No! Since you have 1 chatbot per account, the script automatically uses your chatbot configuration. Just paste the code snippet and it will work.</div>
-            </div>
-            
-            <div class="faq-item">
-                <div class="faq-question">Can I customize the widget's colors to match my brand?</div>
-                <div class="faq-answer">Yes, advanced customization is available. Contact support for help with custom CSS integration.</div>
-            </div>
-            
-            <div class="faq-item">
-                <div class="faq-question">Does the widget work on mobile devices?</div>
-                <div class="faq-answer">Yes, the widget is fully responsive and works on all modern mobile browsers.</div>
-            </div>
-            
-            <div class="faq-item">
-                <div class="faq-question">How do I track widget performance?</div>
-                <div class="faq-answer">Conversation metrics and widget analytics are available in the Overview and System Health sections.</div>
-            </div>
-            
-            <div class="faq-item">
-                <div class="faq-question">What if I need to remove the widget?</div>
-                <div class="faq-answer">Simply remove the code snippet from your website. The widget will no longer load on subsequent visits.</div>
+            <div class="integration-faq-list" style="display: flex; flex-direction: column; gap: 16px; margin-top: 20px;">
+                <!-- Widget Integration FAQs -->
+                <div class="integration-faq-item" style="background: white; border: 1px solid #e1e5e9; border-radius: 12px; padding: 20px; transition: all 0.2s ease;">
+                    <div class="faq-question" style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+                        <span class="material-icons-round" style="font-size: 24px; color: #0891b2; flex-shrink: 0; margin-top: 2px;">help_outline</span>
+                        <h3 style="margin: 0; font-size: 16px; font-weight: 600; color: #1e293b; line-height: 1.4;">Do I need a website ID?</h3>
+                    </div>
+                    <div class="faq-answer" style="color: #64748b; font-size: 14px; line-height: 1.6; padding-left: 36px;">
+                        No! Since you have 1 chatbot per account, the script automatically uses your chatbot configuration. Just paste the code snippet and it will work.
+                    </div>
+                </div>
+                
+                <div class="integration-faq-item" style="background: white; border: 1px solid #e1e5e9; border-radius: 12px; padding: 20px; transition: all 0.2s ease;">
+                    <div class="faq-question" style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+                        <span class="material-icons-round" style="font-size: 24px; color: #0891b2; flex-shrink: 0; margin-top: 2px;">help_outline</span>
+                        <h3 style="margin: 0; font-size: 16px; font-weight: 600; color: #1e293b; line-height: 1.4;">Can I customize the widget's colors to match my brand?</h3>
+                    </div>
+                    <div class="faq-answer" style="color: #64748b; font-size: 14px; line-height: 1.6; padding-left: 36px;">
+                        Yes! Use the <strong>Appearance tab</strong> to customize colors, avatar, and suggested messages. All changes are automatically reflected in the widget. For advanced CSS customization, contact support.
+                    </div>
+                </div>
+                
+                <div class="integration-faq-item" style="background: white; border: 1px solid #e1e5e9; border-radius: 12px; padding: 20px; transition: all 0.2s ease;">
+                    <div class="faq-question" style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+                        <span class="material-icons-round" style="font-size: 24px; color: #0891b2; flex-shrink: 0; margin-top: 2px;">help_outline</span>
+                        <h3 style="margin: 0; font-size: 16px; font-weight: 600; color: #1e293b; line-height: 1.4;">Does the widget work on mobile devices?</h3>
+                    </div>
+                    <div class="faq-answer" style="color: #64748b; font-size: 14px; line-height: 1.6; padding-left: 36px;">
+                        Yes, the widget is fully responsive and works on all modern mobile browsers (iOS Safari, Chrome, Firefox, etc.). The chat interface adapts automatically to screen size.
+                    </div>
+                </div>
+                
+                <div class="integration-faq-item" style="background: white; border: 1px solid #e1e5e9; border-radius: 12px; padding: 20px; transition: all 0.2s ease;">
+                    <div class="faq-question" style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+                        <span class="material-icons-round" style="font-size: 24px; color: #0891b2; flex-shrink: 0; margin-top: 2px;">help_outline</span>
+                        <h3 style="margin: 0; font-size: 16px; font-weight: 600; color: #1e293b; line-height: 1.4;">How do I track widget performance?</h3>
+                    </div>
+                    <div class="faq-answer" style="color: #64748b; font-size: 14px; line-height: 1.6; padding-left: 36px;">
+                        Conversation metrics and widget analytics are available in the <strong>Overview</strong> and <strong>System Management</strong> sections. Monitor usage, response times, and user interactions.
+                    </div>
+                </div>
+                
+                <div class="integration-faq-item" style="background: white; border: 1px solid #e1e5e9; border-radius: 12px; padding: 20px; transition: all 0.2s ease;">
+                    <div class="faq-question" style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+                        <span class="material-icons-round" style="font-size: 24px; color: #0891b2; flex-shrink: 0; margin-top: 2px;">help_outline</span>
+                        <h3 style="margin: 0; font-size: 16px; font-weight: 600; color: #1e293b; line-height: 1.4;">What if I need to remove the widget?</h3>
+                    </div>
+                    <div class="faq-answer" style="color: #64748b; font-size: 14px; line-height: 1.6; padding-left: 36px;">
+                        Simply remove the code snippet from your website. The widget will no longer load on subsequent visits. Your chatbot configuration remains saved in the dashboard.
+                    </div>
+                </div>
+                
+                <!-- LLM Provider FAQs -->
+                <div class="integration-faq-item" style="background: white; border: 1px solid #e1e5e9; border-radius: 12px; padding: 20px; transition: all 0.2s ease;">
+                    <div class="faq-question" style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+                        <span class="material-icons-round" style="font-size: 24px; color: #0891b2; flex-shrink: 0; margin-top: 2px;">help_outline</span>
+                        <h3 style="margin: 0; font-size: 16px; font-weight: 600; color: #1e293b; line-height: 1.4;">Which LLM providers are free to use?</h3>
+                    </div>
+                    <div class="faq-answer" style="color: #64748b; font-size: 14px; line-height: 1.6; padding-left: 36px;">
+                        <strong>Free Tier Available:</strong> Google Gemini and Groq offer free tiers with generous limits. You can use these providers without any cost for testing and small-scale deployments. Check the <strong>LLM Configuration</strong> tab to configure these providers.
+                    </div>
+                </div>
+                
+                <div class="integration-faq-item" style="background: white; border: 1px solid #e1e5e9; border-radius: 12px; padding: 20px; transition: all 0.2s ease;">
+                    <div class="faq-question" style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+                        <span class="material-icons-round" style="font-size: 24px; color: #0891b2; flex-shrink: 0; margin-top: 2px;">help_outline</span>
+                        <h3 style="margin: 0; font-size: 16px; font-weight: 600; color: #1e293b; line-height: 1.4;">Which LLM providers require payment?</h3>
+                    </div>
+                    <div class="faq-answer" style="color: #64748b; font-size: 14px; line-height: 1.6; padding-left: 36px;">
+                        <strong>Paid Providers:</strong> OpenAI (GPT models), Anthropic (Claude), DeepSeek, Together AI, and other premium providers require API keys with billing enabled. Pricing varies by provider and model. Configure your API keys in the <strong>LLM Configuration</strong> tab.
+                    </div>
+                </div>
+                
+                <div class="integration-faq-item" style="background: white; border: 1px solid #e1e5e9; border-radius: 12px; padding: 20px; transition: all 0.2s ease;">
+                    <div class="faq-question" style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+                        <span class="material-icons-round" style="font-size: 24px; color: #0891b2; flex-shrink: 0; margin-top: 2px;">help_outline</span>
+                        <h3 style="margin: 0; font-size: 16px; font-weight: 600; color: #1e293b; line-height: 1.4;">How do I switch between LLM providers?</h3>
+                    </div>
+                    <div class="faq-answer" style="color: #64748b; font-size: 14px; line-height: 1.6; padding-left: 36px;">
+                        Go to the <strong>LLM Configuration</strong> tab, select your preferred provider from the dropdown, enter your API key (if required), and click "Save Configuration". You can test the connection before saving to ensure it works correctly.
+                    </div>
+                </div>
+                
+                <!-- Knowledge Base FAQs -->
+                <div class="integration-faq-item" style="background: white; border: 1px solid #e1e5e9; border-radius: 12px; padding: 20px; transition: all 0.2s ease;">
+                    <div class="faq-question" style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+                        <span class="material-icons-round" style="font-size: 24px; color: #0891b2; flex-shrink: 0; margin-top: 2px;">help_outline</span>
+                        <h3 style="margin: 0; font-size: 16px; font-weight: 600; color: #1e293b; line-height: 1.4;">How does the Knowledge Base work?</h3>
+                    </div>
+                    <div class="faq-answer" style="color: #64748b; font-size: 14px; line-height: 1.6; padding-left: 36px;">
+                        The Knowledge Base uses RAG (Retrieval Augmented Generation). Upload documents, crawl websites, or add FAQs. After ingesting, the chatbot uses this information to answer questions accurately. Enable <strong>AI Content Cleaning</strong> for better results by removing navigation and boilerplate content.
+                    </div>
+                </div>
+                
+                <div class="integration-faq-item" style="background: white; border: 1px solid #e1e5e9; border-radius: 12px; padding: 20px; transition: all 0.2s ease;">
+                    <div class="faq-question" style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+                        <span class="material-icons-round" style="font-size: 24px; color: #0891b2; flex-shrink: 0; margin-top: 2px;">help_outline</span>
+                        <h3 style="margin: 0; font-size: 16px; font-weight: 600; color: #1e293b; line-height: 1.4;">What file types are supported for upload?</h3>
+                    </div>
+                    <div class="faq-answer" style="color: #64748b; font-size: 14px; line-height: 1.6; padding-left: 36px;">
+                        Supported formats: <strong>PDF, TXT, DOC, DOCX, CSV</strong>. Maximum file size is 16MB. Files are processed and can be previewed before ingesting to the knowledge base. Use categories to organize your documents.
+                    </div>
+                </div>
+                
+                <div class="integration-faq-item" style="background: white; border: 1px solid #e1e5e9; border-radius: 12px; padding: 20px; transition: all 0.2s ease;">
+                    <div class="faq-question" style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+                        <span class="material-icons-round" style="font-size: 24px; color: #0891b2; flex-shrink: 0; margin-top: 2px;">help_outline</span>
+                        <h3 style="margin: 0; font-size: 16px; font-weight: 600; color: #1e293b; line-height: 1.4;">How do I update my chatbot's knowledge?</h3>
+                    </div>
+                    <div class="faq-answer" style="color: #64748b; font-size: 14px; line-height: 1.6; padding-left: 36px;">
+                        Upload new documents, crawl updated website pages, or add/edit FAQs in the <strong>Knowledge Base</strong> tab. After ingesting, the chatbot immediately uses the new information. You can also delete outdated content to keep your knowledge base current.
+                    </div>
+                </div>
+                
+                <!-- General FAQs -->
+                <div class="integration-faq-item" style="background: white; border: 1px solid #e1e5e9; border-radius: 12px; padding: 20px; transition: all 0.2s ease;">
+                    <div class="faq-question" style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+                        <span class="material-icons-round" style="font-size: 24px; color: #0891b2; flex-shrink: 0; margin-top: 2px;">help_outline</span>
+                        <h3 style="margin: 0; font-size: 16px; font-weight: 600; color: #1e293b; line-height: 1.4;">Can I customize the chatbot's personality?</h3>
+                    </div>
+                    <div class="faq-answer" style="color: #64748b; font-size: 14px; line-height: 1.6; padding-left: 36px;">
+                        Yes! Use the <strong>Prompt Editor</strong> tab to customize the chatbot's personality, tone, and response style. Choose from preset templates or create your own custom prompt. The chatbot name can be set in the <strong>Appearance</strong> tab.
+                    </div>
+                </div>
+                
+                <div class="integration-faq-item" style="background: white; border: 1px solid #e1e5e9; border-radius: 12px; padding: 20px; transition: all 0.2s ease;">
+                    <div class="faq-question" style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+                        <span class="material-icons-round" style="font-size: 24px; color: #0891b2; flex-shrink: 0; margin-top: 2px;">help_outline</span>
+                        <h3 style="margin: 0; font-size: 16px; font-weight: 600; color: #1e293b; line-height: 1.4;">Is my data secure and private?</h3>
+                    </div>
+                    <div class="faq-answer" style="color: #64748b; font-size: 14px; line-height: 1.6; padding-left: 36px;">
+                        Yes! Each user has an isolated knowledge base and configuration. Your uploaded files, crawled URLs, FAQs, and API keys are stored separately and are not accessible to other users. All data is encrypted and secured.
+                    </div>
+                </div>
             </div>
         </div>
 

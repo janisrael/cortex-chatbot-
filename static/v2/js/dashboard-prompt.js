@@ -294,12 +294,20 @@ async function savePrompt() {
     const botName = nameInput ? nameInput.value.trim() : 'Cortex';
     
     if (!prompt) {
-        showAlert('promptError', 'Prompt cannot be empty');
+        const errorMessage = 'Prompt cannot be empty';
+        showAlert('promptError', errorMessage);
+        if (typeof showErrorNotification === 'function') {
+            showErrorNotification(errorMessage, 4000);
+        }
         return;
     }
     
     if (!botName) {
-        showAlert('promptError', 'Chatbot name cannot be empty');
+        const errorMessage = 'Chatbot name cannot be empty';
+        showAlert('promptError', errorMessage);
+        if (typeof showErrorNotification === 'function') {
+            showErrorNotification(errorMessage, 4000);
+        }
         return;
     }
     
@@ -338,14 +346,24 @@ async function savePrompt() {
         }
         
         const result = await response.json();
-        showAlert('promptSuccess', result.message || 'Configuration saved successfully');
+        const message = result.message || 'Configuration saved successfully';
+        showAlert('promptSuccess', message);
         setTimeout(() => hideAlert('promptSuccess'), 3000);
+        // Show toast notification
+        if (typeof showSuccessNotification === 'function') {
+            showSuccessNotification(message, 5000);
+        }
         
         // Update saved prompt after successful save
         savedPrompt = prompt;
         
     } catch (error) {
-        showAlert('promptError', `Failed to save: ${error.message}`);
+        const errorMessage = `Failed to save: ${error.message}`;
+        showAlert('promptError', errorMessage);
+        // Show toast notification
+        if (typeof showErrorNotification === 'function') {
+            showErrorNotification(errorMessage, 6000);
+        }
     }
     
     savePromptBtn.disabled = false;
@@ -369,16 +387,26 @@ function resetPrompt() {
         // Reset to original preset template
         const preset = globalPresets[currentPresetId];
         editor.value = preset.prompt;
-        showAlert('promptSuccess', 'Prompt reset to original preset template');
+        const message = 'Prompt reset to original preset template';
+        showAlert('promptSuccess', message);
         setTimeout(() => hideAlert('promptSuccess'), 3000);
+        // Show toast notification
+        if (typeof showSuccessNotification === 'function') {
+            showSuccessNotification(message, 5000);
+        }
     } else {
         // Fallback: if no preset selected, use default prompt
         const nameInput = document.getElementById('chatbotName');
         const botName = nameInput ? nameInput.value.trim() || 'Cortex' : 'Cortex';
         const defaultPrompt = getDefaultPrompt(botName);
         editor.value = defaultPrompt;
-        showAlert('promptSuccess', 'Prompt reset to default');
+        const message = 'Prompt reset to default';
+        showAlert('promptSuccess', message);
         setTimeout(() => hideAlert('promptSuccess'), 3000);
+        // Show toast notification
+        if (typeof showSuccessNotification === 'function') {
+            showSuccessNotification(message, 5000);
+        }
     }
 }
 

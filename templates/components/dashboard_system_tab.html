@@ -1,66 +1,91 @@
 <!-- System Management Tab -->
 <div id="system-tab" class="tab-content">
     <div class="card">
-        <h2><span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">settings</span> System Management</h2>
+        <h2><span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">settings</span> Settings</h2>
         
         <div class="alert alert-success" id="systemSuccess"></div>
         <div class="alert alert-error" id="systemError"></div>
         
-        <div class="management-grid">
-            <div class="management-item">
-                <h3>Reset Knowledge Base</h3>
-                <p>Clear all uploaded files and AI knowledge. This will remove:</p>
-                <ul>
-                    <li>All uploaded documents</li>
-                    <li>Vector database</li>
-                    <li>Learned conversations</li>
-                    <li>Knowledge base content</li>
-                </ul>
-                <button class="btn btn-danger" onclick="resetKnowledgeBase()" id="resetKnowledgeBtn">
-                    <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">delete</span> Reset Knowledge Base
+        <div class="management-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-top: 20px;">
+            <!-- Reset Knowledge Base Card -->
+            <div class="management-item" style="background: white; border: 2px solid #e1e5e9; border-radius: 16px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: all 0.3s ease;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #dc3545, #c82333); display: flex; align-items: center; justify-content: center;">
+                        <span class="material-icons-round" style="font-size: 28px; color: white;">delete_sweep</span>
+                    </div>
+                    <h3 style="margin: 0; font-size: 20px; font-weight: 600; color: #1e293b;">Reset Knowledge Base</h3>
+                </div>
+                <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin-bottom: 16px;">Clear all uploaded files and AI knowledge. This action cannot be undone.</p>
+                <div style="background: #f8f9fa; border-radius: 10px; padding: 16px; margin-bottom: 20px; border-left: 4px solid #dc3545;">
+                    <ul style="margin: 0; padding-left: 20px; color: #475569; font-size: 13px; line-height: 1.8;">
+                        <li>All uploaded documents</li>
+                        <li>Vector database</li>
+                        <li>Learned conversations</li>
+                        <li>Knowledge base content</li>
+                    </ul>
+                </div>
+                <button class="btn btn-danger" onclick="resetKnowledgeBase()" id="resetKnowledgeBtn" style="width: 100%; padding: 12px 24px; font-weight: 600; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span class="material-icons-round" style="vertical-align: middle; font-size: 20px;">delete</span> Reset Knowledge Base
                 </button>
             </div>
             
-            <div class="management-item">
-                <h3>Backup System</h3>
-                <p>Create a backup of all system data:</p>
-                <ul>
-                    <li>Vector database</li>
-                    <li>Uploaded files</li>
-                    <li>Configuration</li>
-                    <li>User settings</li>
-                </ul>
-                <button class="btn btn-success" onclick="createBackup()" id="backupBtn">
-                    <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">backup</span> Create Backup
+            <!-- Backup System Card -->
+            <div class="management-item" style="background: white; border: 2px solid #e1e5e9; border-radius: 16px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: all 0.3s ease;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #22c55e, #16a34a); display: flex; align-items: center; justify-content: center;">
+                        <span class="material-icons-round" style="font-size: 28px; color: white;">backup</span>
+                    </div>
+                    <h3 style="margin: 0; font-size: 20px; font-weight: 600; color: #1e293b;">Backup System</h3>
+                </div>
+                <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin-bottom: 16px;">Create a backup of all system data for safekeeping and recovery.</p>
+                <div style="background: #f8f9fa; border-radius: 10px; padding: 16px; margin-bottom: 20px; border-left: 4px solid #22c55e;">
+                    <ul style="margin: 0; padding-left: 20px; color: #475569; font-size: 13px; line-height: 1.8;">
+                        <li>Vector database</li>
+                        <li>Uploaded files</li>
+                        <li>Configuration</li>
+                        <li>User settings</li>
+                    </ul>
+                </div>
+                <button class="btn btn-success" onclick="createBackup()" id="backupBtn" style="width: 100%; padding: 12px 24px; font-weight: 600; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; background: #22c55e; border: none;">
+                    <span class="material-icons-round" style="vertical-align: middle; font-size: 20px;">backup</span> Create Backup
                 </button>
             </div>
 
-            <div class="management-item">
-                <h3>System Information</h3>
-                <p>Current system status and statistics:</p>
-                <div id="systemInfo" style="background: #e9ecef; border-radius: 8px; padding: 15px; margin-top: 10px;">
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
-                        <div style="text-align: center;">
-                            <strong id="vectorCount">-</strong>
-                            <div style="font-size: 12px; color: #666;">Vector Documents</div>
+            <!-- System Information Card -->
+            <div class="management-item" style="background: white; border: 2px solid #e1e5e9; border-radius: 16px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: all 0.3s ease; grid-column: 1 / -1;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #0891b2, #0e7490); display: flex; align-items: center; justify-content: center;">
+                        <span class="material-icons-round" style="font-size: 28px; color: white;">info</span>
+                    </div>
+                    <h3 style="margin: 0; font-size: 20px; font-weight: 600; color: #1e293b;">System Information</h3>
+                </div>
+                <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin-bottom: 20px;">Current system status and statistics</p>
+                <div id="systemInfo" style="background: linear-gradient(135deg, #f8f9fa, #ffffff); border: 2px solid #e1e5e9; border-radius: 12px; padding: 20px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-bottom: 20px;">
+                        <div style="text-align: center; padding: 16px; background: white; border-radius: 10px; border: 1px solid #e1e5e9;">
+                            <div style="font-size: 28px; font-weight: 700; color: #0891b2; margin-bottom: 6px;" id="vectorCount">-</div>
+                            <div style="font-size: 12px; color: #64748b; font-weight: 500;">Vector Documents</div>
                         </div>
-                        <div style="text-align: center;">
-                            <strong id="fileCount">-</strong>
-                            <div style="font-size: 12px; color: #666;">Uploaded Files</div>
+                        <div style="text-align: center; padding: 16px; background: white; border-radius: 10px; border: 1px solid #e1e5e9;">
+                            <div style="font-size: 28px; font-weight: 700; color: #0891b2; margin-bottom: 6px;" id="fileCount">-</div>
+                            <div style="font-size: 12px; color: #64748b; font-weight: 500;">Uploaded Files</div>
                         </div>
-                        <div style="text-align: center;">
-                            <strong id="chatLogCount">-</strong>
-                            <div style="font-size: 12px; color: #666;">Chat Logs</div>
+                        <div style="text-align: center; padding: 16px; background: white; border-radius: 10px; border: 1px solid #e1e5e9;">
+                            <div style="font-size: 28px; font-weight: 700; color: #0891b2; margin-bottom: 6px;" id="chatLogCount">-</div>
+                            <div style="font-size: 12px; color: #64748b; font-weight: 500;">Chat Logs</div>
                         </div>
-                        <div style="text-align: center;">
-                            <strong id="backupCount">-</strong>
-                            <div style="font-size: 12px; color: #666;">Backups</div>
+                        <div style="text-align: center; padding: 16px; background: white; border-radius: 10px; border: 1px solid #e1e5e9;">
+                            <div style="font-size: 28px; font-weight: 700; color: #0891b2; margin-bottom: 6px;" id="backupCount">-</div>
+                            <div style="font-size: 12px; color: #64748b; font-weight: 500;">Backups</div>
                         </div>
                     </div>
-                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ced4da; text-align: center;">
-                        <strong>Website ID:</strong> <span id="websiteIdDisplay">-</span>
-                        <button class="copy-btn" onclick="copyWebsiteId()" style="margin-left: 10px;">
-                            <span class="material-icons-round" style="vertical-align: middle; font-size: 16px;">content_copy</span> Copy ID
+                    <div style="padding: 16px; background: white; border-radius: 10px; border: 1px solid #e1e5e9; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-weight: 600; color: #1e293b;">Website ID:</span>
+                            <span id="websiteIdDisplay" style="font-family: monospace; color: #0891b2; font-weight: 600;">-</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyWebsiteId()" style="padding: 8px 16px; background: #f8f9fa; border: 1px solid #e1e5e9; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 13px; color: #475569; transition: all 0.2s;">
+                            <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">content_copy</span> Copy ID
                         </button>
                     </div>
                 </div>
