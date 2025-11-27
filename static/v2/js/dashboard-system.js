@@ -157,9 +157,13 @@ async function resetKnowledgeBase() {
     if (!confirm("⚠️ This will delete ALL uploaded files and AI knowledge. Continue?")) return;
     if (!confirm("🚨 FINAL WARNING: This action cannot be undone! Proceed?")) return;
     
-    const confirmText = prompt("Type 'RESET KNOWLEDGE' to confirm this action:");
-    if (confirmText !== "RESET KNOWLEDGE") {
-        alert("Reset cancelled - confirmation phrase did not match.");
+    const confirmText = prompt("Type 'RESET ALL KNOWLEDGE' to confirm this action:");
+    if (confirmText !== "RESET ALL KNOWLEDGE") {
+        if (typeof showErrorNotification !== 'undefined') {
+            showErrorNotification("Reset cancelled - confirmation phrase did not match.");
+        } else {
+            alert("Reset cancelled - confirmation phrase did not match.");
+        }
         return;
     }
 
@@ -167,176 +171,114 @@ async function resetKnowledgeBase() {
     const systemLoading = document.getElementById('systemLoading');
     
     if (resetBtn) {
-        resetBtn.innerHTML = '⏳ Resetting Knowledge...';
+        resetBtn.innerHTML = '<span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">hourglass_empty</span> Resetting Knowledge...';
         resetBtn.disabled = true;
     }
     if (systemLoading) systemLoading.style.display = 'block';
     
     try {
-        // Simulate API call - replace with actual API call
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        const response = await fetch('/api/reset-knowledge', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify({
+                reset_type: 'all',
+                confirm_phrase: 'RESET ALL KNOWLEDGE'
+            })
+        });
         
-        showAlert('systemSuccess', 'Knowledge base reset successfully');
-        setTimeout(loadStats, 1000);
+        const result = await response.json();
+        
+        if (response.ok) {
+            // Show success notification
+            if (typeof showSuccessNotification !== 'undefined') {
+                showSuccessNotification('Knowledge base reset successfully! All files and vector data have been cleared.');
+            } else {
+                showAlert('systemSuccess', 'Knowledge base reset successfully');
+            }
+            
+            // Refresh stats
+            if (typeof loadStats === 'function') {
+                setTimeout(loadStats, 1000);
+            }
+        } else {
+            throw new Error(result.error || 'Failed to reset knowledge base');
+        }
         
     } catch (error) {
-        showAlert('systemError', 'Failed to reset knowledge base: ' + error.message);
+        // Show error notification
+        if (typeof showErrorNotification !== 'undefined') {
+            showErrorNotification('Failed to reset knowledge base: ' + error.message);
+        } else {
+            showAlert('systemError', 'Failed to reset knowledge base: ' + error.message);
+        }
     } finally {
         if (resetBtn) {
-            resetBtn.innerHTML = '🗑️ Reset Knowledge Base';
+            resetBtn.innerHTML = '<span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">delete</span> Reset Knowledge Base';
             resetBtn.disabled = false;
         }
         if (systemLoading) systemLoading.style.display = 'none';
     }
 }
 
-async function clearChatHistory() {
-    if (!confirm("⚠️ This will delete ALL chat history. Continue?")) return;
-    
-    const clearBtn = document.getElementById('clearChatBtn');
-    const systemLoading = document.getElementById('systemLoading');
-    
-    if (clearBtn) {
-        clearBtn.innerHTML = '⏳ Clearing...';
-        clearBtn.disabled = true;
-    }
-    if (systemLoading) systemLoading.style.display = 'block';
-    
-    try {
-        // Simulate API call - replace with actual API call
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        showAlert('systemSuccess', 'Chat history cleared successfully');
-        setTimeout(loadStats, 1000);
-        
-    } catch (error) {
-        showAlert('systemError', 'Failed to clear chat history: ' + error.message);
-    } finally {
-        if (clearBtn) {
-            clearBtn.innerHTML = '🗑️ Clear Chat History';
-            clearBtn.disabled = false;
-        }
-        if (systemLoading) systemLoading.style.display = 'none';
-    }
-}
-
-async function rebuildVectorStore() {
-    if (!confirm("⚠️ This will rebuild the vector store from existing files. Continue?")) return;
-    
-    const rebuildBtn = document.getElementById('rebuildVectorBtn');
-    const systemLoading = document.getElementById('systemLoading');
-    
-    if (rebuildBtn) {
-        rebuildBtn.innerHTML = '⏳ Rebuilding...';
-        rebuildBtn.disabled = true;
-    }
-    if (systemLoading) systemLoading.style.display = 'block';
-    
-    try {
-        // Simulate API call - replace with actual API call
-        await new Promise(resolve => setTimeout(resolve, 5000));
-        
-        showAlert('systemSuccess', 'Vector store rebuilt successfully!');
-        setTimeout(loadStats, 1000);
-        
-    } catch (error) {
-        showAlert('systemError', 'Failed to rebuild vector store: ' + error.message);
-    } finally {
-        if (rebuildBtn) {
-            rebuildBtn.innerHTML = '🔄 Rebuild Vector Store';
-            rebuildBtn.disabled = false;
-        }
-        if (systemLoading) systemLoading.style.display = 'none';
-    }
-}
+// Removed: clearChatHistory() - No chat logs system exists
+// Removed: rebuildVectorStore() - Not needed in current implementation
 
 async function createBackup() {
     const backupBtn = document.getElementById('backupBtn');
     const systemLoading = document.getElementById('systemLoading');
     
     if (backupBtn) {
-        backupBtn.innerHTML = '⏳ Creating Backup...';
+        backupBtn.innerHTML = '<span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">hourglass_empty</span> Creating Backup...';
         backupBtn.disabled = true;
     }
     if (systemLoading) systemLoading.style.display = 'block';
     
     try {
-        // Simulate API call - replace with actual API call
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        const response = await fetch('/api/backup-knowledge', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'same-origin'
+        });
         
-        showAlert('systemSuccess', `Backup created successfully at /backups/backup-${new Date().toISOString().slice(0, 10)}.zip`);
+        const result = await response.json();
+        
+        if (response.ok) {
+            // Show success notification
+            const backupLocation = result.backup_location || 'backup created';
+            if (typeof showSuccessNotification !== 'undefined') {
+                showSuccessNotification(`Backup created successfully! Location: ${backupLocation}`);
+            } else {
+                showAlert('systemSuccess', `Backup created successfully at ${backupLocation}`);
+            }
+            
+            // Refresh stats
+            if (typeof loadStats === 'function') {
+                setTimeout(loadStats, 1000);
+            }
+        } else {
+            throw new Error(result.error || 'Failed to create backup');
+        }
         
     } catch (error) {
-        showAlert('systemError', 'Failed to create backup: ' + error.message);
+        // Show error notification
+        if (typeof showErrorNotification !== 'undefined') {
+            showErrorNotification('Failed to create backup: ' + error.message);
+        } else {
+            showAlert('systemError', 'Failed to create backup: ' + error.message);
+        }
     } finally {
         if (backupBtn) {
-            backupBtn.innerHTML = '💾 Create Backup';
+            backupBtn.innerHTML = '<span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">backup</span> Create Backup';
             backupBtn.disabled = false;
         }
         if (systemLoading) systemLoading.style.display = 'none';
     }
 }
 
-async function refreshSession() {
-    const refreshBtn = document.getElementById('refreshBtn');
-    
-    if (refreshBtn) {
-        refreshBtn.innerHTML = '⏳ Refreshing...';
-        refreshBtn.disabled = true;
-    }
-    
-    try {
-        // Simulate API call - replace with actual API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        showAlert('systemSuccess', 'Session refreshed successfully');
-        
-    } catch (error) {
-        showAlert('systemError', 'Failed to refresh session: ' + error.message);
-    } finally {
-        if (refreshBtn) {
-            refreshBtn.innerHTML = '🔄 Refresh Session';
-            refreshBtn.disabled = false;
-        }
-    }
-}
-
-async function fullSystemReset() {
-    if (!confirm("💀 NUCLEAR OPTION: This will delete EVERYTHING. Continue?")) return;
-    if (!confirm("🚨 ABSOLUTE FINAL WARNING: ALL DATA WILL BE LOST! Proceed?")) return;
-    
-    const confirmText = prompt("Type 'RESET EVERYTHING' to confirm this action:");
-    if (confirmText !== "RESET EVERYTHING") {
-        alert("Reset cancelled - confirmation phrase did not match.");
-        return;
-    }
-
-    const resetBtn = document.getElementById('fullResetBtn');
-    const systemLoading = document.getElementById('systemLoading');
-    
-    if (resetBtn) {
-        resetBtn.innerHTML = '⏳ Resetting Everything...';
-        resetBtn.disabled = true;
-    }
-    if (systemLoading) systemLoading.style.display = 'block';
-    
-    try {
-        // Simulate API calls - replace with actual API calls
-        await new Promise(resolve => setTimeout(resolve, 4000));
-        
-        showAlert('systemSuccess', 'Full system reset completed successfully!');
-        setTimeout(() => {
-            loadStats();
-            loadPrompt();
-        }, 2000);
-        
-    } catch (error) {
-        showAlert('systemError', 'Failed to perform full reset: ' + error.message);
-    } finally {
-        if (resetBtn) {
-            resetBtn.innerHTML = '💀 Full System Reset';
-            resetBtn.disabled = false;
-        }
-        if (systemLoading) systemLoading.style.display = 'none';
-    }
-}
+// Removed: refreshSession() - Flask-Login handles sessions automatically, not needed
+// Removed: fullSystemReset() - Too dangerous without proper safeguards, no API endpoint exists

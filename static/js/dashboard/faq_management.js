@@ -462,6 +462,10 @@ async function deleteFAQ(faqId) {
 // Refresh FAQ list
 async function refreshFAQList() {
     await loadFAQs();
+    // Refresh knowledge stats
+    if (typeof loadKnowledgeStats === 'function') {
+        await loadKnowledgeStats();
+    }
 }
 
 // Show FAQ error

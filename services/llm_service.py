@@ -26,9 +26,22 @@ class LLMProvider:
         if not provider or provider == "openai":
             provider = "openai"
         
-        # Get API key from parameter or environment
+        # Get API key from parameter or environment (provider-specific)
         if not api_key:
-            api_key = os.getenv("OPENAI_API_KEY", "")
+            if provider == "openai":
+                api_key = os.getenv("OPENAI_API_KEY", "")
+            elif provider == "claude":
+                api_key = os.getenv("ANTHROPIC_API_KEY", "")
+            elif provider == "gemini":
+                api_key = os.getenv("GOOGLE_API_KEY", "")
+            elif provider == "deepseek":
+                api_key = os.getenv("DEEPSEEK_API_KEY", "")
+            elif provider == "groq":
+                api_key = os.getenv("GROQ_API_KEY", "")
+            elif provider == "together":
+                api_key = os.getenv("TOGETHER_API_KEY", "")
+            else:
+                api_key = os.getenv(f"{provider.upper()}_API_KEY", "")
         
         if not api_key:
             raise ValueError(f"API key required for {provider}. Set {provider.upper()}_API_KEY environment variable or pass api_key parameter.")
@@ -51,15 +64,47 @@ class LLMProvider:
             )
         
         elif provider == "claude":
-            # TODO: Implement when langchain-anthropic is added
-            from langchain_anthropic import ChatAnthropic
-            return ChatAnthropic(
-                model=model,
-                api_key=api_key,
-                temperature=temperature,
-                max_tokens=max_tokens,
-                **kwargs
-            )
+            try:
+                # Import with better error handling
+                from langchain_anthropic import ChatAnthropic
+            except ImportError as e:
+                error_msg = str(e)
+                if "ModelProfile" in error_msg or "cannot import name" in error_msg:
+                    raise ValueError(
+                        f"LangChain version compatibility issue. "
+                        f"Try: pip install --upgrade langchain-anthropic langchain-core && restart Flask app. "
+                        f"Error: {error_msg}"
+                    )
+                raise ValueError(f"langchain-anthropic package not installed. Install with: pip install langchain-anthropic. Error: {error_msg}")
+            except Exception as e:
+                error_msg = str(e)
+                if "ModelProfile" in error_msg or "cannot import name" in error_msg:
+                    raise ValueError(
+                        f"LangChain version compatibility issue. "
+                        f"Try: pip install --upgrade langchain-anthropic langchain-core && restart Flask app. "
+                        f"Error: {error_msg}"
+                    )
+                raise ValueError(f"Failed to import ChatAnthropic: {error_msg}")
+            
+            try:
+                return ChatAnthropic(
+                    model=model,
+                    api_key=api_key,
+                    temperature=temperature,
+                    max_tokens=max_tokens,
+                    **kwargs
+                )
+            except Exception as e:
+                # Provide more helpful error message
+                error_msg = str(e)
+                if "ModelProfile" in error_msg or "cannot import name" in error_msg:
+                    raise ValueError(
+                        f"LangChain version compatibility issue detected during initialization. "
+                        f"Please run: pip install --upgrade langchain-anthropic langchain-core "
+                        f"and restart your Flask application. "
+                        f"Error: {error_msg}"
+                    )
+                raise ValueError(f"Failed to initialize Claude LLM: {error_msg}")
         
         elif provider == "gemini":
             # TODO: Implement when langchain-google-genai is added

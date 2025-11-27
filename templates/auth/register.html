@@ -3,23 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Chatbot Dashboard</title>
-    <link rel="stylesheet" href="/static/css/auth.css?v=1.0.2">
+    <title>Register - Cortex AI</title>
+    <link rel="stylesheet" href="/static/css/auth.css?v=2.0.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-card">
-            <div class="login-header">
-                <div class="logo-container">
-                    <span class="material-symbols-outlined logo-icon">smart_toy</span>
+    <div class="auth-wrapper">
+        <!-- Left Column: Form -->
+        <div class="auth-form-column">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="logo-container">
+                        <!-- <img src="/static/img/logo_white.png" alt="Cortex AI Logo" class="logo-img"> -->
+                    </div>
+                    <h1>Cortex AI</h1>
+                    <p class="subtitle">Create your account to get started</p>
                 </div>
-                <h1>Create Account</h1>
-                <p class="subtitle">Sign up to access the dashboard</p>
-            </div>
 
             <form id="registerForm" class="login-form" method="POST" action="/register">
                 <div id="errorMessage" class="error-message" style="display: none;"></div>
@@ -107,12 +109,53 @@
                 </button>
             </form>
 
-            <div class="login-footer">
-                <p>Already have an account? <a href="/login">Sign in</a></p>
-                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e1e5e9; text-align: center;">
-                    <a href="/privacy-policy" style="color: #666; text-decoration: none; font-size: 0.8rem; margin: 0 8px;">Privacy Policy</a>
-                    <span style="color: #999; font-size: 0.75rem;">|</span>
-                    <a href="/terms-of-service" style="color: #666; text-decoration: none; font-size: 0.8rem; margin: 0 8px;">Terms of Service</a>
+                <div class="login-footer">
+                    <p>Already have an account? <a href="/login">Sign in</a></p>
+                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e1e5e9; text-align: center;">
+                        <a href="/privacy-policy" style="color: #666; text-decoration: none; font-size: 0.8rem; margin: 0 8px;">Privacy Policy</a>
+                        <span style="color: #999; font-size: 0.75rem;">|</span>
+                        <a href="/terms-of-service" style="color: #666; text-decoration: none; font-size: 0.8rem; margin: 0 8px;">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Marketing -->
+        <div class="auth-marketing-column">
+            <div class="marketing-content">
+                <div class="marketing-header">
+                    <img src="/static/img/logo_white.png" alt="Cortex AI Logo" class="marketing-logo">
+                    <h2>Start Building Today</h2>
+                </div>
+                <div class="marketing-features">
+                    <div class="feature-item">
+                        <span class="material-symbols-outlined feature-icon">rocket_launch</span>
+                        <div>
+                            <h3>Quick Setup</h3>
+                            <p>Get started in minutes. No technical expertise required. Create your first chatbot in seconds.</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="material-symbols-outlined feature-icon">security</span>
+                        <div>
+                            <h3>Secure & Private</h3>
+                            <p>Your data is encrypted and isolated. Each user has their own secure knowledge base.</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="material-symbols-outlined feature-icon">integration_instructions</span>
+                        <div>
+                            <h3>Easy Integration</h3>
+                            <p>Embed your chatbot on any website with a simple script. Works on all platforms.</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="material-symbols-outlined feature-icon">trending_up</span>
+                        <div>
+                            <h3>Scale with Confidence</h3>
+                            <p>Built for growth. Handle thousands of conversations without breaking a sweat.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

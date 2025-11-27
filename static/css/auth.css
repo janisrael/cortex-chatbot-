@@ -1,17 +1,18 @@
-/* Chatbot Dashboard - Authentication Styles (Neumorphism, Mobile-First) */
+/* Cortex AI - Authentication Styles (2-Column Layout with Gradient) */
 
 :root {
-  --bg-primary: #e9ecef;
-  --bg-secondary: #e9ecef;
-  --text-primary: #44476a;
-  --text-secondary: #6c757d;
-  --text-muted: #93a5be;
-  --accent-primary: #525480;
-  --accent-secondary: #31344b;
-  --success: #00d4bd;
-  --warning: #f0b400;
-  --error: #e85347;
-  --info: #0056b3;
+  --gradient-primary: linear-gradient(135deg, #0891b2 0%, #0f766e 100%);
+  --gradient-primary-colors: #0891b2, #0f766e;
+  --bg-white: #ffffff;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --accent-primary: #0891b2;
+  --accent-secondary: #0f766e;
+  --success: #22c55e;
+  --warning: #f97316;
+  --error: #ef4444;
+  --info: #0891b2;
   
   /* Neumorphism shadows */
   --shadow-inset: inset 2px 2px 5px #b8b9be, inset -3px -3px 7px #fff;
@@ -28,29 +29,39 @@
 
 body {
   font-family: 'Roboto Slab', sans-serif;
-  background: var(--bg-primary);
+  background: var(--gradient-primary);
   color: var(--text-primary);
   line-height: 1.6;
   min-height: 100vh;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Auth Wrapper - 2 Column Layout */
+.auth-wrapper {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Left Column: Form */
+.auth-form-column {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
-}
-
-/* Login Container - Mobile First */
-.login-container {
-  width: 100%;
-  max-width: 450px;
-  margin: 0 auto;
+  padding: 2rem;
+  background: var(--bg-white);
+  overflow-y: auto;
 }
 
 .login-card {
-  background: var(--bg-secondary);
+  width: 100%;
+  max-width: 450px;
+  background: var(--bg-white);
   border-radius: 1.5rem;
-  padding: 2rem 1.5rem;
-  box-shadow: var(--shadow-outset-lg);
-  transition: all 0.3s ease;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
 }
 
 .login-header {
@@ -64,18 +75,20 @@ body {
   margin-bottom: 1rem;
 }
 
-.logo-icon {
-  font-size: 48px;
-  color: var(--accent-primary);
-  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.1));
+.logo-img {
+  height: 60px;
+  width: auto;
+  object-fit: contain;
 }
 
 .login-header h1 {
-  font-size: 1.75rem;
+  font-size: 2rem;
   font-weight: 700;
-  color: var(--accent-secondary);
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-bottom: 0.5rem;
-  text-shadow: 2px 2px 4px #b8b9be, -1px -1px 2px #fff;
 }
 
 .subtitle {
@@ -112,19 +125,20 @@ body {
 .form-group input[type="password"] {
   width: 100%;
   padding: 0.875rem 1.125rem;
-  background: var(--bg-secondary);
-  border: none;
+  background: #f8fafc;
+  border: 2px solid #e1e5e9;
   border-radius: 0.75rem;
   color: var(--text-primary);
   font-size: 1rem;
   font-family: 'Roboto Slab', sans-serif;
-  box-shadow: var(--shadow-inset);
   transition: all 0.3s ease;
 }
 
 .form-group input:focus {
   outline: none;
-  box-shadow: inset 3px 3px 7px #b8b9be, inset -3px -3px 7px #fff;
+  border-color: var(--accent-primary);
+  background: var(--bg-white);
+  box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
 }
 
 .password-input-wrapper {
@@ -179,31 +193,31 @@ body {
 .btn-login {
   width: 100%;
   padding: 1rem;
-  background: var(--bg-secondary);
+  background: var(--gradient-primary);
   border: none;
   border-radius: 0.75rem;
-  color: var(--accent-primary);
+  color: white;
   font-size: 1rem;
   font-weight: 600;
   font-family: 'Roboto Slab', sans-serif;
   cursor: pointer;
-  box-shadow: var(--shadow-outset);
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   position: relative;
+  box-shadow: 0 4px 15px rgba(8, 145, 178, 0.3);
 }
 
 .btn-login:hover:not(:disabled) {
-  box-shadow: var(--shadow-outset-lg);
   transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(8, 145, 178, 0.4);
 }
 
 .btn-login:active:not(:disabled) {
-  box-shadow: var(--shadow-inset);
   transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(8, 145, 178, 0.3);
 }
 
 .btn-login:disabled {
@@ -214,8 +228,8 @@ body {
 .spinner {
   width: 18px;
   height: 18px;
-  border: 2px solid var(--bg-secondary);
-  border-top: 2px solid var(--accent-primary);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -227,14 +241,13 @@ body {
 
 /* Error Message */
 .error-message {
-  background: var(--bg-secondary);
+  background: #fef2f2;
   border-left: 4px solid var(--error);
   border-radius: 0.5rem;
   padding: 1rem;
   margin-bottom: 1.5rem;
   color: var(--error);
   font-size: 0.9rem;
-  box-shadow: var(--shadow-inset);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -249,7 +262,7 @@ body {
 .login-footer {
   margin-top: 2rem;
   padding-top: 1.5rem;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  border-top: 1px solid #e1e5e9;
   text-align: center;
 }
 
@@ -270,8 +283,141 @@ body {
   text-decoration: underline;
 }
 
+/* Right Column: Marketing */
+.auth-marketing-column {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  background: var(--gradient-primary);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-marketing-column::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  animation: pulse 20s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.marketing-content {
+  max-width: 500px;
+  width: 100%;
+  z-index: 1;
+  position: relative;
+}
+
+.marketing-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.marketing-logo {
+  height: 80px;
+  width: auto;
+  object-fit: contain;
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.marketing-header h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.marketing-features {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.feature-item {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  padding: 1.5rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.feature-item:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.feature-icon {
+  font-size: 40px;
+  color: white;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.feature-item h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: white;
+}
+
+.feature-item p {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.6;
+}
+
+/* Mobile Styles - Stack Columns */
+@media (max-width: 1023px) {
+  .auth-wrapper {
+    flex-direction: column;
+  }
+
+  .auth-form-column {
+    padding: 1.5rem;
+    min-height: auto;
+  }
+
+  .auth-marketing-column {
+    padding: 2rem 1.5rem;
+    min-height: auto;
+  }
+
+  .marketing-header h2 {
+    font-size: 2rem;
+  }
+
+  .marketing-logo {
+    height: 60px;
+  }
+
+  .feature-item {
+    padding: 1.25rem;
+  }
+
+  .feature-icon {
+    font-size: 32px;
+  }
+}
+
 /* Tablet Styles */
-@media (min-width: 768px) {
+@media (min-width: 768px) and (max-width: 1023px) {
   .login-card {
     padding: 2.5rem 2rem;
   }
@@ -280,17 +426,13 @@ body {
     font-size: 2rem;
   }
 
-  .logo-icon {
-    font-size: 56px;
+  .logo-img {
+    height: 70px;
   }
 }
 
 /* Desktop Styles */
 @media (min-width: 1024px) {
-  .login-container {
-    max-width: 500px;
-  }
-
   .login-card {
     padding: 3rem 2.5rem;
   }
@@ -299,8 +441,8 @@ body {
     font-size: 2.25rem;
   }
 
-  .logo-icon {
-    font-size: 64px;
+  .logo-img {
+    height: 80px;
   }
 }
 
@@ -317,4 +459,3 @@ button:focus-visible {
   align-items: center;
   justify-content: center;
 }
-

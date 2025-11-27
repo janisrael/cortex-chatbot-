@@ -55,6 +55,138 @@ def delete_user_file(user_id, filename, category):
     return False
 
 
+def extract_text_from_file(filepath, filename):
+    """Extract text from file for preview (does not ingest)"""
+    try:
+        file_ext = filename.lower().split('.')[-1]
+        print(f"📄 Extracting text from {file_ext} file: {filename}")
+        
+        # Load document based on file extension
+        try:
+            if file_ext == 'pdf':
+                # Try multiple PDF extraction methods for better accuracy
+                full_text = None
+                extraction_method = None
+                
+                # Method 1: Try pdfplumber (most accurate for text extraction)
+                try:
+                    import pdfplumber
+                    full_text = ""
+                    with pdfplumber.open(filepath) as pdf:
+                        print(f"📚 pdfplumber: Found {len(pdf.pages)} pages")
+                        for page_num, page in enumerate(pdf.pages):
+                            page_text = page.extract_text()
+                            if page_text:
+                                full_text += f"\n\n--- Page {page_num + 1} ---\n\n{page_text}"
+                    if full_text and len(full_text.strip()) > 50:
+                        extraction_method = "pdfplumber"
+                        print(f"✅ Extracted {len(full_text)} characters using pdfplumber")
+                        return full_text.strip()
+                except ImportError:
+                    print("⚠️ pdfplumber not available, trying other methods...")
+                except Exception as e:
+                    print(f"⚠️ pdfplumber extraction failed: {e}")
+                
+                # Method 2: Try pypdf directly (more robust than PyPDFLoader)
+                try:
+                    import pypdf
+                    full_text = ""
+                    with open(filepath, 'rb') as file:
+                        pdf_reader = pypdf.PdfReader(file)
+                        print(f"📚 pypdf: Found {len(pdf_reader.pages)} pages")
+                        for page_num, page in enumerate(pdf_reader.pages):
+                            page_text = page.extract_text()
+                            if page_text and page_text.strip():
+                                full_text += f"\n\n--- Page {page_num + 1} ---\n\n{page_text}"
+                    if full_text and len(full_text.strip()) > 50:
+                        extraction_method = "pypdf"
+                        print(f"✅ Extracted {len(full_text)} characters using pypdf")
+                        return full_text.strip()
+                except ImportError:
+                    print("⚠️ pypdf not available, trying PyPDFLoader...")
+                except Exception as e:
+                    print(f"⚠️ pypdf extraction failed: {e}")
+                
+                # Method 3: Try PyPDFLoader (LangChain wrapper)
+                try:
+                    loader = PyPDFLoader(filepath)
+                    documents = loader.load()
+                    print(f"📚 PyPDFLoader: Loaded {len(documents)} pages from {filename}")
+                    full_text = "\n\n".join([doc.page_content for doc in documents if doc.page_content and doc.page_content.strip()])
+                    if full_text and len(full_text.strip()) > 50:
+                        extraction_method = "PyPDFLoader"
+                        print(f"✅ Extracted {len(full_text)} characters using PyPDFLoader")
+                        return full_text
+                except Exception as e:
+                    print(f"⚠️ PyPDFLoader failed: {e}")
+                
+                # Method 4: Try PyPDF2 as fallback
+                try:
+                    import PyPDF2
+                    full_text = ""
+                    with open(filepath, 'rb') as file:
+                        pdf_reader = PyPDF2.PdfReader(file)
+                        print(f"📚 PyPDF2: Found {len(pdf_reader.pages)} pages")
+                        for page_num, page in enumerate(pdf_reader.pages):
+                            page_text = page.extract_text()
+                            if page_text and page_text.strip():
+                                full_text += f"\n\n--- Page {page_num + 1} ---\n\n{page_text}"
+                    if full_text and len(full_text.strip()) > 50:
+                        extraction_method = "PyPDF2"
+                        print(f"✅ Extracted {len(full_text)} characters using PyPDF2")
+                        return full_text.strip()
+                except ImportError:
+                    print("⚠️ PyPDF2 not available, skipping...")
+                except Exception as e:
+                    print(f"⚠️ PyPDF2 extraction failed: {e}")
+                
+                # If all methods failed or returned minimal text
+                if not full_text or len(full_text.strip()) < 50:
+                    print(f"⚠️ All PDF extraction methods failed or returned minimal text ({len(full_text) if full_text else 0} chars). File might be image-based (scanned PDF) or have complex formatting.")
+                    warning_msg = "⚠️ Could not extract substantial text from PDF. This might be:\n- A scanned/image-based PDF (requires OCR)\n- A PDF with complex formatting\n- A password-protected PDF\n\nExtracted text (if any):\n" + (full_text[:500] if full_text else "None")
+                    return warning_msg
+                
+                return full_text.strip()
+                
+            elif file_ext == 'csv':
+                loader = CSVLoader(filepath)
+                documents = loader.load()
+                print(f"📚 Loaded {len(documents)} rows from CSV")
+                full_text = "\n\n".join([doc.page_content for doc in documents])
+                return full_text
+            elif file_ext in ['docx', 'doc']:
+                try:
+                    loader = Docx2txtLoader(filepath)
+                    documents = loader.load()
+                    print(f"📚 Loaded {len(documents)} sections from DOCX")
+                    full_text = "\n\n".join([doc.page_content for doc in documents])
+                    return full_text
+                except Exception as e:
+                    print(f"⚠️ Could not load .docx file, trying as text: {e}")
+                    loader = TextLoader(filepath, encoding='utf-8')
+                    documents = loader.load()
+                    full_text = "\n\n".join([doc.page_content for doc in documents])
+                    return full_text
+            else:
+                loader = TextLoader(filepath, encoding='utf-8')
+                documents = loader.load()
+                print(f"📚 Loaded {len(documents)} documents from text file")
+                full_text = "\n\n".join([doc.page_content for doc in documents])
+                return full_text
+            
+        except Exception as e:
+            print(f"❌ Error loading file {filename}: {e}")
+            import traceback
+            traceback.print_exc()
+            return None
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"❌ Text extraction error: {e}")
+        print(f"Full traceback:\n{error_details}")
+        return None
+
+
 def process_file_for_user(filepath, filename, category, user_id):
     """Process file for specific user's knowledge base"""
     try:

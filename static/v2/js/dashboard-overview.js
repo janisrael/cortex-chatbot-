@@ -60,22 +60,56 @@ const PROMPT_PRESET_METADATA = {
 // TAB MANAGEMENT
 // ===========================
 
-function switchTab(tabName) {
-    // Update tab buttons
-    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
+// Make switchTab globally accessible
+window.switchTab = function(tabName) {
+    console.log('🔵 switchTab called with:', tabName);
+    
+    // Update tab buttons - find the button by its onclick attribute
+    document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.classList.remove('active');
+        // Check if this button corresponds to the tabName
+        const onclickAttr = btn.getAttribute('onclick');
+        if (onclickAttr && onclickAttr.includes(`'${tabName}'`)) {
+            btn.classList.add('active');
+            console.log('✅ Tab button activated:', tabName);
+        }
+    });
     
     // Update tab content
-    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-    document.getElementById(`${tabName}-tab`).classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+        console.log('Removed active from:', content.id);
+    });
+    
+    const targetTab = document.getElementById(`${tabName}-tab`);
+    console.log('Looking for tab:', `${tabName}-tab`, 'Found:', targetTab);
+    
+    if (targetTab) {
+        targetTab.classList.add('active');
+        console.log('✅ Tab content activated:', targetTab.id, 'Has active class:', targetTab.classList.contains('active'));
+        
+        // Force display to check if CSS is the issue
+        const computedStyle = window.getComputedStyle(targetTab);
+        console.log('Tab display style:', computedStyle.display);
+    } else {
+        console.error(`❌ Tab with id "${tabName}-tab" not found`);
+        console.log('Available tabs:', Array.from(document.querySelectorAll('.tab-content')).map(t => t.id));
+        return; // Exit early if tab not found
+    }
     
     currentTab = tabName;
     
     // Load tab-specific data
     if (tabName === 'overview') {
-        loadStats();
+        if (typeof loadStats === 'function') {
+            loadStats();
+        }
     } else if (tabName === 'knowledge') {
-        refreshFileList(); // Load files when knowledge tab is opened
+        if (typeof refreshFileList === 'function') {
+            refreshFileList().catch(err => {
+                console.error('Error loading files in knowledge tab:', err);
+            });
+        }
     } else if (tabName === 'llm') {
         // Initialize LLM provider selection when LLM tab is opened
         console.log('📑 LLM tab opened, initializing provider selection...');
@@ -99,15 +133,26 @@ function switchTab(tabName) {
             }
         }, 200);
     } else if (tabName === 'prompt') {
-        loadPrompt();
-        loadPresets(); // Load prompt presets
+        if (typeof loadPrompt === 'function') {
+            loadPrompt();
+        }
+        if (typeof loadPresets === 'function') {
+            loadPresets(); // Load prompt presets
+        }
     } else if (tabName === 'appearance') {
         if (typeof initializeAppearance === 'function') {
             initializeAppearance();
         }
     } else if (tabName === 'integration') {
-        updateIntegrationSnippet();
+        if (typeof updateIntegrationSnippet === 'function') {
+            updateIntegrationSnippet();
+        }
     }
+};
+
+// Also create a non-window version for backwards compatibility
+function switchTab(tabName) {
+    return window.switchTab(tabName);
 }
 
 // ===========================
@@ -217,16 +262,23 @@ async function loadStats() {
 
 async function loadFiles() {
     try {
-        const response = await fetch('/api/files');
+        const response = await fetch('/api/files', {
+            credentials: 'same-origin'
+        });
         if (!response.ok) {
-            console.error('Failed to load files');
+            console.error('Failed to load files:', response.status, response.statusText);
+            return [];
+        }
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            console.error('Response is not JSON, might be redirected to login');
             return [];
         }
         const data = await response.json();
         return data.files || [];
     } catch (error) {
         console.error('Error loading files:', error);
-        return [];
+        return []; // Return empty array instead of throwing
     }
 }
 
@@ -267,8 +319,17 @@ async function deleteFile(filename, category) {
 
 // Make refreshFileList globally accessible
 window.refreshFileList = async function() {
-    const files = await loadFiles();
-    updateFileList(files);
+    try {
+        const files = await loadFiles();
+        updateFileList(files);
+    } catch (error) {
+        console.error('Error in refreshFileList:', error);
+        // Show error in file list
+        const fileList = document.getElementById('fileList');
+        if (fileList) {
+            fileList.innerHTML = '<div style="text-align: center; color: #dc3545; padding: 20px;">Error loading files. Please try again.</div>';
+        }
+    }
 }
 
 async function refreshFileList() {
@@ -288,12 +349,12 @@ function updateFileList(files) {
     const overviewFileList = document.getElementById('overviewFileList');
     const fileList = document.getElementById('fileList');
     
-    // If files is undefined or not an array, reload files
-    if (!files || !Array.isArray(files)) {
-        console.log('updateFileList called without files, reloading...');
-        refreshFileList();
-        return;
-    }
+    try {
+        // If files is undefined or not an array, set empty array to prevent infinite loop
+        if (!files || !Array.isArray(files)) {
+            console.warn('updateFileList called without valid files array, using empty array');
+            files = [];
+        }
     
     const emptyMessage = '<div style="text-align: center; color: #999; padding: 20px;">No files uploaded yet</div>';
     
@@ -312,7 +373,7 @@ function updateFileList(files) {
         const category = file.category || 'company_details';
         const size = file.size || 0;
         const uploaded = file.uploaded_at || file.modified || file.uploaded || 'Unknown';
-        const fileId = `file-${index}-${Date.now()}`;
+        const fileId = file.id || index;
         
         // Format uploaded date safely
         let uploadedDate = 'Unknown';
@@ -327,40 +388,142 @@ function updateFileList(files) {
         // Escape filename and category for HTML
         const safeFilename = String(filename).replace(/'/g, "\\'").replace(/"/g, '&quot;');
         const safeCategory = String(category).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        const status = file.status || 'preview';
+        
+        // Status icon with circle background
+        let statusIcon = '';
+        let statusIconBg = '';
+        if (status === 'ingested') {
+            statusIcon = 'check_circle';
+            statusIconBg = '#22c55e'; // Green
+        } else if (status === 'error' || status === 'failed') {
+            statusIcon = 'error';
+            statusIconBg = '#ef4444'; // Red
+        } else {
+            statusIcon = 'visibility';
+            statusIconBg = '#f59e0b'; // Yellow/Amber
+        }
+        
+        // Status badge text
+        let statusBadge = '';
+        if (status === 'ingested') {
+            statusBadge = '<span class="status-badge status-ingested" style="background: #22c55e; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 8px; font-weight: 500;">Ingest</span>';
+        } else if (status === 'error' || status === 'failed') {
+            statusBadge = '<span class="status-badge status-error" style="background: #ef4444; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 8px; font-weight: 500;">Error</span>';
+        } else {
+            statusBadge = '<span class="status-badge status-preview" style="background: #f59e0b; color: #000; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 8px; font-weight: 500;">Preview</span>';
+        }
+        
+        const wordCount = file.word_count || 0;
+        const charCount = file.char_count || 0;
         
         return `
-        <div class="file-item" id="${fileId}" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #e1e5e9;">
-            <div class="file-info" style="flex: 1;">
-                <div class="file-name" style="font-weight: 600; margin-bottom: 4px;">${escapeHtml(filename)}</div>
-                <div class="file-size" style="font-size: 12px; color: #666;">
-                    ${typeof formatFileSize === 'function' ? formatFileSize(size) : (size ? (size / 1024).toFixed(1) + ' KB' : '0 B')} • ${escapeHtml(category)} • ${uploadedDate}
+        <div class="file-item" id="file-${fileId}" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 12px; border-bottom: 1px solid #e1e5e9; background: white; border-radius: 8px; margin-bottom: 8px; gap: 12px; position: relative;">
+            <!-- Status Icon with Circle Background (Top Left) -->
+            <div class="file-status-icon" style="width: 40px; height: 40px; border-radius: 50%; background: ${statusIconBg}; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">
+                <span class="material-icons-round" style="font-size: 22px; color: white;">${statusIcon}</span>
+            </div>
+            
+            <div class="file-info" style="flex: 1; min-width: 0;">
+                <div class="file-name" style="font-weight: 600; margin-bottom: 6px; color: #1e293b; font-size: 14px;">${escapeHtml(filename)}</div>
+                <div class="file-size" style="font-size: 12px; color: #64748b; display: flex; flex-wrap: wrap; align-items: center; gap: 4px;">
+                    ${statusBadge}
+                    <span>${typeof formatFileSize === 'function' ? formatFileSize(size) : (size ? (size / 1024).toFixed(1) + ' KB' : '0 B')}</span>
+                    <span>•</span>
+                    <span>${wordCount.toLocaleString()} words</span>
+                    <span>•</span>
+                    <span>${charCount.toLocaleString()} chars</span>
+                    <span>•</span>
+                    <span>${escapeHtml(category)}</span>
+                    <span>•</span>
+                    <span>${uploadedDate}</span>
                 </div>
             </div>
-            <button 
-                class="btn btn-danger delete-file-btn" 
-                data-filename="${safeFilename}"
-                data-category="${safeCategory}"
-                style="padding: 6px 12px; font-size: 12px; margin-left: 10px;"
-                title="Delete file and remove from knowledge base">
-                🗑️ Delete
-            </button>
+            <div class="file-actions" style="display: flex; gap: 8px; flex-shrink: 0;">
+                <button 
+                    class="btn btn-secondary view-file-btn" 
+                    data-file-id="${fileId}"
+                    style="padding: 6px 12px; font-size: 12px; white-space: nowrap;"
+                    title="View file preview">
+                    <span class="material-icons-round" style="font-size: 16px; vertical-align: middle;">visibility</span> <span class="btn-text">View</span>
+                </button>
+                ${status === 'preview' ? `
+                <button 
+                    class="btn ingest-file-btn" 
+                    data-file-id="${fileId}"
+                    style="padding: 6px 12px; font-size: 12px; background: #0891b2; color: white; white-space: nowrap;"
+                    title="Ingest to knowledge base">
+                    <span class="material-icons-round" style="font-size: 16px; vertical-align: middle;">save</span> <span class="btn-text">Ingest</span>
+                </button>
+                ` : ''}
+                <button 
+                    class="btn btn-danger delete-file-btn" 
+                    data-file-id="${fileId}"
+                    data-filename="${safeFilename}"
+                    data-category="${safeCategory}"
+                    style="padding: 6px 12px; font-size: 12px; background: #dc3545; color: white; white-space: nowrap;"
+                    title="Delete file and remove from knowledge base">
+                    <span class="material-icons-round" style="font-size: 16px; vertical-align: middle;">delete</span> <span class="btn-text">Delete</span>
+                </button>
+            </div>
         </div>
         `;
     }).join('');
     
-    // Add event listeners to delete buttons after rendering
-    setTimeout(() => {
-        document.querySelectorAll('.delete-file-btn').forEach(btn => {
-            btn.addEventListener('click', async function() {
-                const filename = this.getAttribute('data-filename');
-                const category = this.getAttribute('data-category');
-                await deleteFile(filename, category);
-            });
-        });
-    }, 100);
-    
-    if (overviewFileList) overviewFileList.innerHTML = fileHTML;
-    if (fileList) fileList.innerHTML = fileHTML;
+        // Add event listeners after rendering
+        setTimeout(() => {
+            try {
+                // View file buttons
+                document.querySelectorAll('.view-file-btn').forEach(btn => {
+                    btn.addEventListener('click', async function() {
+                        const fileId = parseInt(this.getAttribute('data-file-id'));
+                        if (typeof viewFile === 'function') {
+                            await viewFile(fileId);
+                        }
+                    });
+                });
+                
+                // Ingest file buttons
+                document.querySelectorAll('.ingest-file-btn').forEach(btn => {
+                    btn.addEventListener('click', async function() {
+                        const fileId = parseInt(this.getAttribute('data-file-id'));
+                        if (typeof viewFile === 'function') {
+                            await viewFile(fileId); // Show preview first, then user can ingest
+                        }
+                    });
+                });
+                
+                // Delete file buttons
+                document.querySelectorAll('.delete-file-btn').forEach(btn => {
+                    btn.addEventListener('click', async function() {
+                        const fileId = this.getAttribute('data-file-id');
+                        const filename = this.getAttribute('data-filename');
+                        const category = this.getAttribute('data-category');
+                        if (fileId && typeof deleteFileById === 'function') {
+                            await deleteFileById(fileId);
+                        } else if (filename && typeof deleteFile === 'function') {
+                            await deleteFile(filename, category);
+                        }
+                    });
+                });
+            } catch (eventError) {
+                console.error('Error setting up file list event listeners:', eventError);
+            }
+        }, 100);
+        // Update both file lists
+        if (overviewFileList) overviewFileList.innerHTML = fileHTML;
+        if (fileList) fileList.innerHTML = fileHTML;
+    } catch (error) {
+        console.error('Error in updateFileList:', error);
+        // Show error message in file list
+        const errorMessage = '<div style="text-align: center; color: #dc3545; padding: 20px;">Error loading files. Please refresh the page.</div>';
+        if (fileList) {
+            fileList.innerHTML = errorMessage;
+        }
+        if (overviewFileList) {
+            overviewFileList.innerHTML = errorMessage;
+        }
+    }
 }
 
 function updateOverviewMetrics(stats, crawledData, config) {

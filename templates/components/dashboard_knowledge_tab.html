@@ -1,32 +1,93 @@
 <!-- Knowledge Management Tab -->
 <div id="knowledge-tab" class="tab-content">
-    <div class="dashboard-grid">
-        <!-- File Upload -->
-        <div class="card">
-            <h2><span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">upload_file</span> Upload Documents</h2>
-            
-            <div class="alert alert-success" id="uploadSuccess"></div>
-            <div class="alert alert-error" id="uploadError"></div>
-
-            <!-- Category Selection -->
-            <div class="form-group">
-                <label>Document Category</label>
-                <div class="category-tabs" id="categoryTabs">
-                    <!-- Dynamically populated -->
+    <!-- Knowledge Stats Cards (3 columns) -->
+    <div class="knowledge-stats-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px;">
+        <!-- Uploaded Files Card -->
+        <div class="metric-card" style="background: white; border: 2px solid #e1e5e9; border-radius: 12px; padding: 20px; transition: all 0.3s ease;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="metric-icon" style="width: 56px; height: 56px; background: linear-gradient(135deg, #0891b2 0%, #0f766e 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <span class="material-icons-round" style="font-size: 28px; color: white;">cloud_upload</span>
+                </div>
+                <div style="flex: 1; min-width: 0;">
+                    <div style="font-size: 14px; color: #64748b; font-weight: 500; margin-bottom: 4px;">Uploaded Files</div>
+                    <div style="font-size: 24px; font-weight: 700; color: #1e293b;" id="knowledgeFilesCount">-</div>
+                    <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;" id="knowledgeFilesLimit">Limit: 100</div>
                 </div>
             </div>
+        </div>
+
+        <!-- Crawled Websites Card -->
+        <div class="metric-card" style="background: white; border: 2px solid #e1e5e9; border-radius: 12px; padding: 20px; transition: all 0.3s ease;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="metric-icon" style="width: 56px; height: 56px; background: linear-gradient(135deg, #0891b2 0%, #0f766e 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <span class="material-icons-round" style="font-size: 28px; color: white;">language</span>
+                </div>
+                <div style="flex: 1; min-width: 0;">
+                    <div style="font-size: 14px; color: #64748b; font-weight: 500; margin-bottom: 4px;">Crawled Websites</div>
+                    <div style="font-size: 24px; font-weight: 700; color: #1e293b;" id="knowledgeCrawledCount">-</div>
+                    <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;" id="knowledgeCrawledLimit">No limit</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ Entries Card -->
+        <div class="metric-card" style="background: white; border: 2px solid #e1e5e9; border-radius: 12px; padding: 20px; transition: all 0.3s ease;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="metric-icon" style="width: 56px; height: 56px; background: linear-gradient(135deg, #0891b2 0%, #0f766e 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <span class="material-icons-round" style="font-size: 28px; color: white;">help_center</span>
+                </div>
+                <div style="flex: 1; min-width: 0;">
+                    <div style="font-size: 14px; color: #64748b; font-weight: 500; margin-bottom: 4px;">FAQ Entries</div>
+                    <div style="font-size: 24px; font-weight: 700; color: #1e293b;" id="knowledgeFaqCount">-</div>
+                    <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;" id="knowledgeFaqLimit">No limit</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Upload Section (100% width) -->
+    <div class="card" style="width: 100%; margin-bottom: 30px;">
+        <h2><span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">upload_file</span> Upload Documents</h2>
+        
+        <div class="alert alert-success" id="uploadSuccess"></div>
+        <div class="alert alert-error" id="uploadError"></div>
+
+        <!-- Category Selection (4 columns) -->
+        <div class="form-group" style="margin-bottom: 25px;">
+            <label style="display: block; margin-bottom: 12px; font-weight: 600; color: #1e293b;">Document Category</label>
+            <div class="category-tabs" id="categoryTabs">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+        
+        <!-- AI Cleaning & Upload Area (2 columns - left smaller, right larger) -->
+        <div class="upload-controls-grid" style="display: grid; grid-template-columns: 0.4fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <!-- Left Column: AI Cleaning Checkbox (smaller width) -->
+            <div style="display: flex; flex-direction: column; justify-content: center; padding: 20px; background: #f8f9fa; border-radius: 10px; border: 2px solid #e1e5e9;">
+                <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px;">
+                    <input type="checkbox" id="fileAiCleaningEnabled" checked style="width: 24px; height: 24px; cursor: pointer; flex-shrink: 0; margin-top: 2px; accent-color: #0891b2;">
+                    <label for="fileAiCleaningEnabled" style="color: #1e293b; cursor: pointer; font-size: 15px; font-weight: 600; margin: 0; line-height: 1.4;">
+                        Enable AI Content Cleaning
+                    </label>
+                </div>
+                <p style="margin: 0; color: #64748b; font-size: 12px; line-height: 1.5; padding-left: 36px;">
+                    Removes navigation, footers, SEO metadata. Cleaner documents = better embeddings = better search results.
+                </p>
+            </div>
             
-            <div class="file-upload" id="fileUpload">
-                <span class="material-icons-round upload-icon" style="font-size: 48px; color: #0891b2;">folder</span>
-                <p><strong>Drop files here or click to browse</strong></p>
-                <p>Supported: PDF, TXT, DOC, DOCX, CSV (Max 16MB)</p>
+            <!-- Right Column: File Upload Area (larger width) -->
+            <div class="file-upload" id="fileUpload" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 140px;">
+                <span class="material-icons-round upload-icon" style="font-size: 48px; color: #0891b2; margin-bottom: 10px;">folder</span>
+                <p style="margin: 5px 0; font-weight: 600; color: #1e293b;"><strong>Drop files here or click to browse</strong></p>
+                <p style="margin: 5px 0; color: #64748b; font-size: 13px;">Supported: PDF, TXT, DOC, DOCX, CSV (Max 16MB)</p>
                 <input type="file" id="fileInput" multiple accept=".pdf,.txt,.doc,.docx,.csv">
             </div>
-            
-            <div class="loading" id="uploadLoading">
-                <div class="spinner"></div>
-                Processing file...
-            </div>
+        </div>
+        
+        <div class="loading" id="uploadLoading">
+            <div class="spinner"></div>
+            Processing file...
+        </div>
 
             <!-- Uploaded Files (inside the same card) -->
             <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
@@ -45,8 +106,8 @@
             </div>
         </div>
 
-        <!-- URL Crawling -->
-        <div class="card">
+    <!-- URL Crawling Section (100% width) -->
+    <div class="card" style="width: 100%; margin-bottom: 30px;">
             <h2><span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">language</span> Crawl Websites</h2>
             
             <div class="alert alert-success" id="crawlSuccess"></div>
@@ -101,8 +162,8 @@
             </div>
         </div>
 
-        <!-- FAQ Management -->
-        <div class="card">
+    <!-- FAQ Management Section (100% width) -->
+    <div class="card" style="width: 100%; margin-bottom: 30px;">
             <h2><span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">help_center</span> FAQ Management</h2>
             
             <div class="alert alert-success" id="faqSuccess" style="display: none;"></div>
@@ -146,7 +207,6 @@
                 </div>
             </div>
         </div>
-    </div>
 </div>
 
 <!-- FAQ Edit Modal -->
@@ -206,6 +266,36 @@
         <div style="display: flex; gap: 12px; justify-content: flex-end;">
             <button class="btn btn-secondary" onclick="closeCrawlPreview()" style="padding: 10px 20px;">Cancel</button>
             <button class="btn" onclick="ingestCrawledContent()" style="padding: 10px 20px; background: #0891b2; color: white;">
+                <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">save</span> Ingest to Knowledge Base
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- File Preview Modal -->
+<div id="filePreviewModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); overflow: auto;">
+    <div class="modal-content" style="background-color: #1e1e1e; margin: 5% auto; padding: 20px; border: 1px solid #333; border-radius: 8px; max-width: 900px; max-height: 90vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="margin: 0; color: white;">File Preview</h2>
+            <button onclick="closeFilePreview()" style="background: none; border: none; color: white; font-size: 28px; cursor: pointer; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">&times;</button>
+        </div>
+        
+        <div style="margin-bottom: 15px; color: #ccc;">
+            <div style="margin-bottom: 8px;"><strong>Filename:</strong> <span id="previewFileName" style="color: #0891b2;"></span></div>
+            <div style="margin-bottom: 8px;"><strong>Category:</strong> <span id="previewFileCategory"></span></div>
+            <div style="margin-bottom: 8px;"><strong>Word Count:</strong> <span id="previewFileWordCount"></span></div>
+            <div><strong>Character Count:</strong> <span id="previewFileCharCount"></span></div>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label style="color: white; display: block; margin-bottom: 8px;"><strong>Extracted Text (You can edit before ingesting):</strong></label>
+            <textarea id="previewFileText" class="form-control" rows="20" style="font-family: 'Courier New', monospace; font-size: 13px; background: #2a2a2a; color: #e0e0e0; border: 1px solid #444; padding: 12px; border-radius: 4px; width: 100%; resize: vertical;"></textarea>
+            <small style="color: #999; display: block; margin-top: 8px;">Review the extracted text for accuracy. Edit if needed, then click "Ingest to Knowledge Base" to save.</small>
+        </div>
+        
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+            <button class="btn btn-secondary" onclick="closeFilePreview()" style="padding: 10px 20px;">Cancel</button>
+            <button class="btn" onclick="ingestFileContent()" style="padding: 10px 20px; background: #0891b2; color: white;">
                 <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">save</span> Ingest to Knowledge Base
             </button>
         </div>
