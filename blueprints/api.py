@@ -1539,3 +1539,79 @@ def reset_knowledge():
         traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
+
+@api_bp.route("/api/feedback", methods=["POST"])
+@login_required
+def submit_feedback():
+    """Submit feedback, bug reports, or feature requests"""
+    try:
+        if not current_user.is_authenticated:
+            return jsonify({"error": "Authentication required"}), 401
+        
+        data = request.get_json()
+        feedback_type = data.get('type', 'comment')
+        subject = data.get('subject', '')
+        message = data.get('message', '')
+        email = data.get('email', current_user.email if hasattr(current_user, 'email') else '')
+        username = data.get('username', current_user.username if hasattr(current_user, 'username') else 'Anonymous')
+        
+        if not subject or not message:
+            return jsonify({"error": "Subject and message are required"}), 400
+        
+        # Send email with feedback
+        try:
+            import smtplib
+            from email.mime.text import MIMEText
+            from email.mime.multipart import MIMEMultipart
+            
+            SMTP_SERVER = "smtp.gmail.com"
+            SMTP_PORT = 587
+            SMTP_USER = "janfrancisisrael@gmail.com"
+            SMTP_PASSWORD = "goyz tpmm dtxm mjib"
+            
+            msg = MIMEMultipart()
+            msg['From'] = SMTP_USER
+            msg['To'] = SMTP_USER
+            msg['Subject'] = f"[Cortex AI Feedback] {feedback_type.upper()}: {subject}"
+            
+            body = f"""
+New Feedback Submission from Cortex AI
+
+Type: {feedback_type.upper()}
+Subject: {subject}
+User: {username}
+Email: {email or 'Not provided'}
+
+Message:
+{message}
+
+---
+Submitted at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+            """
+            
+            msg.attach(MIMEText(body, 'plain'))
+            
+            server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+            server.starttls()
+            server.login(SMTP_USER, SMTP_PASSWORD)
+            server.sendmail(SMTP_USER, SMTP_USER, msg.as_string())
+            server.quit()
+            
+            print(f"✅ Feedback submitted: {feedback_type} from {username}")
+            
+        except Exception as e:
+            print(f"⚠️ Error sending feedback email: {e}")
+            # Still return success to user even if email fails
+            # You might want to log this to a database instead
+        
+        return jsonify({
+            "message": "Feedback submitted successfully",
+            "type": feedback_type
+        }), 200
+        
+    except Exception as e:
+        print(f"❌ Feedback submission error: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": "Failed to submit feedback. Please try again."}), 500
+

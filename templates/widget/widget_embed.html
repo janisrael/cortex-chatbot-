@@ -162,9 +162,9 @@
                     <div style="font-size: 14px; color: {{ contrast_color }}; opacity: 0.9; margin: 0;">{{ short_info or 'Your friendly assistant' }}</div>
                 </div>
             </div>
-            <button id="chatbot-close-btn" style="background: transparent; border: none; color: {{ contrast_color }}; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+            <!-- <button id="chatbot-close-btn" style="background: transparent; border: none; color: {{ contrast_color }}; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
                 <span class="material-icons-round" style="font-size: 24px;">close</span>
-            </button>
+            </button> -->
         </div>
         
         <!-- Messages Area -->
@@ -210,11 +210,11 @@
         </div>
         
         <!-- Input Area -->
-        <div style="padding: 20px; background: white; border-top: 1px solid #f4f4f5;">
+        <div style="padding: 10px; background: white; border-top: 1px solid #f4f4f5;">
             <div style="display: flex; align-items: center; background: white; border: 1.5px solid #e4e4e7; border-radius: 16px; padding: 8px 12px; transition: border-color 0.2s; min-height: 52px;">
                 <input type="text" id="chatbot-input" placeholder="Message..." style="flex: 1; border: none; outline: none; font-size: 16px; background: transparent; color: #18181b; padding: 4px 8px; font-family: inherit;" maxlength="8000">
                 <div style="display: flex; gap: 4px;">
-                    <button id="chatbot-send-btn" style="background: {{ primary_color }}; color: white; border: none; padding: 12px 20px; border-radius: 25px; font-size: 16px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px;">
+                    <button id="chatbot-send-btn" style="background: {{ primary_color }}; color: white; border: none; padding: 12px 20px; border-radius: 10px; font-size: 16px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px;">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="22" y1="2" x2="11" y2="13"></line>
                             <polygon points="22,2 15,22 11,13 2,9 22,2"></polygon>

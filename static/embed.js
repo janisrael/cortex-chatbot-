@@ -74,35 +74,71 @@
         .bobot-widget-trigger {
           position: fixed;
           ${this.getPositionStyles()}
-          background: linear-gradient(135deg, ${WIDGET_CONFIG.primaryColor} 0%, #2563eb 100%);
+          background: transparent !important;
           color: white;
           border: none;
-          border-radius: 50%;
           width: 60px;
           height: 60px;
           font-size: 24px;
           cursor: pointer;
-          box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3), 0 2px 8px rgba(0, 0, 0, 0.1);
           z-index: ${WIDGET_CONFIG.zIndex};
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
           display: flex;
           align-items: center;
           justify-content: center;
+          
+        }
+
+        .bobot-widget-trigger::before {
+          content: '';
+          position: absolute;
+          inset: -6px;
+          border-radius: 50%;
+          background: conic-gradient(from 0deg, #667eea, #764ba2, #f093fb, #4facfe, #00f2fe, #667eea);
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          animation: gradientRotate 3s linear infinite;
+          z-index: -1;
+        }
+
+        .bobot-widget-trigger:hover::after {
+          background: white;
+        }
+
+
+        .bobot-widget-trigger::after {
+          content: '';
+          position: absolute;
+          inset: -3px;
+          border-radius: 50%;
+          z-index: -1;
+          background: white;
+        }
+
+        @keyframes gradientRotate {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
         }
 
         .bobot-widget-trigger img {
           width: 100%;
-          height: 100%;
-          border-radius: 50%;
           object-fit: cover;
-          border: 2px solid rgba(255, 255, 255, 0.6);
-          background: white;
+          background: transparent;
+          position: relative;
+          z-index: 1;
         }
 
         .bobot-widget-trigger:hover {
           transform: translateY(-2px) scale(1.05);
-          box-shadow: 0 12px 40px rgba(59, 130, 246, 0.4), 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .bobot-widget-trigger:hover::before {
+          opacity: 1;
         }
 
         .bobot-widget-trigger:active {
@@ -428,8 +464,6 @@
           </svg>
         </button>
         <div class="bobot-welcome-header">
-          <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(botName)}&background=667eea&color=fff&size=40&rounded=true" 
-               alt="${botName}" class="bobot-welcome-avatar">
           <h3 class="bobot-welcome-title">${botName}</h3>
         </div>
         <p>Hi! I'm ${botName}, your intelligent AI assistant. How can I help you today?</p>
