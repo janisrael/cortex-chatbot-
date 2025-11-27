@@ -17,24 +17,36 @@ async function initializeFileManagement() {
 
 async function loadKnowledgeStats() {
     try {
+        console.log('📊 Loading knowledge stats...');
         const response = await fetch('/api/knowledge-stats', {
             credentials: 'same-origin'
         });
         
         if (!response.ok) {
-            console.error('Failed to load knowledge stats');
+            console.error('❌ Failed to load knowledge stats:', response.status, response.statusText);
+            // Set default values on error
+            const filesCountEl = document.getElementById('knowledgeFilesCount');
+            const crawledCountEl = document.getElementById('knowledgeCrawledCount');
+            const faqCountEl = document.getElementById('knowledgeFaqCount');
+            if (filesCountEl) filesCountEl.textContent = '0';
+            if (crawledCountEl) crawledCountEl.textContent = '0';
+            if (faqCountEl) faqCountEl.textContent = '0';
             return;
         }
         
         const stats = await response.json();
+        console.log('📊 Knowledge stats received:', stats);
         
         // Update Files Card
         const filesCountEl = document.getElementById('knowledgeFilesCount');
         const filesLimitEl = document.getElementById('knowledgeFilesLimit');
         if (filesCountEl) {
-            const fileCount = stats.file_count || 0;
+            const fileCount = (stats.file_count !== undefined && stats.file_count !== null) ? stats.file_count : 0;
             const maxFiles = stats.max_files || 100;
             filesCountEl.textContent = `${fileCount}/${maxFiles}`;
+            console.log(`✅ Updated files count: ${fileCount}/${maxFiles}`);
+        } else {
+            console.warn('⚠️ knowledgeFilesCount element not found');
         }
         if (filesLimitEl) {
             filesLimitEl.textContent = `Limit: ${stats.max_files || 100} files`;
@@ -44,9 +56,12 @@ async function loadKnowledgeStats() {
         const crawledCountEl = document.getElementById('knowledgeCrawledCount');
         const crawledLimitEl = document.getElementById('knowledgeCrawledLimit');
         if (crawledCountEl) {
-            const crawledCount = stats.crawled_count || 0;
+            const crawledCount = (stats.crawled_count !== undefined && stats.crawled_count !== null) ? stats.crawled_count : 0;
             const maxCrawled = stats.max_crawled || 200;
             crawledCountEl.textContent = `${crawledCount}/${maxCrawled}`;
+            console.log(`✅ Updated crawled count: ${crawledCount}/${maxCrawled}`);
+        } else {
+            console.warn('⚠️ knowledgeCrawledCount element not found');
         }
         if (crawledLimitEl) {
             crawledLimitEl.textContent = `Limit: ${stats.max_crawled || 200} websites`;
@@ -56,18 +71,31 @@ async function loadKnowledgeStats() {
         const faqCountEl = document.getElementById('knowledgeFaqCount');
         const faqLimitEl = document.getElementById('knowledgeFaqLimit');
         if (faqCountEl) {
-            const faqCount = stats.faq_count || 0;
+            const faqCount = (stats.faq_count !== undefined && stats.faq_count !== null) ? stats.faq_count : 0;
             const maxFaqs = stats.max_faqs || 500;
             faqCountEl.textContent = `${faqCount}/${maxFaqs}`;
+            console.log(`✅ Updated FAQ count: ${faqCount}/${maxFaqs}`);
+        } else {
+            console.warn('⚠️ knowledgeFaqCount element not found');
         }
         if (faqLimitEl) {
             faqLimitEl.textContent = `Limit: ${stats.max_faqs || 500} FAQs`;
         }
         
     } catch (error) {
-        console.error('Failed to load knowledge stats:', error);
+        console.error('❌ Failed to load knowledge stats:', error);
+        // Set default values on error
+        const filesCountEl = document.getElementById('knowledgeFilesCount');
+        const crawledCountEl = document.getElementById('knowledgeCrawledCount');
+        const faqCountEl = document.getElementById('knowledgeFaqCount');
+        if (filesCountEl) filesCountEl.textContent = '0';
+        if (crawledCountEl) crawledCountEl.textContent = '0';
+        if (faqCountEl) faqCountEl.textContent = '0';
     }
 }
+
+// Make loadKnowledgeStats globally accessible
+window.loadKnowledgeStats = loadKnowledgeStats;
 
 async function loadCategories() {
     try {
