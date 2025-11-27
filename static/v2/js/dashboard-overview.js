@@ -341,8 +341,22 @@ window.deleteFile = async function(filename, category) {
     
     try {
         const response = await fetch(`/api/files/${encodeURIComponent(filename)}?category=${encodeURIComponent(category)}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            }
         });
+        
+        // Check if response is JSON before parsing
+        const contentType = response.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) {
+            const text = await response.text();
+            if (text.includes('<!DOCTYPE') || text.includes('<html')) {
+                throw new Error('Authentication required. Please refresh the page and try again.');
+            }
+            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+        }
         
         if (!response.ok) {
             const error = await response.json();
@@ -350,7 +364,13 @@ window.deleteFile = async function(filename, category) {
         }
         
         const result = await response.json();
-        alert(`✅ ${result.message || 'File deleted successfully'}`);
+        
+        // Show toast notification if available
+        if (typeof showSuccessNotification === 'function') {
+            showSuccessNotification(result.message || 'File deleted successfully', 4000);
+        } else {
+            alert(`✅ ${result.message || 'File deleted successfully'}`);
+        }
         
         // Reload file list
         await refreshFileList();
@@ -358,7 +378,13 @@ window.deleteFile = async function(filename, category) {
         
         return true;
     } catch (error) {
-        alert(`❌ Error deleting file: ${error.message}`);
+        const errorMessage = `Error deleting file: ${error.message}`;
+        // Show toast notification if available
+        if (typeof showErrorNotification === 'function') {
+            showErrorNotification(errorMessage, 6000);
+        } else {
+            alert(`❌ ${errorMessage}`);
+        }
         console.error('Delete file error:', error);
         return false;
     }
