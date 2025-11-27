@@ -107,8 +107,8 @@ def demo_chatbox():
         from utils.api_key import get_user_api_key
         api_key = get_user_api_key(user_id)
         
-        # Render the new widget preview template with user's API key
-        return render_template("widget/preview.html", 
+        # Render the demo template with user's API key
+        return render_template("widget/demo.html", 
                              bot_name=bot_name,
                              api_key=api_key,
                              user=current_user)
