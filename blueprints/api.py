@@ -250,7 +250,10 @@ def ingest_uploaded_file(file_id):
         from models.uploaded_file import UploadedFile
         from services.knowledge_service import get_user_vectorstore, embeddings
         from langchain.text_splitter import RecursiveCharacterTextSplitter
-        from langchain.schema import Document
+        try:
+            from langchain_core.documents import Document
+        except ImportError:
+            from langchain.schema import Document
         from datetime import datetime
         
         # Get uploaded file
@@ -1091,7 +1094,10 @@ def ingest_crawled_url(crawled_id):
         from models.crawled_url import CrawledUrl
         from services.knowledge_service import get_user_vectorstore, embeddings
         from langchain.text_splitter import RecursiveCharacterTextSplitter
-        from langchain.schema import Document
+        try:
+            from langchain_core.documents import Document
+        except ImportError:
+            from langchain.schema import Document
         
         # Get crawled URL
         crawled = CrawledUrl.get_by_id(user_id, crawled_id)
@@ -1419,7 +1425,10 @@ def ingest_faq(faq_id):
         from models.faq import FAQ
         from services.knowledge_service import get_user_vectorstore, embeddings
         from langchain.text_splitter import RecursiveCharacterTextSplitter
-        from langchain.schema import Document
+        try:
+            from langchain_core.documents import Document
+        except ImportError:
+            from langchain.schema import Document
         
         # Get FAQ
         faq = FAQ.get_by_id(user_id, faq_id)
@@ -1525,7 +1534,10 @@ def bulk_ingest_faqs():
         from models.faq import FAQ
         from services.knowledge_service import get_user_vectorstore, embeddings
         from langchain.text_splitter import RecursiveCharacterTextSplitter
-        from langchain.schema import Document
+        try:
+            from langchain_core.documents import Document
+        except ImportError:
+            from langchain.schema import Document
         
         user_vectorstore = get_user_vectorstore(user_id)
         if user_vectorstore is None:
