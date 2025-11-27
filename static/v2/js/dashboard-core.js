@@ -39,11 +39,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function initializeDashboard() {
     try {
-        await loadWebsites();
-        await loadLLMConfig();
-        loadStats();
-        setupFileUpload();
-        setupCategoryTabs();
+        // Only initialize dashboard features if we're on the dashboard page
+        // Check if required functions exist before calling them
+        if (typeof loadWebsites === 'function') {
+            await loadWebsites();
+        }
+        if (typeof loadLLMConfig === 'function') {
+            await loadLLMConfig();
+        }
+        if (typeof loadStats === 'function') {
+            loadStats();
+        }
+        if (typeof setupFileUpload === 'function') {
+            setupFileUpload();
+        }
+        if (typeof setupCategoryTabs === 'function') {
+            setupCategoryTabs();
+        }
         // Initialize file management (includes crawl functionality)
         if (typeof initializeFileManagement === 'function') {
             await initializeFileManagement();
