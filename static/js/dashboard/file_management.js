@@ -267,31 +267,133 @@ function renderFilesByCategory(categoriesWithFiles) {
             noFilesP.textContent = 'No files in this category';
             filesDiv.appendChild(noFilesP);
         } else {
-            categoryData.files.forEach(file => {
-                const fileItem = document.createElement('div');
-                fileItem.className = 'file-item';
-                
-                const fileInfo = document.createElement('div');
-                
-                const fileName = document.createElement('div');
-                fileName.style.fontWeight = '500';
-                // Safely get filename - handle both file.name and file.filename
+            categoryData.files.forEach((file, index) => {
+                const fileId = file.id || `${categoryId}-${index}`;
                 const filename = file.filename || file.name || 'Unknown File';
-                // Fix if filename is just extension like ".pdf"
                 const safeFilename = (filename.startsWith('.') && filename.length < 10) 
                     ? `Document${filename}` 
                     : (filename && filename !== 'undefined' && filename !== 'null' ? filename : 'Unknown File');
-                fileName.textContent = safeFilename;
+                const category = file.category || categoryId;
+                const size = file.size || 0;
+                const uploaded = file.uploaded_at || file.modified || file.uploaded || 'Unknown';
+                const status = file.status || 'preview';
                 
-                const fileDetails = document.createElement('div');
-                fileDetails.style.cssText = 'color: #666; font-size: 11px;';
-                fileDetails.textContent = formatFileSize(file.size) + ' • ' + file.modified;
+                // Format uploaded date
+                let uploadedDate = 'Unknown';
+                try {
+                    if (uploaded && uploaded !== 'Unknown') {
+                        uploadedDate = new Date(uploaded).toLocaleDateString();
+                    }
+                } catch (e) {
+                    uploadedDate = 'Unknown';
+                }
                 
-                fileInfo.appendChild(fileName);
-                fileInfo.appendChild(fileDetails);
-                fileItem.appendChild(fileInfo);
-                filesDiv.appendChild(fileItem);
+                // Status icon and badge
+                let statusIcon = '';
+                let statusIconBg = '';
+                let statusBadge = '';
+                if (status === 'ingested') {
+                    statusIcon = 'check_circle';
+                    statusIconBg = '#22c55e';
+                    statusBadge = '<span class="status-badge status-ingested" style="background: #22c55e; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 8px; font-weight: 500;">Ingest</span>';
+                } else if (status === 'error' || status === 'failed') {
+                    statusIcon = 'error';
+                    statusIconBg = '#ef4444';
+                    statusBadge = '<span class="status-badge status-error" style="background: #ef4444; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 8px; font-weight: 500;">Error</span>';
+                } else {
+                    statusIcon = 'visibility';
+                    statusIconBg = '#f59e0b';
+                    statusBadge = '<span class="status-badge status-preview" style="background: #f59e0b; color: #000; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 8px; font-weight: 500;">Preview</span>';
+                }
+                
+                const wordCount = (file.word_count !== undefined && file.word_count !== null) ? file.word_count : 0;
+                const charCount = (file.char_count !== undefined && file.char_count !== null) ? file.char_count : 0;
+                
+                // Escape HTML
+                const escapedFilename = safeFilename.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                const escapedCategory = category.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                
+                const fileItemHTML = `
+                    <div class="file-item" id="file-${fileId}" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 12px; border-bottom: 1px solid #e1e5e9; background: white; border-radius: 8px; margin-bottom: 8px; gap: 12px; position: relative !important;">
+                        <!-- Status Icon with Circle Background (Top Left) -->
+                        <div class="file-status-icon" style="width: 40px; height: 40px; border-radius: 50%; background: ${statusIconBg}; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; position: relative; z-index: 1;">
+                            <span class="material-icons-round" style="font-size: 22px; color: white;">${statusIcon}</span>
+                        </div>
+                        
+                        <div class="file-info" style="flex: 1; min-width: 0;">
+                            <div class="file-name" style="font-weight: 600; margin-bottom: 6px; color: #1e293b; font-size: 14px;">${escapedFilename}</div>
+                            <div class="file-size" style="font-size: 12px; color: #64748b; display: flex; flex-wrap: wrap; align-items: center; gap: 4px;">
+                                ${statusBadge}
+                                <span>${typeof formatFileSize === 'function' ? formatFileSize(size) : (size ? (size / 1024).toFixed(1) + ' KB' : '0 B')}</span>
+                                <span>•</span>
+                                <span>${wordCount.toLocaleString()} words</span>
+                                <span>•</span>
+                                <span>${charCount.toLocaleString()} chars</span>
+                                <span>•</span>
+                                <span>${escapedCategory}</span>
+                                <span>•</span>
+                                <span>${uploadedDate}</span>
+                            </div>
+                        </div>
+                        <div class="file-actions" style="display: flex; gap: 8px; flex-shrink: 0;">
+                            <button class="btn btn-secondary view-file-btn" data-file-id="${fileId}" style="padding: 6px 12px; font-size: 12px; white-space: nowrap;" title="View file preview">
+                                <span class="material-icons-round" style="font-size: 16px; vertical-align: middle;">visibility</span> <span class="btn-text">View</span>
+                            </button>
+                            ${status === 'preview' ? `
+                            <button class="btn ingest-file-btn" data-file-id="${fileId}" style="padding: 6px 12px; font-size: 12px; background: #0891b2; color: white; white-space: nowrap;" title="Ingest to knowledge base">
+                                <span class="material-icons-round" style="font-size: 16px; vertical-align: middle;">save</span> <span class="btn-text">Ingest</span>
+                            </button>
+                            ` : ''}
+                            <button class="btn btn-danger delete-file-btn" data-file-id="${fileId}" data-filename="${escapedFilename}" data-category="${escapedCategory}" style="padding: 6px 12px; font-size: 12px; background: #dc3545; color: white; white-space: nowrap;" title="Delete file and remove from knowledge base">
+                                <span class="material-icons-round" style="font-size: 16px; vertical-align: middle;">delete</span> <span class="btn-text">Delete</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                filesDiv.innerHTML += fileItemHTML;
             });
+            
+            // Add event listeners after rendering
+            setTimeout(() => {
+                try {
+                    // View file buttons
+                    filesDiv.querySelectorAll('.view-file-btn').forEach(btn => {
+                        btn.addEventListener('click', async function() {
+                            const fileId = parseInt(this.getAttribute('data-file-id'));
+                            if (typeof viewFile === 'function') {
+                                await viewFile(fileId);
+                            }
+                        });
+                    });
+                    
+                    // Ingest file buttons
+                    filesDiv.querySelectorAll('.ingest-file-btn').forEach(btn => {
+                        btn.addEventListener('click', async function() {
+                            const fileId = parseInt(this.getAttribute('data-file-id'));
+                            if (typeof viewFile === 'function') {
+                                await viewFile(fileId); // Show preview first, then user can ingest
+                            }
+                        });
+                    });
+                    
+                    // Delete file buttons
+                    filesDiv.querySelectorAll('.delete-file-btn').forEach(btn => {
+                        btn.addEventListener('click', async function() {
+                            const fileId = this.getAttribute('data-file-id');
+                            const filename = this.getAttribute('data-filename');
+                            const category = this.getAttribute('data-category');
+                            if (fileId && typeof deleteFileById === 'function') {
+                                await deleteFileById(fileId);
+                            } else if (filename && typeof deleteFile === 'function') {
+                                await deleteFile(filename, category);
+                            }
+                        });
+                    });
+                } catch (eventError) {
+                    console.error('Error setting up file list event listeners:', eventError);
+                }
+            }, 100);
         }
         
         section.appendChild(header);
