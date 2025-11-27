@@ -952,14 +952,30 @@ let filePreviewData = null;
 
 async function viewFile(fileId) {
     try {
-        const response = await fetch(`/api/files/${fileId}`);
+        const response = await fetch(`/api/files/${fileId}`, {
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        // Check if response is JSON before parsing
+        const contentType = response.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) {
+            const text = await response.text();
+            if (text.includes('<!DOCTYPE') || text.includes('<html')) {
+                throw new Error('Authentication required. Please refresh the page and try again.');
+            }
+            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+        }
+        
         const data = await response.json();
         
         if (response.ok) {
             filePreviewData = data;
             showFilePreview(data);
         } else {
-            alert('Failed to load file: ' + data.error);
+            alert('Failed to load file: ' + (data.error || 'Unknown error'));
         }
     } catch (error) {
         alert('Error: ' + error.message);
@@ -1008,11 +1024,22 @@ async function ingestFileContent() {
     try {
         const response = await fetch(`/api/files/${fileId}/ingest`, {
             method: 'POST',
+            credentials: 'same-origin',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 text: editedText
             })
         });
+        
+        // Check if response is JSON before parsing
+        const contentType = response.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) {
+            const text = await response.text();
+            if (text.includes('<!DOCTYPE') || text.includes('<html')) {
+                throw new Error('Authentication required. Please refresh the page and try again.');
+            }
+            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+        }
         
         const result = await response.json();
         
