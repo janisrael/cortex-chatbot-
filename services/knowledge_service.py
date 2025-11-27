@@ -197,20 +197,38 @@ def get_knowledge_stats(user_id):
         
         if user_vectorstore:
             try:
-                # Try to get document count using invoke() (LangChain 0.3.x API)
-                retriever = user_vectorstore.as_retriever(search_kwargs={"k": 10000})
-                # Use a generic query to retrieve all documents (k=10000 should get all)
-                # Use invoke() instead of get_relevant_documents() for LangChain 0.3.x
-                if hasattr(retriever, 'invoke'):
-                    test_docs = retriever.invoke("document")
+                # Method 1: Try to get count directly from ChromaDB collection (most reliable)
+                if hasattr(user_vectorstore, '_collection'):
+                    try:
+                        collection = user_vectorstore._collection
+                        # Get all document IDs to count
+                        results = collection.get()
+                        doc_count = len(results.get('ids', [])) if results and 'ids' in results else 0
+                        db_status = "active"
+                        print(f"✅ Got document count from collection: {doc_count}")
+                    except Exception as coll_error:
+                        print(f"⚠️ Error getting count from collection: {coll_error}")
+                        # Fallback to retriever method
+                        raise coll_error
                 else:
-                    # Fallback for older LangChain versions
-                    test_docs = retriever.get_relevant_documents("document")
-                doc_count = len(test_docs) if test_docs else 0
-                db_status = "active"
+                    # Method 2: Fallback to retriever method if collection not accessible
+                    retriever = user_vectorstore.as_retriever(search_kwargs={"k": 10000})
+                    # Use a generic query to retrieve all documents (k=10000 should get all)
+                    # Use invoke() instead of get_relevant_documents() for LangChain 0.3.x
+                    if hasattr(retriever, 'invoke'):
+                        test_docs = retriever.invoke("document")
+                    else:
+                        # Fallback for older LangChain versions
+                        test_docs = retriever.get_relevant_documents("document")
+                    doc_count = len(test_docs) if test_docs else 0
+                    db_status = "active"
+                    print(f"✅ Got document count from retriever: {doc_count}")
             except Exception as e:
                 print(f"⚠️ Error checking vectorstore: {e}")
+                import traceback
+                traceback.print_exc()
                 db_status = "error"
+                doc_count = 0
         
         # Get file count
         from services.file_service import list_user_files

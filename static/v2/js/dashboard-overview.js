@@ -110,6 +110,12 @@ window.switchTab = function(tabName) {
                 console.error('Error loading files in knowledge tab:', err);
             });
         }
+        // Load knowledge stats when knowledge tab is opened
+        if (typeof loadKnowledgeStats === 'function') {
+            loadKnowledgeStats().catch(err => {
+                console.error('Error loading knowledge stats:', err);
+            });
+        }
     } else if (tabName === 'llm') {
         // Initialize LLM provider selection when LLM tab is opened
         console.log('📑 LLM tab opened, initializing provider selection...');
@@ -536,14 +542,16 @@ function updateFileList(files) {
 function updateOverviewMetrics(stats, crawledData, config) {
     const uploadedFiles = Array.isArray(stats.uploaded_files) ? stats.uploaded_files : [];
     const crawledList = Array.isArray(crawledData?.urls) ? crawledData.urls : [];
-    const crawledCount = typeof crawledData?.total === 'number' ? crawledData.total : crawledList.length;
+    // Use stats.crawled_count from API if available, otherwise fallback to crawledData
+    const crawledCount = typeof stats.crawled_count === 'number' ? stats.crawled_count : (typeof crawledData?.total === 'number' ? crawledData.total : crawledList.length);
     const ingestedCount = crawledList.filter(url => url.status === 'ingested').length;
-    const faqCount = stats.faq_count || 0;
-    const ingestedFaqCount = stats.ingested_faq_count || 0;
+    const faqCount = typeof stats.faq_count === 'number' ? stats.faq_count : 0;
+    const ingestedFaqCount = typeof stats.ingested_faq_count === 'number' ? stats.ingested_faq_count : 0;
     
-    setTextContent('crawledSitesCount', crawledCount ?? '—');
-    setTextContent('uploadedFilesCount', uploadedFiles.length ?? '—');
-    setTextContent('faqEntriesCount', faqCount ?? '—');
+    // Show 0 instead of "—" when values are 0 (better UX)
+    setTextContent('crawledSitesCount', crawledCount !== null && crawledCount !== undefined ? crawledCount : 0);
+    setTextContent('uploadedFilesCount', uploadedFiles.length !== null && uploadedFiles.length !== undefined ? uploadedFiles.length : 0);
+    setTextContent('faqEntriesCount', faqCount !== null && faqCount !== undefined ? faqCount : 0);
     setTextContent('crawledSitesSubtext', `${ingestedCount} ingested`);
     setTextContent('uploadedFilesSubtext', `${stats.total_documents || 0} knowledge chunks`);
     setTextContent('faqEntriesSubtext', ingestedFaqCount > 0 ? `${ingestedFaqCount} ingested` : 'Add FAQ entries');

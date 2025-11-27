@@ -1359,7 +1359,7 @@
             padding: 12px;
             border-radius: 8px;
             margin-bottom: 8px;
-            background: white;
+            background: white !important;
             border: 1px solid #e1e5e9;
             gap: 12px;
             transition: all 0.2s ease;
