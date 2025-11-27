@@ -91,7 +91,12 @@ def get_chatbot_response(user_id, message, system_llm=None, name="User"):
     context = ""
     if user_retriever:
         try:
-            docs = user_retriever.get_relevant_documents(message)
+            # Use invoke() instead of get_relevant_documents() for LangChain 0.3.x
+            if hasattr(user_retriever, 'invoke'):
+                docs = user_retriever.invoke(message)
+            else:
+                # Fallback for older LangChain versions
+                docs = user_retriever.get_relevant_documents(message)
             context = "\n\n".join([doc.page_content for doc in docs]) if docs else ""
             
             # Log retrieval for debugging
@@ -102,6 +107,8 @@ def get_chatbot_response(user_id, message, system_llm=None, name="User"):
                 print(f"ℹ️ No relevant documents found in knowledge base for: {message[:50]}")
         except Exception as e:
             print(f"⚠️ Error retrieving documents: {e}")
+            import traceback
+            traceback.print_exc()
             context = ""
     else:
         print(f"ℹ️ No retriever available - using direct LLM response")
