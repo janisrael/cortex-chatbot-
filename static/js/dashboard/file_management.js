@@ -1064,8 +1064,23 @@ async function deleteFileById(fileId) {
     
     try {
         const response = await fetch(`/api/files/${fileId}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            }
         });
+        
+        // Check if response is JSON before parsing
+        const contentType = response.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) {
+            // Got HTML instead of JSON - likely authentication issue
+            const text = await response.text();
+            if (text.includes('<!DOCTYPE') || text.includes('<html')) {
+                throw new Error('Authentication required. Please refresh the page and try again.');
+            }
+            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+        }
         
         const result = await response.json();
         
