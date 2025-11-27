@@ -163,19 +163,19 @@ body {
     padding: 1.25rem;
     background: var(--card-bg);
     border-radius: 16px;
-    box-shadow: 
-        6px 6px 12px var(--shadow-dark),
-        -6px -6px 12px var(--shadow-light);
+    box-shadow: inset 2px 3px 4px 0px rgba(202, 207, 214, 0.5900000000000001), inset -1px -2px 7px rgba(255, 255, 255, 0.69);
     text-align: left;
     transition: all 0.3s ease;
 }
 
-.instruction-item:hover {
+/* .instruction-item:hover {
     box-shadow: 
         inset 4px 4px 8px var(--shadow-dark),
         inset -4px -4px 8px var(--shadow-light);
+} */
+.legal-content {
+    padding: 0px !important;
 }
-
 .instruction-item .material-icons-round {
     font-size: 1.75rem;
     color: var(--accent);

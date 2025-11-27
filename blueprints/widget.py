@@ -107,8 +107,8 @@ def demo_chatbox():
         from utils.api_key import get_user_api_key
         api_key = get_user_api_key(user_id)
         
-        # Render the demo template with user's API key
-        return render_template("widget/demo.html", 
+        # Render the new widget preview template with user's API key
+        return render_template("widget/preview.html", 
                              bot_name=bot_name,
                              api_key=api_key,
                              user=current_user)
@@ -124,6 +124,15 @@ def demo_chatbox():
                                  user=current_user)
         except:
             return send_from_directory('templates/widget', 'demo.html')
+
+
+@widget_bp.route("/feedback")
+@login_required
+def feedback():
+    """Feedback and bug report page"""
+    if not current_user.is_authenticated:
+        return redirect(url_for('auth.login'))
+    return render_template("widget/feedback.html", user=current_user)
 
 
 @widget_bp.route("/widget")
