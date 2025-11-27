@@ -1559,50 +1559,12 @@ def submit_feedback():
             return jsonify({"error": "Subject and message are required"}), 400
         
         # Send email with feedback
-        try:
-            import smtplib
-            from email.mime.text import MIMEText
-            from email.mime.multipart import MIMEMultipart
-            
-            SMTP_SERVER = "smtp.gmail.com"
-            SMTP_PORT = 587
-            SMTP_USER = "janfrancisisrael@gmail.com"
-            SMTP_PASSWORD = "goyz tpmm dtxm mjib"
-            
-            msg = MIMEMultipart()
-            msg['From'] = SMTP_USER
-            msg['To'] = SMTP_USER
-            msg['Subject'] = f"[Cortex AI Feedback] {feedback_type.upper()}: {subject}"
-            
-            body = f"""
-New Feedback Submission from Cortex AI
-
-Type: {feedback_type.upper()}
-Subject: {subject}
-User: {username}
-Email: {email or 'Not provided'}
-
-Message:
-{message}
-
----
-Submitted at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-            """
-            
-            msg.attach(MIMEText(body, 'plain'))
-            
-            server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
-            server.starttls()
-            server.login(SMTP_USER, SMTP_PASSWORD)
-            server.sendmail(SMTP_USER, SMTP_USER, msg.as_string())
-            server.quit()
-            
-            print(f"✅ Feedback submitted: {feedback_type} from {username}")
-            
-        except Exception as e:
-            print(f"⚠️ Error sending feedback email: {e}")
+        from utils.email_utils import send_feedback_email
+        email_sent = send_feedback_email(feedback_type, subject, message, username, email)
+        
+        if not email_sent:
+            print(f"⚠️ Failed to send feedback email for {feedback_type} from {username}")
             # Still return success to user even if email fails
-            # You might want to log this to a database instead
         
         return jsonify({
             "message": "Feedback submitted successfully",
