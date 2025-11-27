@@ -241,17 +241,22 @@ async function loadStats() {
         // Check if response is JSON before parsing
         let stats = {};
         if (statsResponse.ok) {
-            const contentType = statsResponse.headers.get('content-type');
-            if (contentType && contentType.includes('application/json')) {
-                stats = await statsResponse.json();
-            } else {
-                console.warn('⚠️ Stats response is not JSON, might be redirected to login');
-                // Try to get text to see what we got
-                const text = await statsResponse.text();
-                if (text.includes('<!DOCTYPE') || text.includes('<html')) {
-                    console.error('❌ Received HTML instead of JSON - user may not be authenticated');
-                    return; // Don't try to parse HTML as JSON
+            const contentType = statsResponse.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+                try {
+                    stats = await statsResponse.json();
+                } catch (jsonError) {
+                    // If JSON parse fails, might be HTML redirect
+                    const text = await statsResponse.clone().text();
+                    if (text.includes('<!DOCTYPE') || text.includes('<html')) {
+                        console.error('❌ Received HTML instead of JSON - user may not be authenticated');
+                        return; // Don't try to parse HTML as JSON
+                    }
+                    throw jsonError; // Re-throw if it's a different error
                 }
+            } else {
+                console.warn('⚠️ Stats response is not JSON (content-type:', contentType, '), might be redirected to login');
+                return;
             }
         } else {
             console.error('❌ Failed to load stats:', statsResponse.status, statsResponse.statusText);
