@@ -37,35 +37,85 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeDashboard();
 });
 
+// Helper function to safely call a function if it exists
+function safeCall(fnName, isAsync = false) {
+    try {
+        const fn = window[fnName] || (typeof eval !== 'undefined' ? eval(fnName) : null);
+        if (typeof fn === 'function') {
+            return isAsync ? fn() : fn();
+        }
+    } catch (e) {
+        // Function doesn't exist or can't be accessed - that's okay
+        return isAsync ? Promise.resolve() : undefined;
+    }
+    return isAsync ? Promise.resolve() : undefined;
+}
+
 async function initializeDashboard() {
     try {
         // Only initialize dashboard features if we're on the dashboard page
-        // Check if required functions exist before calling them
-        if (typeof loadWebsites === 'function') {
-            await loadWebsites();
+        // Safely check and call functions - they may not exist on all pages (e.g., feedback page)
+        try {
+            if (typeof window.loadWebsites === 'function') {
+                await window.loadWebsites();
+            }
+        } catch (e) {
+            // loadWebsites not available - skip it
         }
-        if (typeof loadLLMConfig === 'function') {
-            await loadLLMConfig();
+        
+        try {
+            if (typeof window.loadLLMConfig === 'function') {
+                await window.loadLLMConfig();
+            }
+        } catch (e) {
+            // loadLLMConfig not available - skip it
         }
-        if (typeof loadStats === 'function') {
-            loadStats();
+        
+        try {
+            if (typeof window.loadStats === 'function') {
+                window.loadStats();
+            }
+        } catch (e) {
+            // loadStats not available - skip it
         }
-        if (typeof setupFileUpload === 'function') {
-            setupFileUpload();
+        
+        try {
+            if (typeof window.setupFileUpload === 'function') {
+                window.setupFileUpload();
+            }
+        } catch (e) {
+            // setupFileUpload not available - skip it
         }
-        if (typeof setupCategoryTabs === 'function') {
-            setupCategoryTabs();
+        
+        try {
+            if (typeof window.setupCategoryTabs === 'function') {
+                window.setupCategoryTabs();
+            }
+        } catch (e) {
+            // setupCategoryTabs not available - skip it
         }
+        
         // Initialize file management (includes crawl functionality)
-        if (typeof initializeFileManagement === 'function') {
-            await initializeFileManagement();
+        try {
+            if (typeof window.initializeFileManagement === 'function') {
+                await window.initializeFileManagement();
+            }
+        } catch (e) {
+            // initializeFileManagement not available - skip it
         }
+        
         // Update integration snippet when dashboard loads
-        if (typeof updateIntegrationSnippet === 'function') {
-            await updateIntegrationSnippet();
+        try {
+            if (typeof window.updateIntegrationSnippet === 'function') {
+                await window.updateIntegrationSnippet();
+            }
+        } catch (e) {
+            // updateIntegrationSnippet not available - skip it
         }
+        
         console.log('✅ Dashboard initialized successfully');
     } catch (error) {
+        // Final catch-all - don't let initialization errors break the page
         console.error('Dashboard initialization failed:', error);
     }
 }
