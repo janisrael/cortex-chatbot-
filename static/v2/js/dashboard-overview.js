@@ -147,6 +147,13 @@ window.switchTab = function(tabName) {
         if (typeof updateIntegrationSnippet === 'function') {
             updateIntegrationSnippet();
         }
+        // Load preview automatically when integration tab is opened
+        setTimeout(() => {
+            const iframe = document.getElementById('previewFrame');
+            if (iframe && (!iframe.src || iframe.src === 'about:blank')) {
+                iframe.src = '/demo';
+            }
+        }, 100);
     }
 };
 

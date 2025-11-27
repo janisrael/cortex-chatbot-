@@ -3,7 +3,7 @@ let appearanceConfig = {
     description: 'Your friendly assistant',
     primary_color: {
         type: 'solid',
-        value: '#0891b2',
+        value: '#1093B2',
         contrast_text: '#ffffff'
     },
     avatar: {
@@ -97,7 +97,7 @@ async function loadAppearanceConfig() {
             // Default primary color
             appearanceConfig.primary_color = {
                 type: 'solid',
-                value: '#0891b2',
+                value: '#1093B2',
                 contrast_text: '#ffffff'
             };
         }
@@ -163,6 +163,15 @@ function setupColorPicker() {
             const solidSection = document.getElementById('solidColorSection');
             const gradientSection = document.getElementById('gradientColorSection');
             
+            // Update card active states
+            document.querySelectorAll('.color-type-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            const selectedCard = e.target.closest('.color-type-card');
+            if (selectedCard) {
+                selectedCard.classList.add('active');
+            }
+            
             if (type === 'solid') {
                 solidSection.style.display = 'block';
                 gradientSection.style.display = 'none';
@@ -176,8 +185,8 @@ function setupColorPicker() {
                 // If no gradient colors exist, initialize with defaults
                 if (gradientColors.length === 0) {
                     console.log('🔄 Initializing gradient colors');
-                    addGradientColor('#0891b2', 0);
-                    addGradientColor('#764ba2', 100);
+                    addGradientColor('#1093B2', 0);
+                    addGradientColor('#157A73', 100);
                 }
                 
                 // Update gradient value to ensure preview works
@@ -186,6 +195,16 @@ function setupColorPicker() {
             updatePreview();
         });
     });
+    
+    // Initialize active state for color type cards
+    const initialColorType = appearanceConfig.primary_color.type || 'solid';
+    const initialRadio = document.getElementById(`colorType-${initialColorType}`);
+    if (initialRadio && initialRadio.checked) {
+        const initialCard = initialRadio.closest('.color-type-card');
+        if (initialCard) {
+            initialCard.classList.add('active');
+        }
+    }
     
     // Solid color picker
     if (solidColorPicker) {
@@ -221,7 +240,7 @@ function setupGradientBuilder() {
     
     if (addColorBtn) {
         addColorBtn.addEventListener('click', () => {
-            addGradientColor('#0891b2');
+            addGradientColor('#1093B2');
         });
     }
     
@@ -234,7 +253,7 @@ function setupGradientBuilder() {
 }
 
 // Add gradient color stop
-function addGradientColor(color = '#0891b2', position = null) {
+function addGradientColor(color = '#1093B2', position = null) {
     const gradientColorsDiv = document.getElementById('gradientColors');
     if (!gradientColorsDiv) return;
     
@@ -407,9 +426,12 @@ function updateColorUI() {
     const solidRadio = document.querySelector('input[name="colorType"][value="solid"]');
     const gradientRadio = document.querySelector('input[name="colorType"][value="gradient"]');
     
-    // First, uncheck all radio buttons
+    // First, uncheck all radio buttons and remove active class from cards
     if (solidRadio) solidRadio.checked = false;
     if (gradientRadio) gradientRadio.checked = false;
+    document.querySelectorAll('.color-type-card').forEach(card => {
+        card.classList.remove('active');
+    });
     
     // Then set the correct radio button based on saved type
     if (colorType === 'gradient') {
@@ -417,6 +439,12 @@ function updateColorUI() {
         if (gradientRadio) {
             gradientRadio.checked = true;
             console.log('✅ Gradient radio button selected');
+        }
+        
+        // Set active state on gradient card
+        const gradientCard = document.querySelector('.color-type-card[data-color-type="gradient"]');
+        if (gradientCard) {
+            gradientCard.classList.add('active');
         }
         
         // Show gradient section, hide solid section
@@ -431,6 +459,12 @@ function updateColorUI() {
         if (solidRadio) {
             solidRadio.checked = true;
             console.log('✅ Solid radio button selected');
+        }
+        
+        // Set active state on solid card
+        const solidCard = document.querySelector('.color-type-card[data-color-type="solid"]');
+        if (solidCard) {
+            solidCard.classList.add('active');
         }
         
         // Show solid section, hide gradient section
@@ -844,18 +878,28 @@ async function saveAppearanceConfig() {
         const result = await saveResponse.json();
         
         if (saveResponse.ok) {
+            const message = 'Appearance settings saved successfully!';
             if (successAlert) {
-                successAlert.textContent = 'Appearance settings saved successfully!';
+                successAlert.textContent = message;
                 successAlert.style.display = 'block';
+            }
+            // Show toast notification
+            if (typeof showSuccessNotification === 'function') {
+                showSuccessNotification(message, 5000);
             }
         } else {
             throw new Error(result.error || 'Failed to save appearance settings');
         }
     } catch (error) {
         console.error('Failed to save appearance config:', error);
+        const errorMessage = 'Error: ' + error.message;
         if (errorAlert) {
-            errorAlert.textContent = 'Error: ' + error.message;
+            errorAlert.textContent = errorMessage;
             errorAlert.style.display = 'block';
+        }
+        // Show toast notification
+        if (typeof showErrorNotification === 'function') {
+            showErrorNotification(errorMessage, 6000);
         }
     }
 }
