@@ -12,11 +12,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Icons+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/v2/css/dashboard.css?v=9">
     <link rel="stylesheet" href="/static/css/widget_preview.css">
+    <link rel="stylesheet" href="/static/v2/css/floating-share-widget.css">
     <style>
         .legal-content {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+         
         }
         body {
             background-color: #f8fafc;
@@ -225,8 +226,11 @@
         </footer>
     </div>
 
+    {% include 'components/floating_share_widget.html' %}
+    
     <!-- Load the chatbot widget with user's API key -->
     <script src="/static/embed.js?api_key={{ api_key }}"></script>
+    <script src="/static/v2/js/floating-share-widget.js"></script>
 </body>
 </html>
 

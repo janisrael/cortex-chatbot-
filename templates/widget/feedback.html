@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Icons+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/v2/css/dashboard.css?v=9">
+    <link rel="stylesheet" href="/static/v2/css/floating-share-widget.css">
     <style>
         .legal-content {
             max-width: 1200px;
@@ -475,7 +476,10 @@
         });
     </script>
 
+    {% include 'components/floating_share_widget.html' %}
+    
     <script src="/static/v2/js/dashboard-core.js"></script>
     <script src="/static/v2/js/dashboard-utils.js"></script>
+    <script src="/static/v2/js/floating-share-widget.js"></script>
 </body>
 </html>
