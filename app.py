@@ -72,13 +72,15 @@ except Exception as e:
 # Register all blueprints
 register_blueprints(app)
 
-# Disable caching for static files (for 5 months as requested)
+# Disable ALL caching completely - no cache anywhere
 @app.after_request
 def disable_cache(response):
-    """Disable caching for all responses"""
-    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    """Disable ALL caching - no nginx cache, no server cache, no browser cache"""
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0, private'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'
+    response.headers['X-Accel-Expires'] = '0'  # Disable nginx caching
+    response.headers['ETag'] = ''  # Remove ETag to prevent conditional requests
     return response
 
 # Make llm available to blueprints via app context
