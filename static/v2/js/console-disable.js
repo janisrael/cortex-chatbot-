@@ -30,6 +30,9 @@
     
     const isProduction = !isLocal;
     
+    // Temporarily disabled to debug production issues
+    // Re-enable by uncommenting the code below when ready
+    /*
     if (isProduction) {
         // Override console methods to be no-ops in production
         const noop = function() {};
@@ -43,5 +46,6 @@
         // Keep console.error enabled for critical errors (can be disabled if needed)
         // console.error = noop;
     }
+    */
 })();
 
