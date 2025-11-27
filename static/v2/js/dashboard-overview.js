@@ -233,22 +233,51 @@ function selectWebsite(websiteId) {
 async function loadStats() {
     try {
         const [statsResponse, crawledResponse, configResponse] = await Promise.all([
-            fetch('/api/knowledge-stats'),
-            fetch('/api/crawled-urls'),
-            fetch('/api/user/chatbot-config')
+            fetch('/api/knowledge-stats', { credentials: 'same-origin' }),
+            fetch('/api/crawled-urls', { credentials: 'same-origin' }),
+            fetch('/api/user/chatbot-config', { credentials: 'same-origin' })
         ]);
         
-        const stats = await statsResponse.json();
-        if (!statsResponse.ok) {
-            console.error('Failed to load stats:', stats);
+        // Check if response is JSON before parsing
+        let stats = {};
+        if (statsResponse.ok) {
+            const contentType = statsResponse.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                stats = await statsResponse.json();
+            } else {
+                console.warn('⚠️ Stats response is not JSON, might be redirected to login');
+                // Try to get text to see what we got
+                const text = await statsResponse.text();
+                if (text.includes('<!DOCTYPE') || text.includes('<html')) {
+                    console.error('❌ Received HTML instead of JSON - user may not be authenticated');
+                    return; // Don't try to parse HTML as JSON
+                }
+            }
+        } else {
+            console.error('❌ Failed to load stats:', statsResponse.status, statsResponse.statusText);
             return;
         }
         
         stats.llm_model = stats.llm_model || 'gpt-4o-mini';
         
-        const crawledData = crawledResponse.ok ? await crawledResponse.json() : { urls: [], total: 0 };
-        const configPayload = configResponse.ok ? await configResponse.json() : {};
-        const config = configPayload.config || configPayload || {};
+        // Safely parse crawled data
+        let crawledData = { urls: [], total: 0 };
+        if (crawledResponse.ok) {
+            const contentType = crawledResponse.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                crawledData = await crawledResponse.json();
+            }
+        }
+        
+        // Safely parse config
+        let config = {};
+        if (configResponse.ok) {
+            const contentType = configResponse.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                const configPayload = await configResponse.json();
+                config = configPayload.config || configPayload || {};
+            }
+        }
         
         updateOverviewMetrics(stats, crawledData, config);
         
@@ -269,7 +298,11 @@ async function loadStats() {
         await refreshFileList();
         
     } catch (error) {
-        console.error('Failed to load stats:', error);
+        console.error('❌ Failed to load stats:', error);
+        // Don't show error if it's a JSON parse error from HTML redirect
+        if (error.message && error.message.includes('JSON')) {
+            console.warn('⚠️ JSON parse error - likely authentication issue. User may need to refresh page.');
+        }
     }
 }
 
