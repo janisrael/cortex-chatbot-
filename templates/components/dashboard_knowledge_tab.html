@@ -113,7 +113,7 @@
         <div class="alert alert-success" id="crawlSuccess"></div>
         <div class="alert alert-error" id="crawlError"></div>
         
-        <!-- 3 Column Checkboxes -->
+        <!-- 3 Column Layout: AI Cleaning, Recrawl, Upload Sitemap -->
         <div class="crawl-options-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 25px;">
             <!-- First Column: Enable AI Content Cleaning -->
             <div style="display: flex; flex-direction: column; justify-content: center; padding: 20px; background: #f8f9fa; border-radius: 10px; border: 2px solid #e1e5e9;">
@@ -128,29 +128,31 @@
                 </p>
             </div>
             
-            <!-- Second Column: Recrawl -->
-            <div style="display: flex; flex-direction: column; justify-content: center; padding: 20px; background: #f8f9fa; border-radius: 10px; border: 2px solid #e1e5e9;">
-                <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px;">
-                    <input type="checkbox" id="recrawlEnabled" style="width: 24px; height: 24px; cursor: pointer; flex-shrink: 0; margin-top: 2px; accent-color: #0891b2;">
-                    <label for="recrawlEnabled" style="color: #1e293b; cursor: pointer; font-size: 15px; font-weight: 600; margin: 0; line-height: 1.4;">
-                        Recrawl
-                    </label>
+            <!-- Second Column: Recrawl Button -->
+            <div style="display: flex; flex-direction: column; justify-content: center; padding: 20px; background: #f8f9fa; border-radius: 10px; border: 2px solid #e1e5e9; position: relative;">
+                <div style="position: absolute; top: 8px; right: 8px;">
+                    <span style="background: #f59e0b; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: 600;">Future Feature</span>
                 </div>
-                <p style="margin: 0; color: #64748b; font-size: 12px; line-height: 1.5; padding-left: 36px;">
-                    Recrawl the URL to update content. This will replace existing crawled data.
+                <button class="btn btn-secondary" onclick="showRecrawlConfirm()" style="width: 100%; padding: 12px; font-weight: 600; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span class="material-icons-round" style="font-size: 18px;">refresh</span>
+                    <span>Recrawl</span>
+                </button>
+                <p style="margin: 0; color: #64748b; font-size: 12px; line-height: 1.5;">
+                    Recrawl all websites on the list to update content. This will replace existing crawled data.
                 </p>
             </div>
             
-            <!-- Third Column: Add Lorem Ipsum -->
-            <div style="display: flex; flex-direction: column; justify-content: center; padding: 20px; background: #f8f9fa; border-radius: 10px; border: 2px solid #e1e5e9;">
-                <div style="display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px;">
-                    <input type="checkbox" id="loremIpsumEnabled" style="width: 24px; height: 24px; cursor: pointer; flex-shrink: 0; margin-top: 2px; accent-color: #0891b2;">
-                    <label for="loremIpsumEnabled" style="color: #1e293b; cursor: pointer; font-size: 15px; font-weight: 600; margin: 0; line-height: 1.4;">
-                        Add Lorem Ipsum
-                    </label>
+            <!-- Third Column: Upload Sitemap Button -->
+            <div style="display: flex; flex-direction: column; justify-content: center; padding: 20px; background: #f8f9fa; border-radius: 10px; border: 2px solid #e1e5e9; position: relative;">
+                <div style="position: absolute; top: 8px; right: 8px;">
+                    <span style="background: #f59e0b; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; font-weight: 600;">Future Feature</span>
                 </div>
-                <p style="margin: 0; color: #64748b; font-size: 12px; line-height: 1.5; padding-left: 36px;">
-                    Add placeholder text for testing purposes.
+                <button class="btn btn-secondary" onclick="showUploadSitemapInfo()" style="width: 100%; padding: 12px; font-weight: 600; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span class="material-icons-round" style="font-size: 18px;">upload_file</span>
+                    <span>Upload Sitemap</span>
+                </button>
+                <p style="margin: 0; color: #64748b; font-size: 12px; line-height: 1.5;">
+                    Upload a sitemap file to crawl multiple URLs automatically from your website.
                 </p>
             </div>
         </div>
@@ -193,35 +195,34 @@
 
     <!-- FAQ Management Section (100% width) -->
     <div class="card" style="width: 100%; margin-bottom: 30px;">
-            <h2><span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">help_center</span> FAQ Management</h2>
-            
-            <div class="alert alert-success" id="faqSuccess" style="display: none;"></div>
-            <div class="alert alert-error" id="faqError" style="display: none;"></div>
+        <h2><span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">help_center</span> FAQ Management</h2>
+        
+        <div class="alert alert-success" id="faqSuccess" style="display: none;"></div>
+        <div class="alert alert-error" id="faqError" style="display: none;"></div>
 
-            <!-- Add FAQ Form -->
-            <div class="form-group" style="margin-bottom: 20px;">
-                <label for="faqQuestion">Question</label>
-                <input type="text" id="faqQuestion" class="form-control" placeholder="e.g., What is your return policy?" style="margin-bottom: 12px;">
-                
-                <label for="faqAnswer">Answer</label>
-                <textarea id="faqAnswer" class="form-control" rows="4" placeholder="e.g., We offer a 30-day return policy for all products..." style="margin-bottom: 12px; resize: vertical;"></textarea>
-                
-                <label for="faqCategory">Category</label>
-                <select id="faqCategory" class="form-control" style="margin-bottom: 12px;">
-                    <option value="company_details">Company Details</option>
-                    <option value="products_services">Products & Services</option>
-                    <option value="support">Support</option>
-                    <option value="pricing">Pricing</option>
-                    <option value="other">Other</option>
-                </select>
-                
-                <button class="btn" onclick="createFAQ()" id="createFaqBtn" style="width: 100%;">
-                    <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">add</span> Add FAQ
-                </button>
+        <!-- Category Selection (4 columns) -->
+        <div class="form-group" style="margin-bottom: 25px;">
+            <label style="display: block; margin-bottom: 12px; font-weight: 600; color: #1e293b;">FAQ Category</label>
+            <div class="category-tabs" id="faqCategoryTabs">
+                <!-- Dynamically populated -->
             </div>
+        </div>
 
-            <!-- FAQ List -->
-            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+        <!-- Add FAQ Form -->
+        <div class="form-group" style="margin-bottom: 20px;">
+            <label for="faqQuestion" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">Question</label>
+            <input type="text" id="faqQuestion" class="form-control" placeholder="e.g., What is your return policy?" style="margin-bottom: 12px;">
+            
+            <label for="faqAnswer" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">Answer</label>
+            <textarea id="faqAnswer" class="form-control" rows="4" placeholder="e.g., We offer a 30-day return policy for all products..." style="margin-bottom: 12px; resize: vertical;"></textarea>
+            
+            <button class="btn" onclick="createFAQ()" id="createFaqBtn" style="width: 100%;">
+                <span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">add</span> Add FAQ
+            </button>
+        </div>
+
+        <!-- FAQ List -->
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e1e5e9;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h3 style="margin: 0; font-size: 18px;">
                         <span class="material-icons-round" style="vertical-align: middle; font-size: 20px;">help_center</span> 

@@ -90,6 +90,21 @@ const CATEGORY_ICONS = {
     'faq': 'help_center'
 };
 
+// FAQ category selection (global)
+let selectedFaqCategory = 'company_details';
+window.selectedFaqCategory = selectedFaqCategory; // Make globally accessible
+
+// Make selectFaqCategory globally accessible
+window.selectFaqCategory = function(categoryId) {
+    selectedFaqCategory = categoryId;
+    window.selectedFaqCategory = categoryId; // Update global reference
+    renderCategoryTabs();
+    // Reload FAQs filtered by category
+    if (typeof loadFAQs === 'function') {
+        loadFAQs();
+    }
+};
+
 function renderCategoryTabs() {
     // Render for file upload section
     const tabsContainer = document.getElementById('categoryTabs');
@@ -116,7 +131,34 @@ function renderCategoryTabs() {
             tabsContainer.appendChild(tab);
         });
     }
+    
+    // Render for FAQ section
+    const faqTabsContainer = document.getElementById('faqCategoryTabs');
+    if (faqTabsContainer) {
+        faqTabsContainer.innerHTML = '';
+        Object.entries(categories).forEach(([categoryId, categoryInfo]) => {
+            const tab = document.createElement('div');
+            tab.className = 'category-tab' + (categoryId === selectedFaqCategory ? ' active' : '');
+            tab.onclick = () => selectFaqCategory(categoryId);
+            tab.title = categoryInfo.description;
+            
+            // Icon
+            const iconDiv = document.createElement('span');
+            iconDiv.className = 'material-icons-round category-icon';
+            iconDiv.textContent = CATEGORY_ICONS[categoryId] || 'folder';
+            
+            // Name
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'category-name';
+            nameDiv.textContent = categoryInfo.name;
+            
+            tab.appendChild(iconDiv);
+            tab.appendChild(nameDiv);
+            faqTabsContainer.appendChild(tab);
+        });
+    }
 }
+
 
 function selectCategory(categoryId) {
     selectedCategory = categoryId;
@@ -493,25 +535,29 @@ async function crawlUrl() {
     if (crawlLoading) crawlLoading.style.display = 'none';
 }
 
-function recrawlUrl() {
-    // UI placeholder - functionality to be implemented
-    const urlInput = document.getElementById('urlInput');
-    if (!urlInput || !urlInput.value.trim()) {
-        const errorMessage = 'Please enter a URL first';
-        if (typeof showErrorNotification === 'function') {
-            showErrorNotification(errorMessage, 4000);
-        } else {
-            alert(errorMessage);
+function showRecrawlConfirm() {
+    // Show confirmation popup
+    if (confirm('Are you sure you want to recrawl all websites on the lists?')) {
+        // Future: Implement recrawl functionality
+        // For now, just close the popup
+        if (typeof showSuccessNotification === 'function') {
+            showSuccessNotification('Recrawl feature coming soon!', 3000);
         }
-        return;
-    }
-    const message = 'Recrawl functionality coming soon!';
-    if (typeof showSuccessNotification === 'function') {
-        showSuccessNotification(message, 3000);
-    } else {
-        alert(message);
     }
 }
+
+function showUploadSitemapInfo() {
+    // Show info about upload sitemap feature
+    if (typeof showSuccessNotification === 'function') {
+        showSuccessNotification('Upload Sitemap feature coming soon! This will allow you to crawl multiple URLs from a sitemap file.', 5000);
+    } else {
+        alert('Upload Sitemap feature coming soon! This will allow you to crawl multiple URLs from a sitemap file.');
+    }
+}
+
+// Make functions globally accessible
+window.showRecrawlConfirm = showRecrawlConfirm;
+window.showUploadSitemapInfo = showUploadSitemapInfo;
 
 function showCrawlPreview(data) {
     const modal = document.getElementById('crawlPreviewModal');

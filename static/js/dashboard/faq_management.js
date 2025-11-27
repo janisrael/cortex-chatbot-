@@ -9,6 +9,10 @@ let currentEditingFaqId = null;
 // Initialize FAQ management
 async function initializeFAQManagement() {
     try {
+        // Ensure category tabs are rendered
+        if (typeof renderCategoryTabs === 'function') {
+            renderCategoryTabs();
+        }
         await loadFAQs();
     } catch (error) {
         console.error('Failed to initialize FAQ management:', error);
@@ -70,16 +74,24 @@ function renderFAQList(faqs) {
     const faqList = document.getElementById('faqList');
     if (!faqList) return;
     
-    if (faqs.length === 0) {
-        faqList.innerHTML = '<div style="color: #999; padding: 20px; text-align: center;">No FAQs yet. Create your first FAQ above!</div>';
+    // Filter by selected category if available
+    let filteredFaqs = faqs;
+    const currentCategory = (typeof window.selectedFaqCategory !== 'undefined' && window.selectedFaqCategory) 
+        ? window.selectedFaqCategory 
+        : 'company_details';
+    if (currentCategory) {
+        filteredFaqs = faqs.filter(faq => faq.category === currentCategory);
+    }
+    
+    if (filteredFaqs.length === 0) {
+        faqList.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">No FAQs yet. Create your first FAQ above!</div>';
         return;
     }
     
-    faqList.innerHTML = faqs.map(faq => {
+    faqList.innerHTML = filteredFaqs.map(faq => {
         // Safely extract all values with defaults
         const faqId = faq && faq.id ? String(faq.id) : '0';
         const status = (faq && faq.status) ? String(faq.status) : 'draft';
-        const statusBadge = getStatusBadge(status);
         const category = (faq && faq.category) ? String(faq.category) : 'company_details';
         const categoryLabel = getCategoryLabel(category);
         const isIngested = status === 'active' && faq.ingested_at;
@@ -87,40 +99,72 @@ function renderFAQList(faqs) {
         // Safely get question and answer
         const question = (faq && faq.question) ? String(faq.question) : 'No question';
         const answer = (faq && faq.answer) ? String(faq.answer) : 'No answer';
-        const answerPreview = answer.length > 150 ? answer.substring(0, 150) + '...' : answer;
+        const answerPreview = answer.length > 100 ? answer.substring(0, 100) + '...' : answer;
+        
+        // Status icon and badge
+        let statusIcon = '';
+        let statusBadge = '';
+        let statusBg = '';
+        
+        if (isIngested) {
+            statusIcon = '<span class="material-icons-round" style="font-size: 22px; color: white;">check_circle</span>';
+            statusBadge = '<span class="status-badge status-ingested" style="background: #22c55e; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 8px; font-weight: 500;">Ingest</span>';
+            statusBg = '#22c55e';
+        } else if (status === 'preview' || status === 'draft') {
+            statusIcon = '<span class="material-icons-round" style="font-size: 22px; color: white;">visibility</span>';
+            statusBadge = '<span class="status-badge status-preview" style="background: #f59e0b; color: #000; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 8px; font-weight: 500;">Preview</span>';
+            statusBg = '#f59e0b';
+        } else {
+            statusIcon = '<span class="material-icons-round" style="font-size: 22px; color: white;">error</span>';
+            statusBadge = '<span class="status-badge status-error" style="background: #dc3545; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 8px; font-weight: 500;">Error</span>';
+            statusBg = '#dc3545';
+        }
+        
+        // Format dates
+        const createdDate = faq.created_at ? new Date(faq.created_at).toLocaleDateString() : 'N/A';
+        const wordCount = answer.split(/\s+/).length;
+        const charCount = answer.length;
         
         return `
-            <div class="faq-item" data-faq-id="${faqId}" style="background: #2a2a2a; border: 1px solid #333; border-radius: 8px; padding: 16px; margin-bottom: 12px;">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
-                    <div style="flex: 1;">
-                        <div style="font-weight: 600; color: #fff; margin-bottom: 8px; font-size: 16px;">
-                            <span class="material-icons-round" style="vertical-align: middle; font-size: 18px; margin-right: 6px; color: #0891b2;">help_outline</span>
-                            ${escapeHtml(question)}
-                        </div>
-                        <div style="color: #ccc; font-size: 14px; line-height: 1.5; margin-bottom: 8px;">
-                            ${escapeHtml(answerPreview)}
-                        </div>
-                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                            <span style="background: #444; color: #ccc; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${categoryLabel}</span>
-                            ${statusBadge}
-                        </div>
+            <div class="faq-item" id="faq-${faqId}" data-faq-id="${faqId}" style="display: flex; justify-content: space-between; align-items: flex-start; padding: 12px; border-bottom: 1px solid #e1e5e9; background: white; border-radius: 8px; margin-bottom: 8px; gap: 12px; position: relative;">
+                <!-- Status Icon with Circle Background (Top Left) -->
+                <div class="faq-status-icon" style="width: 40px; height: 40px; border-radius: 50%; background: ${statusBg}; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">
+                    ${statusIcon}
+                </div>
+                
+                <div class="faq-info" style="flex: 1; min-width: 0;">
+                    <div class="faq-question" style="font-weight: 600; margin-bottom: 6px; color: #1e293b; font-size: 14px; line-height: 1.4;">
+                        ${escapeHtml(question)}
+                    </div>
+                    <div class="faq-answer-preview" style="font-size: 12px; color: #64748b; margin-bottom: 6px; line-height: 1.4;">
+                        ${escapeHtml(answerPreview)}
+                    </div>
+                    <div class="faq-size" style="font-size: 12px; color: #64748b; display: flex; flex-wrap: wrap; align-items: center; gap: 4px; flex-direction: inherit;">
+                        ${statusBadge}
+                        <span>${wordCount} words</span>
+                        <span>•</span>
+                        <span>${charCount} chars</span>
+                        <span>•</span>
+                        <span>${categoryLabel}</span>
+                        <span>•</span>
+                        <span>${createdDate}</span>
                     </div>
                 </div>
-                <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; padding-top: 12px; border-top: 1px solid #333;">
-                    <button class="btn btn-secondary" onclick="editFAQ(${faqId})" style="padding: 6px 12px; font-size: 12px;">
-                        <span class="material-icons-round" style="vertical-align: middle; font-size: 16px;">edit</span> Edit
+                <div class="faq-actions" style="display: flex; gap: 8px; flex-shrink: 0;">
+                    <button class="btn btn-secondary edit-faq-btn" data-faq-id="${faqId}" onclick="editFAQ(${faqId})" style="padding: 6px 12px; font-size: 12px; white-space: nowrap;" title="Edit FAQ">
+                        <span class="material-icons-round" style="font-size: 16px; vertical-align: middle;">edit</span> <span class="btn-text">Edit</span>
                     </button>
                     ${!isIngested ? `
-                        <button class="btn" onclick="ingestFAQ(${faqId})" style="padding: 6px 12px; font-size: 12px; background: #0891b2; color: white;">
-                            <span class="material-icons-round" style="vertical-align: middle; font-size: 16px;">cloud_upload</span> Ingest
+                        <button class="btn ingest-faq-btn" data-faq-id="${faqId}" onclick="ingestFAQ(${faqId})" style="padding: 6px 12px; font-size: 12px; background: #0891b2; color: white; white-space: nowrap;" title="Ingest FAQ to knowledge base">
+                            <span class="material-icons-round" style="font-size: 16px; vertical-align: middle;">cloud_upload</span> <span class="btn-text">Ingest</span>
                         </button>
                     ` : `
-                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; opacity: 0.6; cursor: not-allowed;" disabled>
-                            <span class="material-icons-round" style="vertical-align: middle; font-size: 16px;">check_circle</span> Ingested
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; opacity: 0.6; cursor: not-allowed; white-space: nowrap;" disabled title="Already ingested">
+                            <span class="material-icons-round" style="font-size: 16px; vertical-align: middle;">check_circle</span> <span class="btn-text">Ingested</span>
                         </button>
                     `}
-                    <button class="btn btn-danger" onclick="deleteFAQ(${faqId})" style="padding: 6px 12px; font-size: 12px;">
-                        <span class="material-icons-round" style="vertical-align: middle; font-size: 16px;">delete</span> Delete
+                    <button class="btn btn-danger delete-faq-btn" data-faq-id="${faqId}" onclick="deleteFAQ(${faqId})" style="padding: 6px 12px; font-size: 12px; background: #dc3545; color: white; white-space: nowrap;" title="Delete FAQ">
+                        <span class="material-icons-round" style="font-size: 16px; vertical-align: middle;">delete</span> <span class="btn-text">Delete</span>
                     </button>
                 </div>
             </div>
@@ -154,24 +198,37 @@ function getCategoryLabel(category) {
 async function createFAQ() {
     const questionInput = document.getElementById('faqQuestion');
     const answerInput = document.getElementById('faqAnswer');
-    const categorySelect = document.getElementById('faqCategory');
     const successAlert = document.getElementById('faqSuccess');
     const errorAlert = document.getElementById('faqError');
     const createBtn = document.getElementById('createFaqBtn');
     
-    if (!questionInput || !answerInput || !categorySelect) return;
+    if (!questionInput || !answerInput) {
+        showFAQError('Form fields not found. Please refresh the page.');
+        return;
+    }
     
     const question = questionInput.value.trim();
     const answer = answerInput.value.trim();
-    const category = categorySelect.value;
+    // Use selected category from tabs (fallback to company_details)
+    const category = (typeof window.selectedFaqCategory !== 'undefined' && window.selectedFaqCategory) 
+        ? window.selectedFaqCategory 
+        : 'company_details';
     
     // Validation
     if (!question) {
-        showFAQError('Please enter a question');
+        const errorMessage = 'Please enter a question';
+        showFAQError(errorMessage);
+        if (typeof showErrorNotification === 'function') {
+            showErrorNotification(errorMessage, 4000);
+        }
         return;
     }
     if (!answer) {
-        showFAQError('Please enter an answer');
+        const errorMessage = 'Please enter an answer';
+        showFAQError(errorMessage);
+        if (typeof showErrorNotification === 'function') {
+            showErrorNotification(errorMessage, 4000);
+        }
         return;
     }
     
@@ -206,16 +263,25 @@ async function createFAQ() {
             // Clear form
             questionInput.value = '';
             answerInput.value = '';
-            categorySelect.value = 'company_details';
             
             // Show success
+            const message = data.message || 'FAQ created successfully!';
             if (successAlert) {
-                successAlert.textContent = data.message || 'FAQ created successfully!';
+                successAlert.textContent = message;
                 successAlert.style.display = 'block';
+            }
+            // Show toast notification
+            if (typeof showSuccessNotification === 'function') {
+                showSuccessNotification(message, 5000);
             }
             
             // Reload FAQs
             await loadFAQs();
+            
+            // Refresh knowledge stats
+            if (typeof loadKnowledgeStats === 'function') {
+                await loadKnowledgeStats();
+            }
             
             // Scroll to FAQ list
             const faqList = document.getElementById('faqList');
@@ -226,7 +292,12 @@ async function createFAQ() {
             throw new Error(data.error || 'Failed to create FAQ');
         }
     } catch (error) {
-        showFAQError('Error: ' + error.message);
+        const errorMessage = 'Error: ' + error.message;
+        showFAQError(errorMessage);
+        // Show toast notification
+        if (typeof showErrorNotification === 'function') {
+            showErrorNotification(errorMessage, 6000);
+        }
     } finally {
         // Re-enable button
         if (createBtn) {
@@ -284,7 +355,12 @@ async function editFAQ(faqId) {
             throw new Error(data.error || 'Failed to load FAQ');
         }
     } catch (error) {
-        showFAQError('Error loading FAQ: ' + error.message);
+        const errorMessage = 'Error loading FAQ: ' + error.message;
+        showFAQError(errorMessage);
+        // Show toast notification
+        if (typeof showErrorNotification === 'function') {
+            showErrorNotification(errorMessage, 5000);
+        }
     }
 }
 
@@ -304,11 +380,19 @@ async function saveFAQEdit() {
     
     // Validation
     if (!question) {
-        showFAQError('Please enter a question');
+        const errorMessage = 'Please enter a question';
+        showFAQError(errorMessage);
+        if (typeof showErrorNotification === 'function') {
+            showErrorNotification(errorMessage, 4000);
+        }
         return;
     }
     if (!answer) {
-        showFAQError('Please enter an answer');
+        const errorMessage = 'Please enter an answer';
+        showFAQError(errorMessage);
+        if (typeof showErrorNotification === 'function') {
+            showErrorNotification(errorMessage, 4000);
+        }
         return;
     }
     
@@ -334,13 +418,18 @@ async function saveFAQEdit() {
             closeFAQEditModal();
             
             // Show success
+            const message = data.message || 'FAQ updated successfully!';
             const successAlert = document.getElementById('faqSuccess');
             if (successAlert) {
-                successAlert.textContent = data.message || 'FAQ updated successfully!';
+                successAlert.textContent = message;
                 successAlert.style.display = 'block';
                 setTimeout(() => {
                     successAlert.style.display = 'none';
                 }, 3000);
+            }
+            // Show toast notification
+            if (typeof showSuccessNotification === 'function') {
+                showSuccessNotification(message, 5000);
             }
             
             // Reload FAQs
@@ -349,7 +438,12 @@ async function saveFAQEdit() {
             throw new Error(data.error || 'Failed to update FAQ');
         }
     } catch (error) {
-        showFAQError('Error: ' + error.message);
+        const errorMessage = 'Error: ' + error.message;
+        showFAQError(errorMessage);
+        // Show toast notification
+        if (typeof showErrorNotification === 'function') {
+            showErrorNotification(errorMessage, 6000);
+        }
     }
 }
 
@@ -387,26 +481,36 @@ async function ingestFAQ(faqId) {
         
         if (response.ok) {
             // Show success
+            const message = data.message || 'FAQ ingested successfully!';
             if (successAlert) {
-                successAlert.textContent = data.message || 'FAQ ingested successfully!';
+                successAlert.textContent = message;
                 successAlert.style.display = 'block';
                 setTimeout(() => {
                     successAlert.style.display = 'none';
                 }, 3000);
+            }
+            // Show toast notification
+            if (typeof showSuccessNotification === 'function') {
+                showSuccessNotification(message, 5000);
             }
             
             // Reload FAQs
             await loadFAQs();
             
             // Refresh knowledge stats if function exists
-            if (typeof refreshKnowledgeStats === 'function') {
-                await refreshKnowledgeStats();
+            if (typeof loadKnowledgeStats === 'function') {
+                await loadKnowledgeStats();
             }
         } else {
             throw new Error(data.error || 'Failed to ingest FAQ');
         }
     } catch (error) {
-        showFAQError('Error: ' + error.message);
+        const errorMessage = 'Error: ' + error.message;
+        showFAQError(errorMessage);
+        // Show toast notification
+        if (typeof showErrorNotification === 'function') {
+            showErrorNotification(errorMessage, 6000);
+        }
     }
 }
 
@@ -436,26 +540,36 @@ async function deleteFAQ(faqId) {
         
         if (response.ok) {
             // Show success
+            const message = data.message || 'FAQ deleted successfully!';
             if (successAlert) {
-                successAlert.textContent = data.message || 'FAQ deleted successfully!';
+                successAlert.textContent = message;
                 successAlert.style.display = 'block';
                 setTimeout(() => {
                     successAlert.style.display = 'none';
                 }, 3000);
+            }
+            // Show toast notification
+            if (typeof showSuccessNotification === 'function') {
+                showSuccessNotification(message, 5000);
             }
             
             // Reload FAQs
             await loadFAQs();
             
             // Refresh knowledge stats if function exists
-            if (typeof refreshKnowledgeStats === 'function') {
-                await refreshKnowledgeStats();
+            if (typeof loadKnowledgeStats === 'function') {
+                await loadKnowledgeStats();
             }
         } else {
             throw new Error(data.error || 'Failed to delete FAQ');
         }
     } catch (error) {
-        showFAQError('Error: ' + error.message);
+        const errorMessage = 'Error: ' + error.message;
+        showFAQError(errorMessage);
+        // Show toast notification
+        if (typeof showErrorNotification === 'function') {
+            showErrorNotification(errorMessage, 6000);
+        }
     }
 }
 

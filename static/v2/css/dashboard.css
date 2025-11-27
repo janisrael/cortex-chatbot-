@@ -1326,7 +1326,7 @@
             margin-bottom: 15px;
         }
 
-        .file-list, .crawled-urls-list {
+        .file-list, .crawled-urls-list, .faq-list {
             max-height: 400px;
             overflow-y: auto;
             border: 1px solid #e1e5e9;
@@ -1352,7 +1352,7 @@
             background: #64748b;
         }
 
-        .file-item, .crawled-url-item {
+        .file-item, .crawled-url-item, .faq-item {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
@@ -1412,15 +1412,15 @@
             white-space: nowrap;
         }
 
-        /* Mobile Responsive Styles for File Items */
+        /* Mobile Responsive Styles for File Items, Crawled URLs, and FAQs */
         @media (max-width: 768px) {
-            .file-item {
+            .file-item, .crawled-url-item, .faq-item {
                 flex-direction: column;
                 align-items: stretch;
                 padding: 12px;
             }
 
-            .file-status-icon {
+            .file-status-icon, .url-status-icon, .faq-status-icon {
                 position: absolute;
                 top: 12px;
                 left: 12px;
@@ -1428,60 +1428,76 @@
                 height: 32px;
             }
 
-            .file-status-icon .material-icons-round {
+            .file-status-icon .material-icons-round,
+            .url-status-icon .material-icons-round,
+            .faq-status-icon .material-icons-round {
                 font-size: 18px !important;
             }
 
-            .file-info {
+            .file-info, .url-info, .faq-info {
                 padding-left: 48px; /* Make room for status icon */
                 margin-bottom: 12px;
             }
 
-            .file-name {
+            .file-name, .url-name, .faq-question {
                 font-size: 13px;
                 margin-bottom: 8px;
             }
 
-            .file-size {
+            .file-size, .url-size, .faq-size {
                 font-size: 11px;
                 flex-direction: inherit;
                 align-items: center;
                 gap: 4px;
             }
 
-            .file-size span:not(.status-badge):not(:last-child)::after {
+            .file-size span:not(.status-badge):not(:last-child)::after,
+            .url-size span:not(.status-badge):not(:last-child)::after,
+            .faq-size span:not(.status-badge):not(:last-child)::after {
                 content: '';
             }
 
-            .file-actions {
+            .file-actions, .url-actions, .faq-actions {
                 width: 100%;
                 flex-wrap: wrap;
                 gap: 6px;
             }
 
-            .file-actions .btn {
+            .file-actions .btn,
+            .url-actions .btn,
+            .faq-actions .btn {
                 flex: 1;
                 min-width: calc(50% - 3px);
                 padding: 8px 10px;
                 font-size: 11px;
             }
 
-            .file-actions .btn .btn-text {
+            .file-actions .btn .btn-text,
+            .url-actions .btn .btn-text,
+            .faq-actions .btn .btn-text {
                 display: inline;
             }
 
-            .file-actions .btn .material-icons-round {
+            .file-actions .btn .material-icons-round,
+            .url-actions .btn .material-icons-round,
+            .faq-actions .btn .material-icons-round {
                 font-size: 14px !important;
+            }
+
+            .crawl-options-grid {
+                grid-template-columns: repeat(1, 1fr) !important;
             }
         }
 
         @media (max-width: 480px) {
-            .file-actions .btn {
+            .file-actions .btn,
+            .url-actions .btn,
+            .faq-actions .btn {
                 min-width: 100%;
                 flex: 1 1 100%;
             }
 
-            .file-size {
+            .file-size, .url-size, .faq-size {
                 font-size: 10px;
             }
         }
