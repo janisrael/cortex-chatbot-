@@ -16,6 +16,92 @@ def get_smtp_config():
     }
 
 
+def send_otp_email(email, otp_code, purpose='registration'):
+    """
+    Send OTP verification email
+    
+    Args:
+        email: Recipient email address
+        otp_code: 6-digit OTP code
+        purpose: Purpose of OTP (registration, forgot_password, etc.)
+    
+    Returns:
+        tuple: (success: bool, error_message: str or None)
+    """
+    try:
+        smtp_config = get_smtp_config()
+        
+        # Validate SMTP configuration
+        if not smtp_config['user'] or not smtp_config['password']:
+            error_msg = "SMTP credentials not configured"
+            print(f"⚠️ {error_msg}")
+            return False, error_msg
+        
+        # Create email message
+        msg = MIMEMultipart()
+        msg['From'] = smtp_config['user']
+        msg['To'] = email
+        msg['Subject'] = "Cortex AI - Email Verification Code"
+        
+        # Format email body
+        purpose_text = {
+            'registration': 'complete your registration',
+            'email_verification': 'verify your email address',
+            'forgot_password': 'reset your password',
+            'email_change': 'verify your new email address',
+            'two_factor_auth': 'complete two-factor authentication'
+        }.get(purpose, 'verify your account')
+        
+        body = f"""
+Hello,
+
+Your verification code for Cortex AI is:
+
+    {otp_code}
+
+This code will expire in 15 minutes.
+
+Please use this code to {purpose_text}.
+
+If you didn't request this code, please ignore this email.
+
+---
+Cortex AI Team
+        """
+        
+        msg.attach(MIMEText(body, 'plain'))
+        
+        # Send email
+        print(f"📧 Sending OTP email to {email}...")
+        server = smtplib.SMTP(smtp_config['server'], smtp_config['port'])
+        server.starttls()
+        server.login(smtp_config['user'], smtp_config['password'])
+        server.sendmail(smtp_config['user'], email, msg.as_string())
+        server.quit()
+        
+        print(f"✅ OTP email sent successfully to {email}")
+        return True, None
+        
+    except smtplib.SMTPAuthenticationError as e:
+        error_msg = f"SMTP Authentication Error: {e}"
+        print(f"❌ {error_msg}")
+        import traceback
+        traceback.print_exc()
+        return False, error_msg
+    except smtplib.SMTPException as e:
+        error_msg = f"SMTP Error: {e}"
+        print(f"❌ {error_msg}")
+        import traceback
+        traceback.print_exc()
+        return False, error_msg
+    except Exception as e:
+        error_msg = f"Error sending OTP email: {e}"
+        print(f"❌ {error_msg}")
+        import traceback
+        traceback.print_exc()
+        return False, error_msg
+
+
 def send_feedback_email(feedback_type, subject, message, username, user_email):
     """
     Send feedback email to the configured recipient

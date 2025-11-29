@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Email - Cortex AI</title>
+    <link rel="stylesheet" href="/static/css/auth.css?v=2.0.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Icons+Round&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/v2/css/dashboard.css?v=12">
+    <script src="/static/v2/js/notification-system.js?v=2"></script>
+</head>
+<body>
+    <div class="auth-wrapper">
+        <!-- Left Column: Form -->
+        <div class="auth-form-column">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="logo-container">
+                        <!-- <img src="/static/img/logo_white.png" alt="Cortex AI Logo" class="logo-img"> -->
+                    </div>
+                    <h1>Verify Your Email</h1>
+                    <p class="subtitle">Enter the verification code sent to your email</p>
+                </div>
+
+                <form id="verifyOtpForm" class="login-form" method="POST" action="/verify-otp">
+                    <input type="hidden" name="email" value="{{ email }}">
+                    <input type="hidden" name="purpose" value="registration">
+
+                    <div class="form-group">
+                        <label for="email_display">
+                            <span class="material-symbols-outlined">email</span>
+                            Email Address
+                        </label>
+                        <input 
+                            type="email" 
+                            id="email_display" 
+                            name="email_display"
+                            value="{{ email }}"
+                            readonly
+                            style="background: #f1f5f9; cursor: not-allowed;"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="otp_code">
+                            <span class="material-symbols-outlined">lock</span>
+                            Verification Code
+                        </label>
+                        <input 
+                            type="text" 
+                            id="otp_code" 
+                            name="otp_code" 
+                            required 
+                            autocomplete="off"
+                            placeholder="Enter 6-digit code"
+                            maxlength="6"
+                            pattern="[0-9]{6}"
+                            autofocus
+                            style="text-align: center; font-size: 24px; letter-spacing: 8px; font-weight: 600;"
+                        >
+                        <small style="color: #64748b; margin-top: 8px; display: block;">
+                            Check your email for the 6-digit verification code
+                        </small>
+                    </div>
+
+                    <button type="submit" class="btn-primary" style="width: 100%; margin-top: 20px;">
+                        <span class="material-icons-round" style="font-size: 18px; vertical-align: middle;">verified</span>
+                        Verify Email
+                    </button>
+                </form>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <p style="color: #64748b; font-size: 14px; margin-bottom: 10px;">
+                        Didn't receive the code?
+                    </p>
+                    <button type="button" id="resendOtpBtn" class="btn-secondary" style="width: 100%;">
+                        <span class="material-icons-round" style="font-size: 18px; vertical-align: middle;">refresh</span>
+                        Resend Code
+                    </button>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="/register" style="color: #0891b2; text-decoration: none; font-size: 14px;">
+                        <span class="material-icons-round" style="font-size: 16px; vertical-align: middle;">arrow_back</span>
+                        Back to Registration
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Marketing -->
+        <div class="auth-marketing-column">
+            <div class="marketing-content">
+                <h2>Welcome to Cortex AI</h2>
+                <p>Your intelligent chatbot assistant is ready to help you engage with customers and automate support.</p>
+                <div class="features-list">
+                    <div class="feature-item">
+                        <span class="material-icons-round">verified</span>
+                        <span>Email Verification</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="material-icons-round">security</span>
+                        <span>Secure & Protected</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="material-icons-round">speed</span>
+                        <span>Quick Setup</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Handle form submission
+        document.getElementById('verifyOtpForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const email = formData.get('email');
+            const otpCode = formData.get('otp_code');
+            
+            if (!otpCode || otpCode.length !== 6) {
+                if (typeof showErrorNotification === 'function') {
+                    showErrorNotification('Please enter a valid 6-digit code', 4000);
+                } else {
+                    alert('Please enter a valid 6-digit code');
+                }
+                return;
+            }
+            
+            try {
+                const response = await fetch('/verify-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        otp_code: otpCode,
+                        purpose: 'registration'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    if (typeof showSuccessNotification === 'function') {
+                        showSuccessNotification(data.message || 'Email verified successfully!', 3000);
+                    }
+                    setTimeout(() => {
+                        window.location.href = data.redirect || '/dashboard';
+                    }, 1000);
+                } else {
+                    if (typeof showErrorNotification === 'function') {
+                        showErrorNotification(data.message || 'Verification failed', 5000);
+                    } else {
+                        alert(data.message || 'Verification failed');
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                if (typeof showErrorNotification === 'function') {
+                    showErrorNotification('An error occurred. Please try again.', 5000);
+                } else {
+                    alert('An error occurred. Please try again.');
+                }
+            }
+        });
+        
+        // Handle resend OTP
+        document.getElementById('resendOtpBtn').addEventListener('click', async function() {
+            const email = document.querySelector('input[name="email"]').value;
+            const btn = this;
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-icons-round" style="font-size: 18px; vertical-align: middle;">hourglass_empty</span> Sending...';
+            
+            try {
+                const response = await fetch('/resend-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        purpose: 'registration'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    if (typeof showSuccessNotification === 'function') {
+                        showSuccessNotification(data.message || 'Verification code resent', 3000);
+                    } else {
+                        alert(data.message || 'Verification code resent');
+                    }
+                } else {
+                    if (typeof showErrorNotification === 'function') {
+                        showErrorNotification(data.message || 'Failed to resend code', 5000);
+                    } else {
+                        alert(data.message || 'Failed to resend code');
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                if (typeof showErrorNotification === 'function') {
+                    showErrorNotification('An error occurred. Please try again.', 5000);
+                } else {
+                    alert('An error occurred. Please try again.');
+                }
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span class="material-icons-round" style="font-size: 18px; vertical-align: middle;">refresh</span> Resend Code';
+            }
+        });
+        
+        // Auto-focus and format OTP input
+        const otpInput = document.getElementById('otp_code');
+        otpInput.addEventListener('input', function(e) {
+            // Only allow numbers
+            this.value = this.value.replace(/[^0-9]/g, '');
+            // Limit to 6 digits
+            if (this.value.length > 6) {
+                this.value = this.value.slice(0, 6);
+            }
+        });
+    </script>
+</body>
+</html>
+

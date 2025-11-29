@@ -3,7 +3,7 @@ let appearanceConfig = {
     description: 'Your friendly assistant',
     primary_color: {
         type: 'solid',
-        value: '#1093B2',
+        value: '#525252',
         contrast_text: '#ffffff'
     },
     avatar: {
@@ -88,7 +88,7 @@ async function loadAppearanceConfig() {
                 console.warn('⚠️ Primary color is unexpected type:', typeof config.primary_color);
                 appearanceConfig.primary_color = {
                     type: 'solid',
-                    value: '#0891b2',
+                    value: '#525252',
                     contrast_text: '#ffffff'
                 };
             }
@@ -97,7 +97,7 @@ async function loadAppearanceConfig() {
             // Default primary color
             appearanceConfig.primary_color = {
                 type: 'solid',
-                value: '#1093B2',
+                value: '#525252',
                 contrast_text: '#ffffff'
             };
         }
@@ -185,7 +185,7 @@ function setupColorPicker() {
                 // If no gradient colors exist, initialize with defaults
                 if (gradientColors.length === 0) {
                     console.log('🔄 Initializing gradient colors');
-                    addGradientColor('#1093B2', 0);
+                    addGradientColor('#525252', 0);
                     addGradientColor('#157A73', 100);
                 }
                 
@@ -240,7 +240,7 @@ function setupGradientBuilder() {
     
     if (addColorBtn) {
         addColorBtn.addEventListener('click', () => {
-            addGradientColor('#1093B2');
+            addGradientColor('#525252');
         });
     }
     
@@ -253,7 +253,7 @@ function setupGradientBuilder() {
 }
 
 // Add gradient color stop
-function addGradientColor(color = '#1093B2', position = null) {
+function addGradientColor(color = '#525252', position = null) {
     const gradientColorsDiv = document.getElementById('gradientColors');
     if (!gradientColorsDiv) return;
     
