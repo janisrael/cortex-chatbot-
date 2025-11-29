@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Cortex AI</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/static/favicon-192x192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="/static/favicon-512x512.png">
     <link rel="stylesheet" href="/static/css/auth.css?v=2.0.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,7 +16,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Icons+Round&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/v2/css/dashboard.css?v=12">
 </head>
-<body>
+<body style="overflow: visible !important;">
     <div class="auth-wrapper">
         <!-- Left Column: Form -->
         <div class="auth-form-column">
@@ -108,6 +112,63 @@
                     </span>
                 </button>
             </form>
+
+            <!-- OTP Verification Form (Hidden Initially) -->
+            <div id="otpVerificationSection" style="display: none; margin-top: 30px;">
+                <div style="background: #f8fafc; border: 2px solid #e1e5e9; border-radius: 12px; padding: 24px; margin-bottom: 20px;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <span class="material-icons-round" style="font-size: 48px; color: #0891b2; display: block; margin-bottom: 10px;">mark_email_read</span>
+                        <h2 style="font-size: 20px; font-weight: 600; color: #1e293b; margin: 0 0 8px 0;">Verify Your Email</h2>
+                        <p style="color: #64748b; font-size: 14px; margin: 0;">
+                            We've sent a 6-digit verification code to<br>
+                            <strong id="otpEmailDisplay" style="color: #1e293b;"></strong>
+                        </p>
+                    </div>
+
+                    <form id="otpVerificationForm" class="login-form" style="margin-top: 0;">
+                        <div class="form-group">
+                            <label for="otp_code">
+                                <span class="material-symbols-outlined">lock</span>
+                                Verification Code
+                            </label>
+                            <input 
+                                type="text" 
+                                id="otp_code" 
+                                name="otp_code" 
+                                required 
+                                autocomplete="off"
+                                placeholder=""
+                                maxlength="6"
+                                pattern="[0-9]{6}"
+                                style="text-align: center; font-size: 24px; letter-spacing: 8px; font-weight: 600;"
+                            >
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+                                <small style="color: #64748b; font-size: 12px;">
+                                    Code expires in: <span id="otpCountdown" style="color: #0891b2; font-weight: 600;">15:00</span>
+                                </small>
+                                <button type="button" id="resendOtpBtn" class="btn-secondary" style="padding: 4px 12px; font-size: 12px; background: transparent; border: 1px solid #e1e5e9; color: #64748b;">
+                                    <span class="material-icons-round" style="font-size: 16px; vertical-align: middle;">refresh</span>
+                                    Resend
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-login" id="verifyOtpBtn" style="width: 100%; margin-top: 20px;">
+                            <span class="btn-text">Verify & Complete Registration</span>
+                            <span class="btn-loader" style="display: none;">
+                                <span class="spinner"></span>
+                            </span>
+                        </button>
+                    </form>
+
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button type="button" id="backToRegisterBtn" class="btn-secondary" style="background: transparent; border: 1px solid #e1e5e9; color: #64748b; padding: 8px 16px;">
+                            <span class="material-icons-round" style="font-size: 16px; vertical-align: middle;">arrow_back</span>
+                            Back to Registration
+                        </button>
+                    </div>
+                </div>
+            </div>
 
                 <div class="login-footer">
                     <p>Already have an account? <a href="/login">Sign in</a></p>
@@ -239,14 +300,31 @@
 
                 const data = await response.json();
 
-                if (response.ok && data.status === 'success') {
-                    // Show success notification
+                if (response.ok && data.status === 'otp_sent') {
+                    // OTP sent - show OTP verification form on same page
                     if (typeof showSuccessNotification === 'function') {
-                        showSuccessNotification('Account created successfully! Redirecting to login...', 3000);
+                        showSuccessNotification(data.message || 'Verification code sent to your email', 4000);
                     }
-                    // Redirect to login after a short delay
+                    
+                    // Hide registration form and show OTP form
+                    document.getElementById('registerForm').style.display = 'none';
+                    document.getElementById('otpVerificationSection').style.display = 'block';
+                    document.getElementById('otpEmailDisplay').textContent = data.email || document.getElementById('email').value;
+                    
+                    // Focus on OTP input
+                    document.getElementById('otp_code').focus();
+                    
+                    // Start countdown timer (15 minutes = 900 seconds)
+                    startOtpCountdown(15 * 60);
+                    
+                } else if (response.ok && data.status === 'success') {
+                    // Registration successful after OTP verification
+                    if (typeof showSuccessNotification === 'function') {
+                        showSuccessNotification(data.message || 'Registration successful! Welcome to Cortex AI.', 3000);
+                    }
+                    // Redirect to dashboard after a short delay
                     setTimeout(() => {
-                        window.location.href = '/login?registered=1';
+                        window.location.href = data.redirect || '/dashboard';
                     }, 1500);
                 } else {
                     // Show error notification
@@ -273,6 +351,201 @@
             }
         });
 
+        // OTP Countdown Timer
+        let otpCountdownInterval = null;
+        function startOtpCountdown(seconds) {
+            const countdownEl = document.getElementById('otpCountdown');
+            if (!countdownEl) return;
+            
+            let remaining = seconds;
+            
+            function updateCountdown() {
+                const minutes = Math.floor(remaining / 60);
+                const secs = remaining % 60;
+                countdownEl.textContent = `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                
+                if (remaining <= 0) {
+                    clearInterval(otpCountdownInterval);
+                    countdownEl.textContent = 'Expired';
+                    countdownEl.style.color = '#dc2626';
+                    if (typeof showErrorNotification === 'function') {
+                        showErrorNotification('OTP expired. Please request a new code.', 5000);
+                    }
+                } else {
+                    remaining--;
+                }
+            }
+            
+            // Clear any existing interval
+            if (otpCountdownInterval) {
+                clearInterval(otpCountdownInterval);
+            }
+            
+            updateCountdown(); // Initial call
+            otpCountdownInterval = setInterval(updateCountdown, 1000);
+        }
+
+        // OTP Verification Form Handler
+        const otpVerificationForm = document.getElementById('otpVerificationForm');
+        if (otpVerificationForm) {
+            otpVerificationForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const otpCode = document.getElementById('otp_code').value.trim();
+                const email = document.getElementById('otpEmailDisplay').textContent || document.getElementById('email').value;
+                
+                if (!otpCode || otpCode.length !== 6) {
+                    if (typeof showErrorNotification === 'function') {
+                        showErrorNotification('Please enter a valid 6-digit code', 4000);
+                    } else {
+                        alert('Please enter a valid 6-digit code');
+                    }
+                    return;
+                }
+                
+                const verifyBtn = document.getElementById('verifyOtpBtn');
+                const btnText = verifyBtn.querySelector('.btn-text');
+                const btnLoader = verifyBtn.querySelector('.btn-loader');
+                
+                verifyBtn.disabled = true;
+                btnText.style.display = 'none';
+                btnLoader.style.display = 'inline-flex';
+                
+                try {
+                    // Get registration data from form (stored in session on backend)
+                    // Send OTP verification to /verify-otp endpoint
+                    const response = await fetch('/verify-otp', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({
+                            otp_code: otpCode,
+                            email: email,
+                            purpose: 'registration'
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok && data.status === 'success') {
+                        // Registration successful
+                        if (typeof showSuccessNotification === 'function') {
+                            showSuccessNotification(data.message || 'Registration successful!', 3000);
+                        }
+                        setTimeout(() => {
+                            window.location.href = '/login';
+                        }, 1500);
+                    } else {
+                        // Verification failed
+                        if (typeof showErrorNotification === 'function') {
+                            showErrorNotification(data.message || 'Invalid verification code. Please try again.', 5000);
+                        } else {
+                            alert(data.message || 'Invalid verification code. Please try again.');
+                        }
+                        verifyBtn.disabled = false;
+                        btnText.style.display = 'inline';
+                        btnLoader.style.display = 'none';
+                        document.getElementById('otp_code').value = '';
+                        document.getElementById('otp_code').focus();
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    if (typeof showErrorNotification === 'function') {
+                        showErrorNotification('An error occurred. Please try again.', 5000);
+                    } else {
+                        alert('An error occurred. Please try again.');
+                    }
+                    verifyBtn.disabled = false;
+                    btnText.style.display = 'inline';
+                    btnLoader.style.display = 'none';
+                }
+            });
+        }
+
+        // OTP Input Formatting
+        const otpInput = document.getElementById('otp_code');
+        if (otpInput) {
+            otpInput.addEventListener('input', function(e) {
+                // Only allow numbers
+                this.value = this.value.replace(/[^0-9]/g, '');
+                // Limit to 6 digits
+                if (this.value.length > 6) {
+                    this.value = this.value.slice(0, 6);
+                }
+            });
+        }
+
+        // Resend OTP Button
+        const resendOtpBtn = document.getElementById('resendOtpBtn');
+        if (resendOtpBtn) {
+            resendOtpBtn.addEventListener('click', async function() {
+                const email = document.getElementById('otpEmailDisplay').textContent || document.getElementById('email').value;
+                
+                if (!email) {
+                    if (typeof showErrorNotification === 'function') {
+                        showErrorNotification('Email not found. Please start over.', 5000);
+                    }
+                    return;
+                }
+                
+                resendOtpBtn.disabled = true;
+                resendOtpBtn.innerHTML = '<span class="material-icons-round" style="font-size: 16px; vertical-align: middle;">hourglass_empty</span> Sending...';
+                
+                try {
+                    const response = await fetch('/resend-otp', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({
+                            email: email,
+                            purpose: 'registration'
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.status === 'success') {
+                        if (typeof showSuccessNotification === 'function') {
+                            showSuccessNotification(data.message || 'Verification code resent', 3000);
+                        }
+                        // Restart countdown
+                        startOtpCountdown(15 * 60);
+                        document.getElementById('otp_code').value = '';
+                        document.getElementById('otp_code').focus();
+                    } else {
+                        if (typeof showErrorNotification === 'function') {
+                            showErrorNotification(data.message || 'Failed to resend code', 5000);
+                        } else {
+                            alert(data.message || 'Failed to resend code');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    if (typeof showErrorNotification === 'function') {
+                        showErrorNotification('An error occurred. Please try again.', 5000);
+                    } else {
+                        alert('An error occurred. Please try again.');
+                    }
+                } finally {
+                    resendOtpBtn.disabled = false;
+                    resendOtpBtn.innerHTML = '<span class="material-icons-round" style="font-size: 16px; vertical-align: middle;">refresh</span> Resend';
+                }
+            });
+        }
+
+        // Back to Registration Button
+        const backToRegisterBtn = document.getElementById('backToRegisterBtn');
+        if (backToRegisterBtn) {
+            backToRegisterBtn.addEventListener('click', function() {
+                // Clear session data by reloading page
+                window.location.href = '/register';
+            });
+        }
+
         // Check for error in URL and show toast notification
         const urlParams = new URLSearchParams(window.location.search);
         const error = urlParams.get('error');
@@ -285,6 +558,15 @@
                 alert(decodeURIComponent(error));
             }
         }
+
+        // Check if OTP form should be shown (from server-side render)
+        {% if show_otp %}
+        document.getElementById('registerForm').style.display = 'none';
+        document.getElementById('otpVerificationSection').style.display = 'block';
+        document.getElementById('otpEmailDisplay').textContent = '{{ email }}';
+        startOtpCountdown(15 * 60);
+        document.getElementById('otp_code').focus();
+        {% endif %}
     </script>
 </body>
 </html>
