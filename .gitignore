@@ -48,3 +48,8 @@ htmlcov/
 # OS
 .DS_Store
 Thumbs.db
+
+# Documentation (keep only essential README files)
+*.md
+!README.md
+!.github/workflows/README.md
