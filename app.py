@@ -49,8 +49,15 @@ from services.llm_service import LLMProvider
 
 # Default system LLM (used for system-level features like AI text cleaning)
 # User-specific LLMs are created dynamically in chatbot_service.py
-llm = LLMProvider.get_default_llm(temperature=0.3, max_tokens=2000)
-print(f"🤖 Using OpenAI model: gpt-4o-mini (unified LLM service)")
+# Initialize lazily - only if API key is available (allows tests to run without key)
+llm = None
+try:
+    llm = LLMProvider.get_default_llm(temperature=0.3, max_tokens=2000)
+    print(f"🤖 Using OpenAI model: gpt-4o-mini (unified LLM service)")
+except ValueError as e:
+    # API key not available - LLM will be created lazily when needed
+    print(f"⚠️ System LLM not initialized at startup: {e}")
+    print("   LLM will be created on-demand when API key is available")
 
 # Make llm available globally (needed by chat blueprint)
 app.config['LLM'] = llm
