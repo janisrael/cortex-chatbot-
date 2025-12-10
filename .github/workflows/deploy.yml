@@ -94,6 +94,8 @@ jobs:
       
       - name: Verify imports
         run: |
+          # Set dummy API key for import tests (actual key not needed for import verification)
+          export OPENAI_API_KEY="test-key-for-import-only" || true
           python -c "import app; print('✅ App imports successfully')"
           python -c "from blueprints import register_blueprints; print('✅ Blueprints import successfully')"
           python -c "from services import chatbot_service; print('✅ Services import successfully')"
