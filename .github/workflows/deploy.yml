@@ -357,16 +357,21 @@ jobs:
           chmod 600 ~/.ssh/hetzner_key
           ssh-keyscan -H ${{ secrets.HETZNER_HOST }} >> ~/.ssh/known_hosts
           
+          # Configure SSH for long-running connections
+          SSH_OPTS="-i ~/.ssh/hetzner_key -o StrictHostKeyChecking=no -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -o ConnectTimeout=30"
+          
           # Upload source code to Hetzner and build there (avoids GitHub Actions disk space issues)
           echo "=== Uploading source code to Hetzner ==="
           tar --exclude='.git' --exclude='venv' --exclude='__pycache__' --exclude='*.pyc' --exclude='.env' --exclude='chroma_db' --exclude='uploads' --exclude='*.db' --exclude='*.sqlite*' --exclude='logs' --exclude='data' -czf /tmp/cortex-source.tar.gz .
-          scp -i ~/.ssh/hetzner_key -o StrictHostKeyChecking=no /tmp/cortex-source.tar.gz root@${{ secrets.HETZNER_HOST }}:/tmp/
+          scp $SSH_OPTS /tmp/cortex-source.tar.gz root@${{ secrets.HETZNER_HOST }}:/tmp/
           rm -f /tmp/cortex-source.tar.gz
           
           # Build Docker image directly on Hetzner server
           echo "=== Building Docker image on Hetzner ==="
-          ssh -i ~/.ssh/hetzner_key -o StrictHostKeyChecking=no root@${{ secrets.HETZNER_HOST }} << 'DEPLOY_SCRIPT'
+          ssh $SSH_OPTS root@${{ secrets.HETZNER_HOST }} << 'DEPLOY_SCRIPT'
             set -e
+            set -o pipefail
+            
             cd /tmp
             rm -rf cortex-build || true
             mkdir -p cortex-build
@@ -374,15 +379,27 @@ jobs:
             tar -xzf /tmp/cortex-source.tar.gz
             rm /tmp/cortex-source.tar.gz
             
-            echo "Building Docker image..."
-            docker build -t cortex:latest .
+            echo "Building Docker image (this may take several minutes)..."
+            docker build -t cortex:latest . || {
+              echo "❌ Docker build failed"
+              exit 1
+            }
             
             echo "Importing image into k3s..."
-            docker save cortex:latest | k3s ctr images import -
+            docker save cortex:latest | k3s ctr images import - || {
+              echo "❌ Image import failed"
+              exit 1
+            }
             
             echo "Restarting deployment..."
-            kubectl rollout restart deployment/cortex-app -n cortex
-            kubectl rollout status deployment/cortex-app -n cortex --timeout=120s
+            kubectl rollout restart deployment/cortex-app -n cortex || {
+              echo "❌ Deployment restart failed"
+              exit 1
+            }
+            
+            kubectl rollout status deployment/cortex-app -n cortex --timeout=120s || {
+              echo "⚠️ Deployment status check timed out, but may still be in progress"
+            }
             
             echo "Cleaning up..."
             cd /
