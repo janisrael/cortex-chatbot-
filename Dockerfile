@@ -12,7 +12,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Copy requirements and install dependencies
 COPY requirements-prod.txt .
-RUN pip install --no-cache-dir --user -r requirements-prod.txt
+# Set PATH in builder stage to avoid warnings
+ENV PATH=/root/.local/bin:$PATH
+RUN pip install --no-cache-dir --user --no-warn-script-location -r requirements-prod.txt
 
 # Stage 2: Runtime
 FROM python:3.11-slim
