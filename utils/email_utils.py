@@ -8,11 +8,25 @@ from datetime import datetime
 
 def get_smtp_config():
     """Get SMTP configuration from environment variables"""
+    # Try SMTP_USERNAME first (preferred), then fallback to SMTP_USER
+    smtp_user = os.getenv('SMTP_USERNAME', '') or os.getenv('SMTP_USER', '')
+    smtp_password = os.getenv('SMTP_PASSWORD', '')
+    
+    # Debug logging (only in development)
+    if os.getenv('FLASK_ENV') == 'development':
+        print(f"🔍 SMTP Config Debug:")
+        print(f"   SMTP_SERVER: {os.getenv('SMTP_SERVER', 'smtp.gmail.com')}")
+        print(f"   SMTP_PORT: {os.getenv('SMTP_PORT', '587')}")
+        print(f"   SMTP_USERNAME: {'Set' if os.getenv('SMTP_USERNAME') else 'Not set'}")
+        print(f"   SMTP_USER: {'Set' if os.getenv('SMTP_USER') else 'Not set'}")
+        print(f"   SMTP_PASSWORD: {'Set' if smtp_password else 'Not set'}")
+        print(f"   Final user: {'Set' if smtp_user else 'Missing'}")
+    
     return {
         'server': os.getenv('SMTP_SERVER', 'smtp.gmail.com'),
         'port': int(os.getenv('SMTP_PORT', '587')),
-        'user': os.getenv('SMTP_USER', ''),
-        'password': os.getenv('SMTP_PASSWORD', '')
+        'user': smtp_user,
+        'password': smtp_password
     }
 
 
@@ -35,6 +49,11 @@ def send_otp_email(email, otp_code, purpose='registration'):
         if not smtp_config['user'] or not smtp_config['password']:
             error_msg = "SMTP credentials not configured"
             print(f"⚠️ {error_msg}")
+            print(f"   SMTP_USERNAME env var: {'Set' if os.getenv('SMTP_USERNAME') else 'Not set'}")
+            print(f"   SMTP_USER env var: {'Set' if os.getenv('SMTP_USER') else 'Not set'}")
+            print(f"   SMTP_PASSWORD env var: {'Set' if os.getenv('SMTP_PASSWORD') else 'Not set'}")
+            print(f"   Final config user: {'Set' if smtp_config['user'] else 'Missing'}")
+            print(f"   Final config password: {'Set' if smtp_config['password'] else 'Missing'}")
             return False, error_msg
         
         # Create email message
