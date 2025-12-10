@@ -19,7 +19,7 @@ from blueprints import register_blueprints
 
 # App setup
 app = Flask(__name__)
-app.secret_key = os.getenv("FLASK_SECRET_KEY", "admin123")
+app.secret_key = os.getenv("FLASK_SECRET_KEY", os.urandom(32).hex())
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 app.config['UPLOAD_FOLDER'] = 'uploads'
 CORS(app)
@@ -107,7 +107,7 @@ if __name__ == "__main__":
     print(f"📊 Vector store location: ./chroma_db")
     print(f"📝 Upload folder: ./uploads")
     print(f"📋 Logs will be saved to: ./logs/")
-    print(f"🔑 Default admin: admin@example.com / admin123")
+    print(f"Default admin created: admin@example.com (password set during initialization)")
     
     # Initialize database tables and run migrations
     print("📦 Initializing database...")

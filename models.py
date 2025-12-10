@@ -334,7 +334,10 @@ class User(UserMixin):
                 admin_count = cursor.fetchone()[0]
             
             if admin_count == 0:
-                admin_password = generate_password_hash('admin123')
+                # Generate a random default password for security
+                import secrets
+                default_password = secrets.token_urlsafe(16)
+                admin_password = generate_password_hash(default_password)
                 created_at = datetime.now()
                 
                 if is_sqlite:
@@ -357,7 +360,8 @@ class User(UserMixin):
                 if user_id:
                     User._create_user_directories(user_id)
                 
-                print("✅ Created default admin user: admin@example.com / admin123")
+                print(f"Created default admin user: admin@example.com / {default_password}")
+                print("IMPORTANT: Change the default admin password immediately after first login!")
             
             if not is_sqlite:
                 cursor.close()

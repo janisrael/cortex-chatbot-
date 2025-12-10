@@ -4,7 +4,7 @@ import os
 
 class Config:
     """Base configuration"""
-    SECRET_KEY = os.getenv("FLASK_SECRET_KEY", "admin123")
+    SECRET_KEY = os.getenv("FLASK_SECRET_KEY", os.urandom(32).hex())
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size
     UPLOAD_FOLDER = 'uploads'
     
