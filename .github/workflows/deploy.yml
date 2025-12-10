@@ -3,8 +3,9 @@ name: Deploy to AWS
 on:
   push:
     branches:
-      - v2
-      - v2-appearance  # Also deploy to production
+      - main  # Main branch for production deployment (Hetzner)
+      - v2  # Legacy branch (kept for compatibility)
+      - v2-appearance  # Staging branch (AWS - kept for now)
   workflow_dispatch:
 
 env:
@@ -112,7 +113,7 @@ jobs:
     name: Deploy to Production
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/v2' || github.ref == 'refs/heads/v2-appearance'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/v2' || github.ref == 'refs/heads/v2-appearance'
     
     steps:
       - name: Checkout code
@@ -121,9 +122,18 @@ jobs:
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.AWS_SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H ${{ secrets.AWS_EC2_HOST }} >> ~/.ssh/known_hosts
+          # Configure AWS SSH (for v2-appearance branch)
+          if [ "${{ github.ref }}" == "refs/heads/v2-appearance" ] || [ "${{ github.ref }}" == "refs/heads/v2" ]; then
+            echo "${{ secrets.AWS_SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+            chmod 600 ~/.ssh/deploy_key
+            ssh-keyscan -H ${{ secrets.AWS_EC2_HOST }} >> ~/.ssh/known_hosts
+          fi
+          # Configure Hetzner SSH (for main branch)
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "${{ secrets.HETZNER_SSH_PRIVATE_KEY }}" > ~/.ssh/hetzner_key
+            chmod 600 ~/.ssh/hetzner_key
+            ssh-keyscan -H ${{ secrets.HETZNER_HOST }} >> ~/.ssh/known_hosts
+          fi
       
       - name: Create deployment script
         env:
@@ -319,7 +329,8 @@ jobs:
           DEPLOYSCRIPT
           chmod +x deploy.sh
       
-      - name: Deploy to AWS EC2 (Production)
+      - name: Deploy to AWS EC2 (v2-appearance branch)
+        if: github.ref == 'refs/heads/v2-appearance'
         env:
           REPO_URL: https://github.com/${{ github.repository }}.git
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -330,10 +341,42 @@ jobs:
           scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no deploy.sh ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }}:/tmp/deploy.sh
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_HOST }} "export GITHUB_REF='$GITHUB_REF' && bash /tmp/deploy.sh ${{ secrets.AWS_DEPLOY_PATH }} '$REPO_URL' '$GITHUB_TOKEN' '$APP_NAME' '$APP_PORT'"
       
+      - name: Deploy to Hetzner Kubernetes (main branch)
+        if: github.ref == 'refs/heads/main'
+        env:
+          REPO_URL: https://github.com/${{ github.repository }}.git
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REF: ${{ github.ref }}
+        run: |
+          echo "=== Deploying to Hetzner Kubernetes ==="
+          mkdir -p ~/.ssh
+          echo "${{ secrets.HETZNER_SSH_PRIVATE_KEY }}" > ~/.ssh/hetzner_key
+          chmod 600 ~/.ssh/hetzner_key
+          ssh-keyscan -H ${{ secrets.HETZNER_HOST }} >> ~/.ssh/known_hosts
+          
+          # Build Docker image
+          docker build -t cortex:latest .
+          docker save cortex:latest -o /tmp/cortex.tar.gz
+          
+          # Upload to Hetzner
+          scp -i ~/.ssh/hetzner_key -o StrictHostKeyChecking=no /tmp/cortex.tar.gz root@${{ secrets.HETZNER_HOST }}:/tmp/
+          
+          # Import and deploy
+          ssh -i ~/.ssh/hetzner_key -o StrictHostKeyChecking=no root@${{ secrets.HETZNER_HOST }} << 'DEPLOY_SCRIPT'
+            k3s ctr images import /tmp/cortex.tar.gz
+            kubectl rollout restart deployment/cortex-app -n cortex
+            kubectl rollout status deployment/cortex-app -n cortex --timeout=120s
+            echo "✅ Deployment complete"
+          DEPLOY_SCRIPT
+      
       - name: Verify deployment
         run: |
           sleep 10
-          curl -f ${{ secrets.AWS_APP_URL || 'https://cortex.janisrael.com' }}/health || echo "Health check failed, but deployment may still be in progress"
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            curl -f ${{ secrets.HETZNER_APP_URL || 'https://cortex.janisrael.com' }}/health || echo "Health check failed, but deployment may still be in progress"
+          else
+            curl -f ${{ secrets.AWS_APP_URL || 'https://cortex.janisrael.com' }}/health || echo "Health check failed, but deployment may still be in progress"
+          fi
       
       - name: Notify deployment status
         if: always()
