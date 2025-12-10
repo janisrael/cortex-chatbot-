@@ -126,7 +126,7 @@ def register():
             
             if success:
                 # OTP verified - create user account
-                user_id = User.create_user(reg_data['email'], reg_data['username'], reg_data['password'], role='user')
+                user_id, error_msg = User.create_user(reg_data['email'], reg_data['username'], reg_data['password'], role='user')
                 
                 if user_id:
                     # Login user
@@ -150,9 +150,11 @@ def register():
                         session.pop('pending_registration', None)
                         return render_template('auth/register.html', cache_busting_version='1.0.2')
                 else:
+                    # User creation failed - show specific error message
+                    error_message = error_msg or "Failed to create account. Please try again."
                     if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                        return jsonify({"status": "error", "message": "Failed to create account. Please try again."}), 500
-                    flash('Failed to create account. Please try again.', 'error')
+                        return jsonify({"status": "error", "message": error_message}), 400
+                    flash(error_message, 'error')
                     session.pop('pending_registration', None)
                     return render_template('auth/register.html', cache_busting_version='1.0.2')
             else:
@@ -165,6 +167,25 @@ def register():
         # Initial registration - validate and send OTP (don't create user yet)
         from flask import session
         from services.otp_service import OTPService
+        
+        # Validate username and email BEFORE sending OTP
+        if User.get_by_email(email):
+            if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({
+                    "status": "error",
+                    "message": "An account with this email already exists. Please use a different email or log in."
+                }), 400
+            flash('An account with this email already exists. Please use a different email or log in.', 'error')
+            return render_template('auth/register.html', cache_busting_version='1.0.2')
+        
+        if User.username_exists(username):
+            if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({
+                    "status": "error",
+                    "message": f"Username '{username}' is already taken. Please choose a different username."
+                }), 400
+            flash(f"Username '{username}' is already taken. Please choose a different username.", 'error')
+            return render_template('auth/register.html', cache_busting_version='1.0.2')
         
         # Store registration data in session (temporarily)
         session['pending_registration'] = {
@@ -252,7 +273,7 @@ def verify_otp():
                     return redirect(url_for('auth.register'))
                 
                 # OTP verified - create user account
-                user_id = User.create_user(reg_data['email'], reg_data['username'], reg_data['password'], role='user')
+                user_id, error_msg = User.create_user(reg_data['email'], reg_data['username'], reg_data['password'], role='user')
                 
                 if user_id:
                     # Login user
@@ -276,9 +297,11 @@ def verify_otp():
                         session.pop('pending_registration', None)
                         return redirect(url_for('auth.register'))
                 else:
+                    # User creation failed - show specific error message
+                    error_message = error_msg or "Failed to create account. Please try again."
                     if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                        return jsonify({"status": "error", "message": "Failed to create account. Please try again."}), 500
-                    flash('Failed to create account. Please try again.', 'error')
+                        return jsonify({"status": "error", "message": error_message}), 400
+                    flash(error_message, 'error')
                     session.pop('pending_registration', None)
                     return redirect(url_for('auth.register'))
             else:

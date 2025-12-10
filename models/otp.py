@@ -257,4 +257,37 @@ class OTP:
         except Exception as e:
             print(f"❌ Error getting recent OTP count: {e}")
             return 0
+    
+    @staticmethod
+    def get_oldest_recent_otp_time(email, purpose, minutes=60):
+        """Get the creation time of the oldest OTP in the last N minutes (for rate limiting)"""
+        try:
+            conn = OTP._get_db_connection()
+            is_sqlite = OTP._is_sqlite(conn)
+            
+            cutoff_time = datetime.now() - timedelta(minutes=minutes)
+            
+            if is_sqlite:
+                cursor = conn.execute(
+                    "SELECT MIN(created_at) as oldest_time FROM otp_verifications WHERE email = ? AND purpose = ? AND created_at > ?",
+                    (email, purpose, cutoff_time)
+                )
+                result = cursor.fetchone()
+                oldest_time = result['oldest_time'] if result and result['oldest_time'] else None
+            else:
+                cursor = conn.cursor(dictionary=True)
+                cursor.execute(
+                    "SELECT MIN(created_at) as oldest_time FROM otp_verifications WHERE email = %s AND purpose = %s AND created_at > %s",
+                    (email, purpose, cutoff_time)
+                )
+                result = cursor.fetchone()
+                oldest_time = result['oldest_time'] if result and result['oldest_time'] else None
+                cursor.close()
+            
+            conn.close()
+            return oldest_time
+            
+        except Exception as e:
+            print(f"❌ Error getting oldest OTP time: {e}")
+            return None
 

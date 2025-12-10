@@ -200,8 +200,23 @@ class User(UserMixin):
     
     @staticmethod
     def create_user(email, username, password, role='user'):
-        """Create a new user"""
+        """
+        Create a new user
+        
+        Returns:
+            tuple: (user_id: int or None, error_message: str or None)
+                   If successful, returns (user_id, None)
+                   If failed, returns (None, error_message)
+        """
         try:
+            # Check if email already exists
+            if User.get_by_email(email):
+                return None, "An account with this email already exists. Please use a different email or log in."
+            
+            # Check if username already exists
+            if User.username_exists(username):
+                return None, f"Username '{username}' is already taken. Please choose a different username."
+            
             conn = User._get_db_connection()
             is_sqlite = User._is_sqlite(conn)
             
@@ -233,12 +248,41 @@ class User(UserMixin):
             if user_id:
                 User._create_user_directories(user_id)
             
-            return user_id
+            return user_id, None
+        except mysql.connector.errors.IntegrityError as e:
+            error_msg = str(e)
+            print(f"Error creating user (IntegrityError): {e}")
+            import traceback
+            traceback.print_exc()
+            
+            # Check for duplicate username
+            if 'username' in error_msg.lower() or 'duplicate entry' in error_msg.lower():
+                if username.lower() in error_msg.lower():
+                    return None, f"Username '{username}' is already taken. Please choose a different username."
+            
+            # Check for duplicate email
+            if 'email' in error_msg.lower() or 'duplicate entry' in error_msg.lower():
+                if email.lower() in error_msg.lower():
+                    return None, "An account with this email already exists. Please use a different email or log in."
+            
+            return None, "Username or email already exists. Please choose different credentials."
+        except sqlite3.IntegrityError as e:
+            error_msg = str(e)
+            print(f"Error creating user (SQLite IntegrityError): {e}")
+            import traceback
+            traceback.print_exc()
+            
+            if 'username' in error_msg.lower() or 'UNIQUE constraint' in error_msg:
+                return None, f"Username '{username}' is already taken. Please choose a different username."
+            if 'email' in error_msg.lower() or 'UNIQUE constraint' in error_msg:
+                return None, "An account with this email already exists. Please use a different email or log in."
+            
+            return None, "Username or email already exists. Please choose different credentials."
         except Exception as e:
             print(f"Error creating user: {e}")
             import traceback
             traceback.print_exc()
-            return None
+            return None, f"Failed to create account: {str(e)}"
     
     @staticmethod
     def _create_user_directories(user_id):
