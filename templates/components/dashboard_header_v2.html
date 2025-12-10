@@ -19,10 +19,12 @@
                     Admin
                 </a>
                 {% endif %}
+                {% if request.endpoint != 'admin.dashboard' %}
                 <a href="/demo" class="widget-preview-btn">
                     <span class="material-icons-round" style="font-size: 18px;">preview</span>
                     Widget Preview
                 </a>
+                {% endif %}
             </div>
             <div class="user-info" style="background: rgba(255, 255, 255, 0.2); color: white; border: 1px solid rgba(255, 255, 255, 0.3); padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 14px; transition: all 0.2s; display: flex; align-items: center; gap: 6px;">
                 <span class="material-icons-round" style="font-size: 18px;">account_circle</span>
