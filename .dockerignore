@@ -51,6 +51,11 @@ chroma_db/
 uploads/
 config/user_*/
 
+# Logs and data
+logs/
+data/
+*.log
+
 # Large files
 *.pdf
 *.mp4

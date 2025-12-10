@@ -349,25 +349,53 @@ jobs:
           GITHUB_REF: ${{ github.ref }}
         run: |
           echo "=== Deploying to Hetzner Kubernetes ==="
+          
+          # Free up disk space before building
+          echo "=== Freeing disk space ==="
+          df -h
+          docker system prune -af --volumes || true
+          sudo rm -rf /usr/share/dotnet || true
+          sudo rm -rf /opt/ghc || true
+          sudo rm -rf /usr/local/share/boost || true
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY" || true
+          sudo rm -rf ~/.cache/pip || true
+          sudo rm -rf /tmp/* || true
+          sudo apt-get clean || true
+          df -h
+          
           mkdir -p ~/.ssh
           echo "${{ secrets.HETZNER_SSH_PRIVATE_KEY }}" > ~/.ssh/hetzner_key
           chmod 600 ~/.ssh/hetzner_key
           ssh-keyscan -H ${{ secrets.HETZNER_HOST }} >> ~/.ssh/known_hosts
           
-          # Build Docker image
-          docker build -t cortex:latest .
-          docker save cortex:latest -o /tmp/cortex.tar.gz
+          # Build Docker image with buildkit for better caching
+          echo "=== Building Docker image ==="
+          DOCKER_BUILDKIT=1 docker build -t cortex:latest .
+          
+          # Save image with compression directly to gzip
+          echo "=== Saving Docker image (compressed) ==="
+          docker save cortex:latest | gzip -c > /tmp/cortex.tar.gz
+          
+          # Check file size
+          ls -lh /tmp/cortex.tar.gz
           
           # Upload to Hetzner
+          echo "=== Uploading to Hetzner ==="
           scp -i ~/.ssh/hetzner_key -o StrictHostKeyChecking=no /tmp/cortex.tar.gz root@${{ secrets.HETZNER_HOST }}:/tmp/
           
           # Import and deploy
+          echo "=== Deploying to Kubernetes ==="
           ssh -i ~/.ssh/hetzner_key -o StrictHostKeyChecking=no root@${{ secrets.HETZNER_HOST }} << 'DEPLOY_SCRIPT'
-            k3s ctr images import /tmp/cortex.tar.gz
+            echo "Importing Docker image..."
+            gunzip -c /tmp/cortex.tar.gz | k3s ctr images import -
+            echo "Restarting deployment..."
             kubectl rollout restart deployment/cortex-app -n cortex
             kubectl rollout status deployment/cortex-app -n cortex --timeout=120s
             echo "✅ Deployment complete"
           DEPLOY_SCRIPT
+          
+          # Cleanup
+          rm -f /tmp/cortex.tar.gz
       
       - name: Verify deployment
         run: |
