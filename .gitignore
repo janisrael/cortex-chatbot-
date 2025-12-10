@@ -53,3 +53,15 @@ Thumbs.db
 *.md
 !README.md
 !.github/workflows/README.md
+
+# Testing scripts (development only)
+test_*.py
+tests/
+*_test.py
+
+# Utility scripts (one-time use, not needed in production)
+send_*.py
+update_*.sh
+sync-env-to-k8s.sh
+update-cortex-smtp.sh
+!migrations/
