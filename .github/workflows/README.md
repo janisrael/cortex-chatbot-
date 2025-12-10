@@ -1,16 +1,19 @@
 # CI/CD Workflow Documentation
 
 ## Overview
-This repository uses GitHub Actions for continuous integration and deployment to AWS EC2 via SSH (same method as Sandata project).
+This repository uses GitHub Actions for continuous integration and deployment:
+- **Main branch** → Deploys to **Hetzner Kubernetes** (k3s)
+- **v2-appearance branch** → Deploys to **AWS EC2** (legacy, kept for compatibility)
+- **v2 branch** → Deploys to **AWS EC2** (legacy, kept for compatibility)
 
 ## Workflows
 
 ### Main Deployment (`deploy.yml`)
 
 **Triggers:**
-- Push to `main` branch → Production deployment
-- Push to `v2` branch → Production deployment  
-- Push to `v2-appearance` branch → Staging deployment
+- Push to `main` branch → Production deployment to **Hetzner Kubernetes** (standard)
+- Push to `v2-appearance` branch → Staging deployment to **AWS EC2** (legacy)
+- Push to `v2` branch → Production deployment to **AWS EC2** (legacy)
 - Manual trigger via `workflow_dispatch`
 
 **Jobs:**
@@ -22,22 +25,29 @@ This repository uses GitHub Actions for continuous integration and deployment to
    - Check for syntax errors
    - Verify imports
 
-2. **Deploy Production** (main/v2 branches only)
-   - Configure SSH access
-   - Create deployment script
-   - Deploy code to EC2 via SSH
-   - Restart application in screen session
+2. **Deploy Production** (main/v2/v2-appearance branches)
+   - **Main branch**: Deploys to Hetzner Kubernetes
+     - Builds Docker image
+     - Uploads to Hetzner server
+     - Imports into k3s
+     - Restarts Kubernetes deployment
+   - **v2-appearance/v2 branches**: Deploys to AWS EC2
+     - Configure SSH access
+     - Create deployment script
+     - Deploy code to EC2 via SSH
+     - Restart application in screen session
    - Verify deployment health
-
-3. **Deploy Staging** (v2-appearance branch only)
-   - Configure SSH access
-   - Create deployment script
-   - Deploy code to EC2 via SSH (staging path)
-   - Restart application in screen session
-   - Verify deployment
 
 ## Required GitHub Secrets
 
+### For Main Branch (Hetzner Kubernetes)
+| Secret Name | Description | Example Value |
+|------------|-------------|---------------|
+| `HETZNER_SSH_PRIVATE_KEY` | SSH private key content for Hetzner | Content of `~/.ssh/swordfishproject.pem` |
+| `HETZNER_HOST` | Hetzner server IP address | `178.156.162.135` |
+| `HETZNER_APP_URL` | Application URL (optional) | `https://cortex.janisrael.com` |
+
+### For v2-appearance/v2 Branches (AWS EC2)
 | Secret Name | Description | Example Value |
 |------------|-------------|---------------|
 | `AWS_SSH_PRIVATE_KEY` | SSH private key content | Content of `~/.ssh/swordfishproject.pem` |
@@ -47,7 +57,7 @@ This repository uses GitHub Actions for continuous integration and deployment to
 | `AWS_DEPLOY_PATH_STAGING` | Staging deployment path (optional) | `/var/www/portfolio/chatbot/staging` |
 | `AWS_APP_PORT` | Application port (optional) | `6001` |
 | `AWS_APP_PORT_STAGING` | Staging app port (optional) | `6002` |
-| `AWS_APP_URL` | Production URL (optional) | `https://chatbot.janisrael.com` |
+| `AWS_APP_URL` | Production URL (optional) | `https://cortex.janisrael.com` |
 
 ## Getting SSH Private Key
 
