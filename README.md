@@ -177,3 +177,4 @@ For issues and questions, please contact the development team.
 
 # Trigger CI/CD to rebuild Cortex image
 # Trigger Cortex rebuild
+# Add admin credentials to login page
