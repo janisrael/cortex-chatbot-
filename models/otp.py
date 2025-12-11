@@ -25,7 +25,13 @@ class OTP:
             return mysql.connector.connect(**DB_CONFIG)
         except Exception as e:
             # Fallback to SQLite if MySQL is not available
-            db_path = 'users.db'
+            # Use PVC path if available, otherwise use default location
+            db_path = os.getenv('SQLITE_DB_PATH', 'users.db')
+            # If relative path, make it absolute from /app
+            if not os.path.isabs(db_path):
+                db_path = os.path.join('/app', db_path)
+            # Ensure directory exists
+            os.makedirs(os.path.dirname(db_path), exist_ok=True)
             conn = sqlite3.connect(db_path)
             conn.row_factory = sqlite3.Row
             return conn

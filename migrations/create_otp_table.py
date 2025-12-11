@@ -50,10 +50,15 @@ def create_otp_table():
         except Exception as mysql_error:
             print(f"⚠️ MySQL connection failed, trying SQLite: {mysql_error}")
             # Fallback to SQLite
-            db_path = 'users.db'
+            # Use PVC path if available, otherwise use default location
+            db_path = os.getenv('SQLITE_DB_PATH', 'users.db')
+            # If relative path, make it absolute from /app
+            if not os.path.isabs(db_path):
+                db_path = os.path.join('/app', db_path)
+            # Ensure directory exists
+            os.makedirs(os.path.dirname(db_path), exist_ok=True)
             if not os.path.exists(db_path):
-                print(f"❌ SQLite database not found at {db_path}")
-                return False
+                print(f"⚠️ SQLite database not found at {db_path}, will create it")
             
             conn = sqlite3.connect(db_path)
             cursor = conn.cursor()
