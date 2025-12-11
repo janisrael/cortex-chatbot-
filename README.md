@@ -175,3 +175,4 @@ For issues and questions, please contact the development team.
 
 **Live URL**: https://cortex.janisrael.com
 
+# Trigger CI/CD to rebuild Cortex image
