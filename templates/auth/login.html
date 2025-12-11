@@ -27,6 +27,29 @@
                     <p class="subtitle">Sign in to access your dashboard</p>
                 </div>
 
+            <!-- Demo Credentials for Portfolio -->
+            <div class="demo-credentials" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 20px; margin-bottom: 24px; color: white; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                    <span class="material-symbols-outlined" style="font-size: 24px;">admin_panel_settings</span>
+                    <h3 style="margin: 0; font-size: 18px; font-weight: 600;">Demo Account (Portfolio)</h3>
+                </div>
+                <p style="margin: 0 0 12px 0; opacity: 0.9; font-size: 14px;">Use these credentials to explore the platform:</p>
+                <div style="background: rgba(255, 255, 255, 0.15); border-radius: 8px; padding: 12px; font-family: 'Courier New', monospace; font-size: 14px; backdrop-filter: blur(10px);">
+                    <div style="margin-bottom: 8px;">
+                        <strong>Email:</strong> <span id="demo-email" style="user-select: all;">admin@example.com</span>
+                        <button onclick="copyToClipboard('admin@example.com', 'demo-email')" style="background: rgba(255, 255, 255, 0.2); border: none; border-radius: 4px; padding: 4px 8px; margin-left: 8px; color: white; cursor: pointer; font-size: 12px;">Copy</button>
+                    </div>
+                    <div>
+                        <strong>Password:</strong> <span id="demo-password" style="user-select: all;">admin123</span>
+                        <button onclick="copyToClipboard('admin123', 'demo-password')" style="background: rgba(255, 255, 255, 0.2); border: none; border-radius: 4px; padding: 4px 8px; margin-left: 8px; color: white; cursor: pointer; font-size: 12px;">Copy</button>
+                    </div>
+                </div>
+                <button onclick="fillDemoCredentials()" style="width: 100%; margin-top: 12px; background: white; color: #667eea; border: none; border-radius: 8px; padding: 10px; font-weight: 600; cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+                    <span class="material-symbols-outlined" style="vertical-align: middle; margin-right: 4px;">auto_fix_high</span>
+                    Auto-Fill Credentials
+                </button>
+            </div>
+
             <form id="loginForm" class="login-form" method="POST" action="/login">
                 <div id="errorMessage" class="error-message" style="display: none;"></div>
                 
@@ -215,6 +238,35 @@
             errorMessage.style.borderLeftColor = '#28a745';
             errorMessage.style.color = '#28a745';
             errorMessage.style.background = '#d4edda';
+        }
+
+        // Copy to clipboard function
+        function copyToClipboard(text, elementId) {
+            navigator.clipboard.writeText(text).then(() => {
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = 'rgba(76, 175, 80, 0.3)';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = 'rgba(255, 255, 255, 0.2)';
+                }, 1500);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+            });
+        }
+
+        // Auto-fill demo credentials
+        function fillDemoCredentials() {
+            document.getElementById('email').value = 'admin@example.com';
+            document.getElementById('password').value = 'admin123';
+            // Visual feedback
+            document.getElementById('email').style.borderColor = '#667eea';
+            document.getElementById('password').style.borderColor = '#667eea';
+            setTimeout(() => {
+                document.getElementById('email').style.borderColor = '';
+                document.getElementById('password').style.borderColor = '';
+            }, 1000);
         }
     </script>
 </body>
