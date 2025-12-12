@@ -144,6 +144,10 @@
         {% set hex_color = clean_color.replace('#', '')[:6] %}
         {% set widget_avatar_url = 'https://ui-avatars.com/api/?name=' + bot_name|urlencode + '&background=' + hex_color + '&color=fff&size=64&rounded=true' %}
     {% endif %}
+    {# Store base_url for use in JavaScript #}
+    <script>
+        window.WIDGET_BASE_URL = '{{ base_url }}';
+    </script>
     <!-- Chat Window - Full width/height for iframe -->
     <div id="chatbot-window">
         <!-- Header -->
@@ -152,7 +156,7 @@
         <div style="background: {{ header_bg }}; padding: 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(0, 0, 0, 0.1);">
             <div style="display: flex; align-items: center; gap: 12px;">
                 {% if avatar and avatar.type == 'preset' %}
-                <img src="/static/img/avatar/{{ avatar.value }}.png" alt="{{ bot_name }} Avatar" style="width: 48px; height: 48px; border-radius: 50%; object-fit: contain; border: 1px solid rgba(255, 255, 255, 0.3);">
+                <img src="{{ base_url }}/static/img/avatar/{{ avatar.value }}.png" alt="{{ bot_name }} Avatar" style="width: 48px; height: 48px; border-radius: 50%; object-fit: contain; border: 1px solid rgba(255, 255, 255, 0.3);">
                 {% else %}
                 <img src="https://ui-avatars.com/api/?name={{ bot_name }}&background={{ primary_color[1:] if primary_color.startswith('#') else '0891b2' }}&color=fff&size=48" 
                      alt="{{ bot_name }} Avatar" style="width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.3);">
@@ -172,7 +176,7 @@
             <div class="message bot" style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start; animation: fadeIn 0.3s ease-out;">
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
                         {% if avatar and avatar.type == 'preset' %}
-                        <img src="/static/img/avatar/{{ avatar.value }}.png" alt="Bot Avatar" style="width: 24px; height: 24px; border-radius: 50%; object-fit: contain;">
+                        <img src="{{ base_url }}/static/img/avatar/{{ avatar.value }}.png" alt="Bot Avatar" style="width: 24px; height: 24px; border-radius: 50%; object-fit: contain;">
                         {% else %}
                         <img src="https://ui-avatars.com/api/?name={{ bot_name }}&background={{ primary_color[1:] if primary_color.startswith('#') else '0891b2' }}&color=fff&size=24" 
                              alt="Bot Avatar" style="width: 24px; height: 24px; border-radius: 50%;">
@@ -282,8 +286,9 @@
             if (isBot) {
                 const botName = '{{ bot_name }}';
                 const primaryColor = '{{ primary_color }}';
+                const baseUrl = window.WIDGET_BASE_URL || '{{ base_url }}';
                 {% if avatar and avatar.type == 'preset' and avatar.value %}
-                const avatarUrl = '{{ base_url }}/static/img/avatar/{{ avatar.value }}.png';
+                const avatarUrl = baseUrl + '/static/img/avatar/{{ avatar.value }}.png';
                 {% else %}
                 // Extract hex color from primaryColor (handle gradients)
                 let hexColor = '0891b2'; // default

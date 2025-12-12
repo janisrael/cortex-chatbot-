@@ -117,6 +117,7 @@ class MigrationManager:
             (5, "005_create_chatbot_appearance", MigrationManager._migration_005_create_chatbot_appearance),
             (6, "006_create_faqs", MigrationManager._migration_006_create_faqs),
             (7, "007_create_uploaded_files", MigrationManager._migration_007_create_uploaded_files),
+            (8, "008_create_demo_user", MigrationManager._migration_008_create_demo_user),
         ]
         
         for version, name, migration_func in migrations:
@@ -207,6 +208,30 @@ class MigrationManager:
         from models.uploaded_file import UploadedFile
         # This is handled by UploadedFile.init_db(), so we just ensure it's called
         UploadedFile.init_db()
+    
+    @staticmethod
+    def _migration_008_create_demo_user():
+        """Create demo user account for portfolio showcase"""
+        from models.user import User
+        
+        # Check if user already exists
+        existing_user = User.get_by_email('user@example.com')
+        if existing_user:
+            print("ℹ️  Demo user (user@example.com) already exists, skipping creation")
+            return
+        
+        # Create the demo user
+        user_id, error = User.create_user(
+            email='user@example.com',
+            username='UserNormal',
+            password='user123',
+            role='user'
+        )
+        
+        if user_id:
+            print(f"✅ Demo user created successfully (ID: {user_id})")
+        else:
+            print(f"⚠️  Failed to create demo user: {error}")
 
 
 def run_migrations():
