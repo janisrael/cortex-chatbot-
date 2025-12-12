@@ -221,7 +221,7 @@ def widget_multi():
 
 @widget_bp.route("/embed.js")
 def serve_embed_script_multi():
-    """Serve user-specific embed script (1 chatbot per user) - requires API key"""
+    """Serve user-specific embed script (1 chatbot per user) - requires API key - Uses iframe approach"""
     # Get API key from query parameter
     api_key = request.args.get('api_key') or request.args.get('key')
     
@@ -244,7 +244,10 @@ def serve_embed_script_multi():
 })();
 """, 200, {'Content-Type': 'application/javascript'}
     
-    # Load user's config
+    # Get the base URL from the script's src (where embed.js is loaded from)
+    base_url = request.host_url.rstrip('/')
+    
+    # Load user's config for widget config
     try:
         user_config = load_user_chatbot_config(user_id)
         bot_name = user_config.get('bot_name', 'Cortex')
@@ -284,269 +287,359 @@ def serve_embed_script_multi():
         avatar = {'type': 'preset', 'value': 'avatar_1', 'fallback': 'ui-avatars'}
         short_info = 'Your friendly assistant'
     
-    config = {
-        'bot_name': bot_name,
-        'primary_color': primary_color,
-        'name': website_name,
-        'avatar': avatar,
-        'short_info': short_info
-    }
-    
-    # Generate dynamic embed script with user-specific config
+    # Generate iframe-based embed script (plug-and-play)
     embed_script = f"""
-// Define sendSuggestion IMMEDIATELY at the top level (synchronous)
-window.sendSuggestion = window.sendSuggestion || function(message) {{
-    console.log('sendSuggestion called with:', message);
-    
-    function trySend() {{
-        const inputField = document.getElementById('chatbot-input');
-        const sendBtn = document.getElementById('chatbot-send-btn');
-        
-        if (!inputField) {{
-            console.log('Input field not found, retrying in 50ms...');
-            setTimeout(trySend, 50);
-            return;
-        }}
-        
-        inputField.value = message;
-        console.log('Input field set to:', message);
-        
-        // Try to click send button
-        if (sendBtn) {{
-            console.log('Clicking send button');
-            sendBtn.click();
-        }} else {{
-            console.log('Send button not found, trying Enter key');
-            // Fallback: trigger Enter key
-            const event = new KeyboardEvent('keypress', {{
-                key: 'Enter',
-                code: 'Enter',
-                keyCode: 13,
-                which: 13,
-                bubbles: true
-            }});
-            inputField.dispatchEvent(event);
-        }}
-    }}
-    
-    trySend();
-}};
-console.log('✅ sendSuggestion function defined globally (SYNCHRONOUS)');
+(function () {{
+  "use strict";
 
-(function() {{
-    window.CHATBOT_CONFIG = {{
-        apiBaseUrl: '{request.host_url.rstrip('/')}',
-        apiKey: '{api_key}',
-        botName: '{config.get('bot_name', 'Assistant')}',
-        primaryColor: '{config.get('primary_color', '#667eea')}',
-        avatar: {config.get('avatar', {})},
-        shortInfo: '{config.get('short_info', 'Your friendly assistant')}',
-        websiteName: '{config.get('name', 'Website')}'
-    }};
-    
-    // sendSuggestion is already defined above at top level (outside IIFE)
-    // It's available immediately when the script loads
-    
-    // Load the widget HTML
-    fetch('{request.host_url.rstrip('/')}/widget?api_key={api_key}')
-        .then(response => response.text())
-        .then(html => {{
-            const widgetContainer = document.createElement('div');
-            widgetContainer.id = 'ai-chatbot-widget';
-            widgetContainer.innerHTML = html;
-            document.body.appendChild(widgetContainer);
-            console.log('✅ Widget HTML injected');
-            
-            // Execute any script tags in the injected HTML
-            const scripts = widgetContainer.querySelectorAll('script');
-            scripts.forEach(function(oldScript) {{
-                const newScript = document.createElement('script');
-                Array.from(oldScript.attributes).forEach(attr => {{
-                    newScript.setAttribute(attr.name, attr.value);
-                }});
-                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                oldScript.parentNode.replaceChild(newScript, oldScript);
-            }});
-            
-            console.log('✅ Scripts executed, sendSuggestion available:', typeof window.sendSuggestion);
-            
-            // Attach event listeners to suggested buttons using event delegation
-            // This works even if buttons are added dynamically
-            document.addEventListener('click', function(e) {{
-                if (e.target && e.target.classList.contains('suggested-btn')) {{
-                    const message = e.target.getAttribute('data-suggestion') || e.target.textContent.trim();
-                    console.log('Suggested button clicked:', message);
-                    if (window.sendSuggestion && typeof window.sendSuggestion === 'function') {{
-                        window.sendSuggestion(message);
-                    }} else {{
-                        console.error('sendSuggestion not available when button clicked');
-                    }}
-                }}
-            }});
-            console.log('✅ Event delegation attached for suggested buttons');
-            
-            // Initialize widget after HTML is injected
-            setTimeout(function() {{
-                const config = window.CHATBOT_CONFIG;
-                const toggleBtn = document.getElementById('chatbot-toggle-btn');
-                const closeBtn = document.getElementById('chatbot-close-btn');
-                const chatbotWindow = document.getElementById('chatbot-window');
-                const messagesDiv = document.getElementById('chatbot-messages');
-                const inputField = document.getElementById('chatbot-input');
-                const sendBtn = document.getElementById('chatbot-send-btn');
-                
-                if (!toggleBtn || !chatbotWindow) {{
-                    console.error('Chatbot elements not found');
-                    return;
-                }}
-                
-                let isOpen = false;
-                
-                toggleBtn.addEventListener('click', function() {{
-                    isOpen = !isOpen;
-                    chatbotWindow.style.display = isOpen ? 'flex' : 'none';
-                }});
-                
-                if (closeBtn) {{
-                    closeBtn.addEventListener('click', function() {{
-                        isOpen = false;
-                        chatbotWindow.style.display = 'none';
-                    }});
-                }}
-                
-                function addMessage(text, isBot) {{
-                    if (!messagesDiv) return;
-                    const messageDiv = document.createElement('div');
-                    messageDiv.className = 'message ' + (isBot ? 'bot' : 'user');
-                    messageDiv.style.cssText = 'display: flex; flex-direction: column; gap: 8px; align-items: ' + (isBot ? 'flex-start' : 'flex-end') + '; animation: fadeIn 0.3s ease-out;';
-                    
-                    // Format text (convert <br> to actual breaks)
-                    const formattedText = text.replace(/<br>/g, '<br>').replace(/\\n/g, '<br>');
-                    
-                    if (isBot) {{
-                        const botName = config.botName || 'Assistant';
-                        const avatarUrl = `https://ui-avatars.com/api/?name=${{encodeURIComponent(botName)}}&background=${{config.primaryColor.substring(1)}}&color=fff&size=24`;
-                        messageDiv.innerHTML = `
-                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                                <img src="${{avatarUrl}}" alt="Bot Avatar" style="width: 24px; height: 24px; border-radius: 50%;">
-                                <span style="font-size: 14px; font-weight: 500; color: #18181b;">${{botName}}</span>
-                            </div>
-                            <div style="max-width: min(calc(100% - 40px), 65ch); padding: 12px 16px; border-radius: 20px; font-size: 14px; line-height: 1.6; word-wrap: break-word; background: #f4f4f5; color: #27272a; border-bottom-left-radius: 6px;">${{formattedText}}</div>
-                        `;
-                    }} else {{
-                        messageDiv.innerHTML = `
-                            <div style="max-width: min(calc(100% - 40px), 65ch); padding: 12px 16px; border-radius: 20px; font-size: 14px; line-height: 1.6; word-wrap: break-word; background: ${{config.primaryColor}}; color: white; border-bottom-right-radius: 6px;">${{formattedText}}</div>
-                        `;
-                    }}
-                    messagesDiv.appendChild(messageDiv);
-                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-                }}
-                
-                function showTyping() {{
-                    const typingIndicator = document.getElementById('typing-indicator');
-                    if (typingIndicator) {{
-                        typingIndicator.style.display = 'flex';
-                        messagesDiv.appendChild(typingIndicator);
-                        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-                    }}
-                }}
-                
-                function hideTyping() {{
-                    const typingIndicator = document.getElementById('typing-indicator');
-                    if (typingIndicator) {{
-                        typingIndicator.style.display = 'none';
-                        if (typingIndicator.parentNode === messagesDiv) {{
-                            messagesDiv.removeChild(typingIndicator);
-                        }}
-                    }}
-                }}
-                
-                async function sendMessage() {{
-                    if (!inputField || !sendBtn) return;
-                    const message = inputField.value.trim();
-                    if (!message) return;
-                    
-                    addMessage(message, false);
-                    inputField.value = '';
-                    sendBtn.disabled = true;
-                    
-                    showTyping();
-                    
-                    try {{
-                        const response = await fetch(config.apiBaseUrl + '/chat', {{
-                            method: 'POST',
-                            headers: {{ 'Content-Type': 'application/json' }},
-                            body: JSON.stringify({{
-                                message: message,
-                                api_key: config.apiKey
-                            }})
-                        }});
-                        
-                        const data = await response.json();
-                        hideTyping();
-                        addMessage(data.response || 'Sorry, I encountered an error.', true);
-                    }} catch (error) {{
-                        hideTyping();
-                        addMessage('Sorry, I encountered a connection error.', true);
-                        console.error('Chatbot error:', error);
-                    }}
-                    
-                    sendBtn.disabled = false;
-                }}
-                
-                // Make sendMessage available globally
-                window.chatbotSendMessage = sendMessage;
-                
-                // Update sendSuggestion to use local variables (better version)
-                const originalSendSuggestion = window.sendSuggestion;
-                window.sendSuggestion = function(message) {{
-                    console.log('sendSuggestion (enhanced) called with:', message);
-                    if (inputField && typeof sendMessage === 'function') {{
-                        // Use local variables for better performance
-                        inputField.value = message;
-                        sendMessage();
-                    }} else {{
-                        // Fallback to original if elements not ready
-                        console.log('Using fallback sendSuggestion (elements not ready)');
-                        if (originalSendSuggestion) {{
-                            originalSendSuggestion(message);
-                        }}
-                    }}
-                }};
-                console.log('✅ sendSuggestion enhanced with local variables');
-                
-                // Event delegation is already set up above, but we can also attach direct listeners
-                // as a backup (event delegation should handle it, but this ensures it works)
-                const widgetContainer = document.getElementById('ai-chatbot-widget');
-                const suggestedButtons = widgetContainer ? widgetContainer.querySelectorAll('.suggested-btn') : document.querySelectorAll('.suggested-btn');
-                console.log('Found suggested buttons:', suggestedButtons.length);
-                
-                suggestedButtons.forEach(function(btn) {{
-                    btn.addEventListener('click', function(e) {{
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const message = btn.getAttribute('data-suggestion') || btn.textContent.trim();
-                        console.log('Direct listener: Button clicked, message:', message);
-                        if (message && window.sendSuggestion) {{
-                            window.sendSuggestion(message);
-                        }}
-                    }});
-                }});
-                console.log('✅ Direct event listeners attached to suggested buttons');
-                
-                if (sendBtn) {{
-                    sendBtn.addEventListener('click', sendMessage);
-                }}
-                if (inputField) {{
-                    inputField.addEventListener('keypress', function(e) {{
-                        if (e.key === 'Enter') sendMessage();
-                    }});
-                }}
-            }}, 100);
-        }})
-        .catch(error => {{
-            console.error('Error loading chatbot widget:', error);
-        }});
+  // Get the base URL from the script's src (where embed.js is loaded from)
+  function getScriptBaseUrl() {{
+    const scripts = document.getElementsByTagName('script');
+    for (let script of scripts) {{
+      if (script.src && script.src.includes('embed.js')) {{
+        try {{
+          const url = new URL(script.src);
+          return url.origin;
+        }} catch (e) {{
+          return window.location.origin;
+        }}
+      }}
+    }}
+    return window.location.origin;
+  }}
+
+  const WIDGET_CONFIG = {{
+    apiBaseUrl: getScriptBaseUrl(),
+    widgetUrl: "/widget",
+    triggerButtonText: "💬",
+    position: "bottom-right",
+    primaryColor: "{primary_color}",
+    zIndex: 999999,
+  }};
+
+  if (window.BobotWidget) {{
+    console.warn("Bobot Widget already loaded");
+    return;
+  }}
+
+  class BobotWidget {{
+    constructor() {{
+      this.isOpen = false;
+      this.widget = null;
+      this.triggerButton = null;
+      this.iframe = null;
+      this.config = {{}};
+      this.apiKey = "{api_key}";
+      this.initialize();
+    }}
+
+    initialize() {{
+      this.createStyles();
+      this.createTriggerButton();
+      this.createWidget();
+      this.attachEventListeners();
+    }}
+
+    createStyles() {{
+      const styles = `
+        .bobot-widget-trigger {{
+          position: fixed;
+          bottom: 24px;
+          right: 24px;
+          background: transparent !important;
+          color: white;
+          border: none;
+          width: 60px;
+          height: 60px;
+          font-size: 24px;
+          cursor: pointer;
+          z-index: ${{WIDGET_CONFIG.zIndex}};
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }}
+
+        .bobot-widget-trigger::before {{
+          content: '';
+          position: absolute;
+          inset: -6px;
+          border-radius: 50%;
+          background: conic-gradient(from 0deg, #667eea, #764ba2, #f093fb, #4facfe, #00f2fe, #667eea);
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          animation: gradientRotate 3s linear infinite;
+          z-index: -1;
+        }}
+
+        .bobot-widget-trigger::after {{
+          content: '';
+          position: absolute;
+          inset: -3px;
+          border-radius: 50%;
+          z-index: -1;
+          background: white;
+        }}
+
+        @keyframes gradientRotate {{
+          from {{ transform: rotate(0deg); }}
+          to {{ transform: rotate(360deg); }}
+        }}
+
+        .bobot-widget-trigger img {{
+          width: 100%;
+          object-fit: cover;
+          background: transparent;
+          position: relative;
+          z-index: 1;
+        }}
+
+        .bobot-widget-trigger:hover {{
+          transform: translateY(-2px) scale(1.05);
+        }}
+
+        .bobot-widget-trigger:hover::before {{
+          opacity: 1;
+        }}
+
+        .bobot-widget-container {{
+          position: fixed;
+          bottom: 100px;
+          right: 24px;
+          width: 380px;
+          height: 600px;
+          z-index: ${{WIDGET_CONFIG.zIndex + 1}};
+          transform: scale(0.95) translateY(20px);
+          opacity: 0;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transform-origin: bottom right;
+          pointer-events: none;
+        }}
+
+        .bobot-widget-container.open {{
+          transform: scale(1) translateY(0);
+          opacity: 1;
+          pointer-events: all;
+        }}
+
+        .bobot-widget-iframe {{
+          width: 100%;
+          height: 100%;
+          border: none;
+          border-radius: 20px;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12), 0 8px 24px rgba(0, 0, 0, 0.08);
+          background: white;
+        }}
+
+        .bobot-widget-close {{
+          position: absolute;
+          top: -8px;
+          right: -8px;
+          background: #ef4444;
+          color: white;
+          border: none;
+          border-radius: 50%;
+          width: 28px;
+          height: 28px;
+          font-size: 14px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+          z-index: ${{WIDGET_CONFIG.zIndex + 2}};
+          transition: all 0.2s;
+        }}
+
+        .bobot-widget-close:hover {{
+          background: #dc2626;
+          transform: scale(1.1);
+        }}
+
+        @media (max-width: 768px) {{
+          .bobot-widget-container {{
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            transform: translateY(100%);
+            border-radius: 0 !important;
+          }}
+
+          .bobot-widget-container.open {{
+            transform: translateY(0);
+          }}
+
+          .bobot-widget-iframe {{
+            border-radius: 0 !important;
+          }}
+        }}
+      `;
+
+      const styleSheet = document.createElement("style");
+      styleSheet.textContent = styles;
+      document.head.appendChild(styleSheet);
+    }}
+
+    createTriggerButton() {{
+      this.triggerButton = document.createElement("button");
+      this.triggerButton.className = "bobot-widget-trigger";
+      this.renderTriggerButtonContent();
+      this.triggerButton.setAttribute("aria-label", "Open chat");
+      this.triggerButton.addEventListener("click", () => this.toggleWidget());
+      document.body.appendChild(this.triggerButton);
+    }}
+
+    renderTriggerButtonContent() {{
+      if (!this.triggerButton) return;
+      this.triggerButton.innerHTML = "";
+      
+      const avatarUrl = this.config?.avatarUrl;
+      if (avatarUrl) {{
+        const img = document.createElement("img");
+        img.src = avatarUrl;
+        img.alt = this.config?.botName || "Open chat";
+        this.triggerButton.appendChild(img);
+        this.triggerButton.style.background = "transparent";
+      }} else {{
+        this.triggerButton.textContent = WIDGET_CONFIG.triggerButtonText;
+        this.triggerButton.style.background = `linear-gradient(135deg, ${{WIDGET_CONFIG.primaryColor}} 0%, #2563eb 100%)`;
+      }}
+    }}
+
+    createWidget() {{
+      this.widget = document.createElement("div");
+      this.widget.className = "bobot-widget-container";
+
+      const closeButton = document.createElement("button");
+      closeButton.className = "bobot-widget-close";
+      closeButton.innerHTML = "×";
+      closeButton.setAttribute("aria-label", "Close chat");
+      closeButton.addEventListener("click", () => this.closeWidget());
+
+      this.iframe = document.createElement("iframe");
+      this.iframe.className = "bobot-widget-iframe";
+      this.iframe.src = `${{WIDGET_CONFIG.apiBaseUrl}}${{WIDGET_CONFIG.widgetUrl}}?api_key=${{encodeURIComponent(this.apiKey)}}`;
+      this.iframe.allow = "microphone; camera";
+      this.iframe.setAttribute("title", "{bot_name} Chat Widget");
+
+      this.widget.appendChild(closeButton);
+      this.widget.appendChild(this.iframe);
+      document.body.appendChild(this.widget);
+    }}
+
+    attachEventListeners() {{
+      // Close on outside click
+      document.addEventListener("click", (e) => {{
+        if (
+          this.isOpen &&
+          !this.widget.contains(e.target) &&
+          !this.triggerButton.contains(e.target)
+        ) {{
+          this.closeWidget();
+        }}
+      }});
+
+      // Close on Escape key
+      document.addEventListener("keydown", (e) => {{
+        if (e.key === "Escape" && this.isOpen) {{
+          this.closeWidget();
+        }}
+      }});
+
+      // Listen for messages from iframe
+      window.addEventListener("message", (event) => {{
+        if (event.origin !== WIDGET_CONFIG.apiBaseUrl) return;
+
+        if (event.data.type === "close_widget") {{
+          this.closeWidget();
+        }}
+
+        if (event.data.type === "widget_config") {{
+          this.applyWidgetConfig(event.data);
+        }}
+      }});
+    }}
+
+    applyWidgetConfig(data) {{
+      this.config = this.config || {{}};
+      if (data.botName) this.config.botName = data.botName;
+      if (data.avatarUrl) this.config.avatarUrl = data.avatarUrl;
+      if (data.primaryColor) {{
+        this.config.primaryColor = data.primaryColor;
+        WIDGET_CONFIG.primaryColor = data.primaryColor;
+      }}
+      this.renderTriggerButtonContent();
+    }}
+
+    toggleWidget() {{
+      if (this.isOpen) {{
+        this.closeWidget();
+      }} else {{
+        this.openWidget();
+      }}
+    }}
+
+    openWidget() {{
+      this.isOpen = true;
+      this.widget.classList.add("open");
+      this.triggerButton.style.transform = "scale(0.9)";
+    }}
+
+    closeWidget() {{
+      this.isOpen = false;
+      this.widget.classList.remove("open");
+      this.triggerButton.style.transform = "scale(1)";
+    }}
+
+    show() {{
+      this.triggerButton.style.display = "flex";
+    }}
+
+    hide() {{
+      this.triggerButton.style.display = "none";
+      if (this.isOpen) {{
+        this.closeWidget();
+      }}
+    }}
+
+    destroy() {{
+      if (this.widget) {{
+        this.widget.remove();
+      }}
+      if (this.triggerButton) {{
+        this.triggerButton.remove();
+      }}
+      window.BobotWidget = null;
+    }}
+  }}
+
+  function initWidget() {{
+    if (document.readyState === "loading") {{
+      document.addEventListener("DOMContentLoaded", () => {{
+        window.BobotWidget = new BobotWidget();
+      }});
+    }} else {{
+      window.BobotWidget = new BobotWidget();
+    }}
+  }}
+
+  // Public API
+  window.BobotWidgetAPI = {{
+    init: initWidget,
+    show: () => window.BobotWidget?.show(),
+    hide: () => window.BobotWidget?.hide(),
+    toggle: () => window.BobotWidget?.toggleWidget(),
+    destroy: () => window.BobotWidget?.destroy(),
+    getState: () => window.BobotWidget?.getState() || null,
+  }};
+
+  initWidget();
+  console.log("✅ Cortex Widget loaded successfully");
 }})();
 """
     
