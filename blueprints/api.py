@@ -15,6 +15,10 @@ from datetime import datetime
 
 api_bp = Blueprint('api', __name__)
 
+# Allowed avatar file extensions
+ALLOWED_AVATAR_EXTENSIONS = {'png', 'jpg', 'jpeg', 'svg', 'webp'}
+MAX_AVATAR_SIZE = 2 * 1024 * 1024  # 2MB
+
 
 @api_bp.route("/api/upload", methods=["POST"])
 @login_required
@@ -323,13 +327,34 @@ def ingest_uploaded_file(file_id):
             user_vectorstore.add_documents(chunks)
             print(f"✅ Successfully added chunks to vectorstore")
             
+            # VERIFICATION: Verify documents were actually added
+            verified_count = 0
+            try:
+                retriever = user_vectorstore.as_retriever(search_kwargs={"k": len(chunks) + 5})
+                # Test retrieval with a query that should match the file
+                test_query = uploaded_file['filename'] + " " + (uploaded_file.get('extracted_text', '')[:100] or '')
+                if hasattr(retriever, 'invoke'):
+                    verify_docs = retriever.invoke(test_query)
+                else:
+                    verify_docs = retriever.get_relevant_documents(test_query)
+                
+                # Check if our file is in the results
+                verified_count = sum(1 for doc in verify_docs if doc.metadata.get('source_file') == uploaded_file['filename'])
+                print(f"✅ VERIFICATION: Found {verified_count}/{len(chunks)} chunks from '{uploaded_file['filename']}' in vectorstore")
+                
+                if verified_count == 0:
+                    print(f"⚠️ WARNING: Verification found 0 chunks - ingestion may have failed!")
+            except Exception as verify_error:
+                print(f"⚠️ Verification check failed (but ingestion may have succeeded): {verify_error}")
+            
             # Update status to 'ingested'
             UploadedFile.update_status(file_id, 'ingested')
             
             return jsonify({
                 "message": f"File '{uploaded_file['filename']}' ingested successfully. Added {len(chunks)} chunks.",
                 "chunks_added": len(chunks),
-                "status": "ingested"
+                "status": "ingested",
+                "verified": verified_count > 0 if 'verified_count' in locals() else None
             })
         except Exception as e:
             print(f"❌ Error adding documents to vectorstore: {e}")
@@ -1495,13 +1520,33 @@ def ingest_faq(faq_id):
             user_vectorstore.add_documents(chunks)
             print(f"✅ Successfully added FAQ chunks to vectorstore")
             
+            # VERIFICATION: Verify FAQ was actually added
+            verified_count = 0
+            try:
+                retriever = user_vectorstore.as_retriever(search_kwargs={"k": len(chunks) + 5})
+                test_query = faq['question'] + " " + faq['answer'][:100]
+                if hasattr(retriever, 'invoke'):
+                    verify_docs = retriever.invoke(test_query)
+                else:
+                    verify_docs = retriever.get_relevant_documents(test_query)
+                
+                # Check if our FAQ is in the results
+                verified_count = sum(1 for doc in verify_docs if doc.metadata.get('faq_id') == faq_id)
+                print(f"✅ VERIFICATION: Found {verified_count}/{len(chunks)} FAQ chunks in vectorstore")
+                
+                if verified_count == 0:
+                    print(f"⚠️ WARNING: Verification found 0 FAQ chunks - ingestion may have failed!")
+            except Exception as verify_error:
+                print(f"⚠️ Verification check failed (but ingestion may have succeeded): {verify_error}")
+            
             # Update status to 'active' and set ingested_at
             FAQ.update_status(faq_id, 'active')
             
             return jsonify({
                 "message": f"FAQ ingested successfully. Added {len(chunks)} chunk(s).",
                 "chunks_added": len(chunks),
-                "status": "active"
+                "status": "active",
+                "verified": verified_count > 0
             })
         except Exception as e:
             print(f"❌ Error adding FAQ to vectorstore: {e}")

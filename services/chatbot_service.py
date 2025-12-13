@@ -66,8 +66,9 @@ def get_chatbot_response(user_id, message, system_llm=None, name="User"):
         user_vectorstore = get_user_vectorstore(user_id)
         if user_vectorstore:
             # Try to create retriever - if it fails, we'll use direct LLM
+            # Increased k to 10 for better retrieval, priority order handled in retrieval
             try:
-                user_retriever = user_vectorstore.as_retriever(search_kwargs={"k": 5})
+                user_retriever = user_vectorstore.as_retriever(search_kwargs={"k": 10})
             except Exception as e:
                 print(f"⚠️ Cannot create retriever, using direct LLM: {e}")
                 user_retriever = None
@@ -88,6 +89,7 @@ def get_chatbot_response(user_id, message, system_llm=None, name="User"):
     prompt_template_text = prompt_template_text.replace('{bot_name}', bot_name)
     
     # Get relevant documents from user's knowledge base (if retriever is available)
+    # Priority order: FAQ > Crawl > File Upload
     context = ""
     if user_retriever:
         try:
@@ -97,12 +99,27 @@ def get_chatbot_response(user_id, message, system_llm=None, name="User"):
             else:
                 # Fallback for older LangChain versions
                 docs = user_retriever.get_relevant_documents(message)
-            context = "\n\n".join([doc.page_content for doc in docs]) if docs else ""
             
-            # Log retrieval for debugging
+            # Apply priority ordering: FAQ > Crawl > File Upload
             if docs:
-                print(f"📚 Retrieved {len(docs)} relevant documents from knowledge base")
-                print(f"📄 Sources: {[doc.metadata.get('source_file', 'unknown') for doc in docs[:3]]}")
+                # Separate by source type
+                faq_docs = [d for d in docs if d.metadata.get('source_type') == 'faq']
+                crawl_docs = [d for d in docs if d.metadata.get('source_type') == 'crawl']
+                file_docs = [d for d in docs if d.metadata.get('source_type') == 'file_upload']
+                other_docs = [d for d in docs if d.metadata.get('source_type') not in ['faq', 'crawl', 'file_upload']]
+                
+                # Reorder: FAQ first, then crawl, then file, then others
+                prioritized_docs = faq_docs + crawl_docs + file_docs + other_docs
+                
+                # Limit to top 8 for context (keep some for diversity)
+                prioritized_docs = prioritized_docs[:8]
+                
+                context = "\n\n".join([doc.page_content for doc in prioritized_docs]) if prioritized_docs else ""
+                
+                # Log retrieval for debugging
+                print(f"📚 Retrieved {len(docs)} documents, prioritized to {len(prioritized_docs)}")
+                print(f"📊 Breakdown: FAQ={len(faq_docs)}, Crawl={len(crawl_docs)}, File={len(file_docs)}, Other={len(other_docs)}")
+                print(f"📄 Top sources: {[doc.metadata.get('source_file', 'unknown')[:30] for doc in prioritized_docs[:3]]}")
             else:
                 print(f"ℹ️ No relevant documents found in knowledge base for: {message[:50]}")
         except Exception as e:
