@@ -212,26 +212,31 @@ class MigrationManager:
     @staticmethod
     def _migration_008_create_demo_user():
         """Create demo user account for portfolio showcase"""
-        from models.user import User
-        
-        # Check if user already exists
-        existing_user = User.get_by_email('user@example.com')
-        if existing_user:
-            print("ℹ️  Demo user (user@example.com) already exists, skipping creation")
-            return
-        
-        # Create the demo user
-        user_id, error = User.create_user(
-            email='user@example.com',
-            username='UserNormal',
-            password='user123',
-            role='user'
-        )
-        
-        if user_id:
-            print(f"✅ Demo user created successfully (ID: {user_id})")
-        else:
-            print(f"⚠️  Failed to create demo user: {error}")
+        try:
+            from models.user import User
+            
+            # Check if user already exists
+            existing_user = User.get_by_email('user@example.com')
+            if existing_user:
+                print("ℹ️  Demo user (user@example.com) already exists, skipping creation")
+                return
+            
+            # Create the demo user
+            user_id, error = User.create_user(
+                email='user@example.com',
+                username='UserNormal',
+                password='user123',
+                role='user'
+            )
+            
+            if user_id:
+                print(f"✅ Demo user created successfully (ID: {user_id})")
+            else:
+                print(f"⚠️  Failed to create demo user: {error}")
+        except Exception as e:
+            # Don't fail the entire migration if demo user creation fails
+            print(f"⚠️  Warning: Could not create demo user: {e}")
+            print("   Migration will continue - this is not critical")
 
 
 def run_migrations():
