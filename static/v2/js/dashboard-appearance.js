@@ -575,17 +575,74 @@ function setupAvatarSelection() {
     
     // Upload (UI ready, backend later)
     if (avatarUpload) {
-        avatarUpload.addEventListener('change', (e) => {
+        avatarUpload.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (file) {
+                // Validate file
+                const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml', 'image/webp'];
+                if (!allowedTypes.includes(file.type)) {
+                    alert('Invalid file type. Please upload PNG, JPG, SVG, or WebP image.');
+                    avatarUpload.value = '';
+                    return;
+                }
+                
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('File too large. Maximum size is 2MB.');
+                    avatarUpload.value = '';
+                    return;
+                }
+                
                 const fileName = document.getElementById('avatarFileName');
                 if (fileName) {
-                    fileName.textContent = file.name;
+                    fileName.textContent = `Uploading ${file.name}...`;
                 }
-                if (removeAvatarBtn) {
-                    removeAvatarBtn.style.display = 'inline-block';
+                
+                // Upload file
+                try {
+                    const formData = new FormData();
+                    formData.append('avatar', file);
+                    
+                    const response = await fetch('/api/avatar/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        // Update appearance config with uploaded avatar
+                        appearanceConfig.avatar = {
+                            type: 'upload',
+                            value: result.avatar_url,
+                            name: 'custom'
+                        };
+                        
+                        if (fileName) {
+                            fileName.textContent = file.name;
+                        }
+                        if (removeAvatarBtn) {
+                            removeAvatarBtn.style.display = 'inline-block';
+                        }
+                        
+                        // Update UI and preview
+                        updateAvatarUI();
+                        updatePreview();
+                        
+                        // Show success message
+                        if (typeof showSuccessNotification === 'function') {
+                            showSuccessNotification('Avatar uploaded successfully!', 3000);
+                        }
+                    } else {
+                        throw new Error(result.error || 'Failed to upload avatar');
+                    }
+                } catch (error) {
+                    console.error('Avatar upload error:', error);
+                    alert('Failed to upload avatar: ' + error.message);
+                    avatarUpload.value = '';
+                    if (fileName) {
+                        fileName.textContent = 'No file selected';
+                    }
                 }
-                // Preview will be implemented in Phase 4
             }
         });
     }
@@ -633,8 +690,11 @@ function updateAvatarUI() {
                 }
             });
         } else if (appearanceConfig.avatar.type === 'upload') {
-            // Will show uploaded avatar in Phase 4
-            currentAvatarPreview.innerHTML = `<img src="/${appearanceConfig.avatar.value}" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+            // Show uploaded avatar
+            const avatarUrl = appearanceConfig.avatar.value.startsWith('/') 
+                ? appearanceConfig.avatar.value 
+                : '/' + appearanceConfig.avatar.value;
+            currentAvatarPreview.innerHTML = `<img src="${avatarUrl}" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
         } else {
             // Default fallback
             currentAvatarPreview.innerHTML = '<span class="material-icons-round" style="font-size: 40px; color: #71717a;">face</span>';
@@ -951,19 +1011,42 @@ function updatePreviewAvatar() {
     const headerAvatar = document.getElementById('previewHeaderAvatar');
     const headerIcon = document.getElementById('previewHeaderIcon');
     
-    if (appearanceConfig.avatar && appearanceConfig.avatar.type === 'preset') {
-        const avatarId = appearanceConfig.avatar.value;
-        const avatarPath = `/static/img/avatar/${avatarId}.png`;
+    if (appearanceConfig.avatar) {
+        let avatarPath = '';
         
-        if (triggerAvatar) {
-            triggerAvatar.src = avatarPath;
-            triggerAvatar.style.display = 'block';
+        if (appearanceConfig.avatar.type === 'preset') {
+            const avatarId = appearanceConfig.avatar.value;
+            avatarPath = `/static/img/avatar/${avatarId}.png`;
+        } else if (appearanceConfig.avatar.type === 'upload') {
+            // Use uploaded avatar
+            avatarPath = appearanceConfig.avatar.value.startsWith('/') 
+                ? appearanceConfig.avatar.value 
+                : '/' + appearanceConfig.avatar.value;
         }
         
-        if (headerAvatar) {
-            headerAvatar.src = avatarPath;
-            headerAvatar.style.display = 'block';
-            if (headerIcon) headerIcon.style.display = 'none';
+        if (avatarPath) {
+            if (triggerAvatar) {
+                triggerAvatar.src = avatarPath;
+                triggerAvatar.style.display = 'block';
+            }
+            if (headerAvatar) {
+                headerAvatar.src = avatarPath;
+                headerAvatar.style.display = 'block';
+            }
+            if (headerIcon) {
+                headerIcon.style.display = 'none';
+            }
+        } else {
+            // Fallback to icon
+            if (triggerAvatar) {
+                triggerAvatar.style.display = 'none';
+            }
+            if (headerAvatar) {
+                headerAvatar.style.display = 'none';
+            }
+            if (headerIcon) {
+                headerIcon.style.display = 'block';
+            }
         }
     } else {
         // Show icon fallback for header only (trigger always shows avatar)

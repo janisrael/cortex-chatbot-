@@ -154,7 +154,7 @@ def extract_text_from_file(filepath, filename):
                 print(f"📚 Loaded {len(documents)} rows from CSV")
                 full_text = "\n\n".join([doc.page_content for doc in documents])
                 return full_text
-            elif file_ext in ['docx', 'doc']:
+            elif file_ext == 'docx':
                 try:
                     loader = Docx2txtLoader(filepath)
                     documents = loader.load()
@@ -167,6 +167,49 @@ def extract_text_from_file(filepath, filename):
                     documents = loader.load()
                     full_text = "\n\n".join([doc.page_content for doc in documents])
                     return full_text
+            elif file_ext == 'doc':
+                # .doc files (older Microsoft Word format) require special handling
+                # Try python-docx2txt first, then fallback methods
+                try:
+                    # Method 1: Try textract (if available) - handles both .doc and .docx
+                    try:
+                        import textract
+                        full_text = textract.process(filepath).decode('utf-8')
+                        if full_text and len(full_text.strip()) > 50:
+                            print(f"✅ Extracted {len(full_text)} characters from .doc using textract")
+                            return full_text.strip()
+                    except ImportError:
+                        print("⚠️ textract not available, trying other methods...")
+                    except Exception as e:
+                        print(f"⚠️ textract extraction failed: {e}")
+                    
+                    # Method 2: Try antiword (if available) - Linux command-line tool
+                    try:
+                        import subprocess
+                        result = subprocess.run(['antiword', filepath], capture_output=True, text=True, timeout=30)
+                        if result.returncode == 0 and result.stdout and len(result.stdout.strip()) > 50:
+                            print(f"✅ Extracted {len(result.stdout)} characters from .doc using antiword")
+                            return result.stdout.strip()
+                    except (FileNotFoundError, subprocess.TimeoutExpired) as e:
+                        print(f"⚠️ antiword not available or timed out: {e}")
+                    
+                    # Method 3: Try catdoc (if available) - Linux command-line tool
+                    try:
+                        import subprocess
+                        result = subprocess.run(['catdoc', filepath], capture_output=True, text=True, timeout=30)
+                        if result.returncode == 0 and result.stdout and len(result.stdout.strip()) > 50:
+                            print(f"✅ Extracted {len(result.stdout)} characters from .doc using catdoc")
+                            return result.stdout.strip()
+                    except (FileNotFoundError, subprocess.TimeoutExpired) as e:
+                        print(f"⚠️ catdoc not available or timed out: {e}")
+                    
+                    # Method 4: Last resort - warn user
+                    print(f"⚠️ .doc file format not fully supported. Please convert to .docx or .txt")
+                    return "⚠️ .doc file format (older Microsoft Word) is not fully supported. Please convert this file to .docx or .txt format for better compatibility."
+                    
+                except Exception as e:
+                    print(f"❌ Error processing .doc file: {e}")
+                    return f"⚠️ Error processing .doc file: {str(e)}. Please convert to .docx or .txt format."
             else:
                 loader = TextLoader(filepath, encoding='utf-8')
                 documents = loader.load()
@@ -205,12 +248,51 @@ def process_file_for_user(filepath, filename, category, user_id):
                 loader = PyPDFLoader(filepath)
             elif file_ext == 'csv':
                 loader = CSVLoader(filepath)
-            elif file_ext in ['docx', 'doc']:
+            elif file_ext == 'docx':
                 try:
                     loader = Docx2txtLoader(filepath)
                 except Exception as e:
                     print(f"⚠️ Could not load .docx file, trying as text: {e}")
                     loader = TextLoader(filepath, encoding='utf-8')
+            elif file_ext == 'doc':
+                # .doc files need special handling - use text extraction methods
+                # For ingestion, we'll extract text first, then create a document
+                try:
+                    import textract
+                    full_text = textract.process(filepath).decode('utf-8')
+                    if not full_text or len(full_text.strip()) < 50:
+                        raise Exception("textract returned insufficient text")
+                    # Create a single document from extracted text
+                    from langchain_core.documents import Document
+                    documents = [Document(page_content=full_text.strip())]
+                    print(f"✅ Extracted text from .doc file using textract")
+                except ImportError:
+                    # Fallback: try antiword or catdoc
+                    try:
+                        import subprocess
+                        result = subprocess.run(['antiword', filepath], capture_output=True, text=True, timeout=30)
+                        if result.returncode == 0 and result.stdout:
+                            from langchain_core.documents import Document
+                            documents = [Document(page_content=result.stdout.strip())]
+                            print(f"✅ Extracted text from .doc file using antiword")
+                        else:
+                            raise Exception("antiword failed")
+                    except:
+                        try:
+                            import subprocess
+                            result = subprocess.run(['catdoc', filepath], capture_output=True, text=True, timeout=30)
+                            if result.returncode == 0 and result.stdout:
+                                from langchain_core.documents import Document
+                                documents = [Document(page_content=result.stdout.strip())]
+                                print(f"✅ Extracted text from .doc file using catdoc")
+                            else:
+                                raise Exception("catdoc failed")
+                        except:
+                            print(f"⚠️ .doc file not supported - please convert to .docx")
+                            return False
+                except Exception as e:
+                    print(f"❌ Error processing .doc file: {e}")
+                    return False
             else:
                 loader = TextLoader(filepath, encoding='utf-8')
             

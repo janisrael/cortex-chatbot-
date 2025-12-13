@@ -1,0 +1,101 @@
+
+KNOWLEDGE BASE MARATHON TEST REPORT
+====================================
+
+Test Configuration:
+- Total Waves: 10
+- Tests per Wave: 20
+- Total Tests: 200
+- Test User ID: 1
+
+Test Duration:
+- Start: 2025-12-12T16:10:24.025260
+- End: 2025-12-12T16:24:01.436653
+
+OVERALL RESULTS
+===============
+Total Tests: 200
+Passed: 199 (99.5%)
+Failed: 1 (0.5%)
+Overall Accuracy: 49.8%
+
+Performance Metrics:
+- Average Ingestion Time: 0.037s
+- Average Verification Time: 0.008s
+- Average Retrieval Time: 3.432s
+
+RESULTS BY TYPE
+===============
+
+FAQ Tests:
+- Total: 70
+- Passed: 70 (100.0%)
+- Average Accuracy: 79.9%
+- Average Ingestion Time: 0.048s
+
+FILE Tests:
+- Total: 70
+- Passed: 69 (98.6%)
+- Average Accuracy: 33.4%
+- Average Ingestion Time: 0.033s
+
+CRAWL Tests:
+- Total: 60
+- Passed: 60 (100.0%)
+- Average Accuracy: 34.0%
+- Average Ingestion Time: 0.028s
+
+WAVE BREAKDOWN
+==============
+
+Wave 1:
+- Passed: 20/20 (100.0%)
+- Average Accuracy: 48.2%
+
+Wave 2:
+- Passed: 20/20 (100.0%)
+- Average Accuracy: 47.0%
+
+Wave 3:
+- Passed: 20/20 (100.0%)
+- Average Accuracy: 50.2%
+
+Wave 4:
+- Passed: 20/20 (100.0%)
+- Average Accuracy: 52.2%
+
+Wave 5:
+- Passed: 20/20 (100.0%)
+- Average Accuracy: 50.8%
+
+Wave 6:
+- Passed: 19/20 (95.0%)
+- Average Accuracy: 51.5%
+
+Wave 7:
+- Passed: 20/20 (100.0%)
+- Average Accuracy: 49.8%
+
+Wave 8:
+- Passed: 20/20 (100.0%)
+- Average Accuracy: 50.2%
+
+Wave 9:
+- Passed: 20/20 (100.0%)
+- Average Accuracy: 48.7%
+
+Wave 10:
+- Passed: 20/20 (100.0%)
+- Average Accuracy: 49.8%
+
+FAILED TESTS DETAILS
+====================
+
+W6_T11_FILE (FILE):
+  Error: None
+  Accuracy: 15.0%
+  Verified: True
+
+
+FINAL GRADE: F (Failed)
+Based on Pass Rate: 99.5% and Accuracy: 49.8%
