@@ -2,10 +2,11 @@
 from services.knowledge_service import get_user_vectorstore
 from services.config_service import load_user_chatbot_config
 from services.llm_service import LLMProvider
+from services.conversation_service import build_conversation_context
 from utils.prompts import get_default_prompt_with_name
 
 
-def get_chatbot_response(user_id, message, system_llm=None, name="User"):
+def get_chatbot_response(user_id, message, system_llm=None, name="User", conversation_id=None):
     """Get chatbot response using user's knowledge base and config
     
     Args:
@@ -13,6 +14,7 @@ def get_chatbot_response(user_id, message, system_llm=None, name="User"):
         message: User's message
         system_llm: System-level LLM (fallback if user config fails)
         name: User's name (default: "User")
+        conversation_id: Optional conversation ID for maintaining context
     
     Returns:
         tuple: (response_text, error_message)
@@ -66,9 +68,10 @@ def get_chatbot_response(user_id, message, system_llm=None, name="User"):
         user_vectorstore = get_user_vectorstore(user_id)
         if user_vectorstore:
             # Try to create retriever - if it fails, we'll use direct LLM
-            # Increased k to 10 for better retrieval, priority order handled in retrieval
+            # Increased k to 30 for better retrieval, especially for FILE documents
+            # Priority order handled in retrieval
             try:
-                user_retriever = user_vectorstore.as_retriever(search_kwargs={"k": 10})
+                user_retriever = user_vectorstore.as_retriever(search_kwargs={"k": 30})
             except Exception as e:
                 print(f"⚠️ Cannot create retriever, using direct LLM: {e}")
                 user_retriever = None
@@ -108,11 +111,23 @@ def get_chatbot_response(user_id, message, system_llm=None, name="User"):
                 file_docs = [d for d in docs if d.metadata.get('source_type') == 'file_upload']
                 other_docs = [d for d in docs if d.metadata.get('source_type') not in ['faq', 'crawl', 'file_upload']]
                 
+                # Phase 2: Improved prioritization for FILE documents
                 # Reorder: FAQ first, then crawl, then file, then others
                 prioritized_docs = faq_docs + crawl_docs + file_docs + other_docs
                 
-                # Limit to top 8 for context (keep some for diversity)
-                prioritized_docs = prioritized_docs[:8]
+                # Phase 2: Ensure FILE documents are included if they exist
+                # If we have FILE documents but they're not in top 8, include at least one
+                if file_docs and len(prioritized_docs) > 8:
+                    top_docs = prioritized_docs[:7]
+                    # Check if any FILE docs are already in top 7
+                    has_file = any(d.metadata.get('source_type') == 'file_upload' for d in top_docs)
+                    if not has_file and file_docs:
+                        # Replace last doc with first FILE doc to ensure FILE content is included
+                        top_docs = top_docs[:6] + [file_docs[0]]
+                    prioritized_docs = top_docs
+                else:
+                    # Limit to top 8 for context (keep some for diversity)
+                    prioritized_docs = prioritized_docs[:8]
                 
                 context = "\n\n".join([doc.page_content for doc in prioritized_docs]) if prioritized_docs else ""
                 
@@ -149,17 +164,37 @@ def get_chatbot_response(user_id, message, system_llm=None, name="User"):
             if response_style in style_instructions:
                 system_prompt += f"\n\nResponse Style: {style_instructions[response_style]}"
             
+            # Build conversation history context if conversation_id is provided
+            conversation_context = ""
+            if conversation_id:
+                conversation_context = build_conversation_context(conversation_id, max_messages=10)
+                if conversation_context:
+                    print(f"💬 Using conversation history ({len(conversation_context)} chars)")
+            
+            # Build the full prompt with knowledge base context and conversation history
             if context:
                 # Use RAG with context from knowledge base
-                full_prompt = prompt_template_text.format(context=context, question=message)
+                base_prompt = prompt_template_text.format(context=context, question=message)
                 print(f"✅ Using RAG with {len(context)} characters of context")
             else:
                 # No context found - use LLM directly with user's bot name
-                full_prompt = f"{system_prompt}\n\nUser ({name}) asks: {message}"
+                base_prompt = f"User ({name}) asks: {message}"
                 print(f"ℹ️ No knowledge base context - using direct LLM response")
             
-            # Add system prompt at the beginning
-            full_prompt = f"{system_prompt}\n\n{full_prompt}"
+            # Combine system prompt, conversation history, and base prompt
+            full_prompt = system_prompt
+            
+            # Add conversation history if available with explicit instructions
+            if conversation_context:
+                full_prompt += f"\n\n--- CONVERSATION CONTEXT ---"
+                full_prompt += f"\nYou are having an ongoing conversation with the user. Below is the previous conversation history."
+                full_prompt += f"\nIMPORTANT: Use this context to understand references like 'their', 'it', 'that', 'they', etc."
+                full_prompt += f"\nIf the user says 'their phone number' and the previous conversation was about Person 1, they are referring to Person 1's phone number."
+                full_prompt += f"\n\nPrevious Conversation History:\n{conversation_context}"
+                full_prompt += f"\n--- END CONVERSATION CONTEXT ---\n"
+            
+            # Add knowledge base context and current question
+            full_prompt += f"\n{base_prompt}"
             
             # Add instructions for including contact information and links
             full_prompt += f"\n\nCRITICAL INSTRUCTIONS:"

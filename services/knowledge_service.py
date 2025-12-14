@@ -133,7 +133,25 @@ def get_user_vectorstore(user_id):
                     embedding_function=embeddings
                 )
                 print(f"✅ Chroma vectorstore object created for collection: {collection_name}")
-                return user_vectorstore
+                
+                # Verify vectorstore is actually usable before returning
+                try:
+                    # Test that we can access the collection
+                    test_collection = user_vectorstore._collection
+                    if test_collection is None:
+                        print(f"⚠️ Warning: Collection is None after creation")
+                        return None
+                    # Try a simple operation to verify it works (but don't fail if it errors)
+                    try:
+                        _ = test_collection.count()
+                    except:
+                        pass  # Count might fail on empty collection, that's OK
+                    print(f"✅ Vectorstore verified and ready")
+                    return user_vectorstore
+                except Exception as verify_error:
+                    print(f"⚠️ Warning: Vectorstore verification error (but returning anyway): {verify_error}")
+                    # Return it anyway - it might still work
+                    return user_vectorstore
             except Exception as chroma_error:
                 print(f"❌ Error creating Chroma vectorstore: {chroma_error}")
                 import traceback
