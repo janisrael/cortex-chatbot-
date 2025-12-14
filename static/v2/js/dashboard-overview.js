@@ -62,7 +62,6 @@ const PROMPT_PRESET_METADATA = {
 
 // Make switchTab globally accessible
 window.switchTab = function(tabName) {
-    console.log('🔵 switchTab called with:', tabName);
     
     // Update tab buttons - find the button by its onclick attribute
     document.querySelectorAll('.tab-button').forEach(btn => {
@@ -71,29 +70,22 @@ window.switchTab = function(tabName) {
         const onclickAttr = btn.getAttribute('onclick');
         if (onclickAttr && onclickAttr.includes(`'${tabName}'`)) {
             btn.classList.add('active');
-            console.log('✅ Tab button activated:', tabName);
         }
     });
     
     // Update tab content
     document.querySelectorAll('.tab-content').forEach(content => {
         content.classList.remove('active');
-        console.log('Removed active from:', content.id);
     });
     
     const targetTab = document.getElementById(`${tabName}-tab`);
-    console.log('Looking for tab:', `${tabName}-tab`, 'Found:', targetTab);
     
     if (targetTab) {
         targetTab.classList.add('active');
-        console.log('✅ Tab content activated:', targetTab.id, 'Has active class:', targetTab.classList.contains('active'));
         
         // Force display to check if CSS is the issue
         const computedStyle = window.getComputedStyle(targetTab);
-        console.log('Tab display style:', computedStyle.display);
     } else {
-        console.error(`❌ Tab with id "${tabName}-tab" not found`);
-        console.log('Available tabs:', Array.from(document.querySelectorAll('.tab-content')).map(t => t.id));
         return; // Exit early if tab not found
     }
     
@@ -107,33 +99,25 @@ window.switchTab = function(tabName) {
     } else if (tabName === 'knowledge') {
         if (typeof refreshFileList === 'function') {
             refreshFileList().catch(err => {
-                console.error('Error loading files in knowledge tab:', err);
             });
         }
         // Load knowledge stats when knowledge tab is opened
         if (typeof loadKnowledgeStats === 'function') {
             loadKnowledgeStats().catch(err => {
-                console.error('Error loading knowledge stats:', err);
             });
         }
     } else if (tabName === 'llm') {
         // Initialize LLM provider selection when LLM tab is opened
-        console.log('📑 LLM tab opened, initializing provider selection...');
         setTimeout(() => {
             if (typeof window.initializeLLMProvider === 'function') {
-                console.log('✅ Calling window.initializeLLMProvider...');
                 window.initializeLLMProvider();
             } else if (typeof initializeLLMProvider === 'function') {
-                console.log('✅ Calling initializeLLMProvider...');
                 initializeLLMProvider();
             } else {
-                console.error('❌ initializeLLMProvider function not found!');
                 // Try to manually populate models
                 if (typeof onProviderChange === 'function') {
-                    console.log('🔄 Trying onProviderChange directly...');
                     onProviderChange();
                 } else if (typeof window.onProviderChange === 'function') {
-                    console.log('🔄 Trying window.onProviderChange directly...');
                     window.onProviderChange();
                 }
             }
@@ -223,7 +207,6 @@ function selectWebsite(websiteId) {
     loadLLMConfig();
     loadStats();
     
-    console.log(`Switched to website: ${websiteId}`);
 }
 
 // ===========================
@@ -249,17 +232,14 @@ async function loadStats() {
                     // If JSON parse fails, might be HTML redirect
                     const text = await statsResponse.clone().text();
                     if (text.includes('<!DOCTYPE') || text.includes('<html')) {
-                        console.error('❌ Received HTML instead of JSON - user may not be authenticated');
                         return; // Don't try to parse HTML as JSON
                     }
                     throw jsonError; // Re-throw if it's a different error
                 }
             } else {
-                console.warn('⚠️ Stats response is not JSON (content-type:', contentType, '), might be redirected to login');
                 return;
             }
         } else {
-            console.error('❌ Failed to load stats:', statsResponse.status, statsResponse.statusText);
             return;
         }
         
@@ -303,10 +283,8 @@ async function loadStats() {
         await refreshFileList();
         
     } catch (error) {
-        console.error('❌ Failed to load stats:', error);
         // Don't show error if it's a JSON parse error from HTML redirect
         if (error.message && error.message.includes('JSON')) {
-            console.warn('⚠️ JSON parse error - likely authentication issue. User may need to refresh page.');
         }
     }
 }
@@ -317,18 +295,15 @@ async function loadFiles() {
             credentials: 'same-origin'
         });
         if (!response.ok) {
-            console.error('Failed to load files:', response.status, response.statusText);
             return [];
         }
         const contentType = response.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
-            console.error('Response is not JSON, might be redirected to login');
             return [];
         }
         const data = await response.json();
         return data.files || [];
     } catch (error) {
-        console.error('Error loading files:', error);
         return []; // Return empty array instead of throwing
     }
 }
@@ -385,7 +360,6 @@ window.deleteFile = async function(filename, category) {
         } else {
             alert(`❌ ${errorMessage}`);
         }
-        console.error('Delete file error:', error);
         return false;
     }
 }
@@ -400,7 +374,6 @@ window.refreshFileList = async function() {
         const files = await loadFiles();
         updateFileList(files);
     } catch (error) {
-        console.error('Error in refreshFileList:', error);
         // Show error in file list
         const fileList = document.getElementById('fileList');
         if (fileList) {
@@ -429,7 +402,6 @@ function updateFileList(files) {
     try {
         // If files is undefined or not an array, set empty array to prevent infinite loop
         if (!files || !Array.isArray(files)) {
-            console.warn('updateFileList called without valid files array, using empty array');
             files = [];
         }
     
@@ -584,14 +556,12 @@ function updateFileList(files) {
                     });
                 });
             } catch (eventError) {
-                console.error('Error setting up file list event listeners:', eventError);
             }
         }, 100);
         // Update both file lists
         if (overviewFileList) overviewFileList.innerHTML = fileHTML;
         if (fileList) fileList.innerHTML = fileHTML;
     } catch (error) {
-        console.error('Error in updateFileList:', error);
         // Show error message in file list
         const errorMessage = '<div style="text-align: center; color: #dc3545; padding: 20px;">Error loading files. Please refresh the page.</div>';
         if (fileList) {

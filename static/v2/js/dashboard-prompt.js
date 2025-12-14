@@ -54,7 +54,6 @@ async function loadPresets() {
             presetGrid.appendChild(card);
         });
     } catch (error) {
-        console.error('Failed to load presets:', error);
     }
 }
 
@@ -121,20 +120,16 @@ async function loadPrompt() {
         const data = await response.json();
         const config = data.config || data; // Handle both {config: {...}} and direct config
         
-        console.log('📥 Loaded prompt config from API:', {
-            raw_response: data,
-            config_object: config,
-            prompt_preset_id: config.prompt_preset_id,
-            prompt_preset_id_type: typeof config.prompt_preset_id,
-            has_prompt: !!config.prompt,
-            bot_name: config.bot_name,
-            all_config_keys: Object.keys(config)
-        });
-        
         // Load chatbot name
         const nameInput = document.getElementById('chatbotName');
         if (nameInput) {
             nameInput.value = config.bot_name || 'Cortex';
+        }
+        
+        // Load welcome message
+        const welcomeMessageInput = document.getElementById('welcomeMessage');
+        if (welcomeMessageInput) {
+            welcomeMessageInput.value = config.welcome_message || '';
         }
         
         // Load presets first (needed to select default)
@@ -151,14 +146,6 @@ async function loadPrompt() {
             presetIdToSelect = String(presetIdToSelect);
         }
         
-        console.log('📝 Loading prompt config:', { 
-            saved_preset_id: config.prompt_preset_id,
-            saved_preset_id_type: typeof config.prompt_preset_id,
-            presetIdToSelect: presetIdToSelect,
-            has_prompt: !!config.prompt,
-            available_presets: Object.keys(globalPresets)
-        });
-        
         // If no preset_id saved, find Virtual Assistant preset (default for new users)
         if (!presetIdToSelect) {
             const vaPreset = Object.values(globalPresets).find(p => 
@@ -166,13 +153,11 @@ async function loadPrompt() {
             );
             if (vaPreset) {
                 presetIdToSelect = vaPreset.id;
-                console.log('✅ Defaulting to Virtual Assistant preset:', presetIdToSelect);
             } else {
                 // Fallback: use first preset
                 const firstPreset = Object.values(globalPresets)[0];
                 if (firstPreset) {
                     presetIdToSelect = firstPreset.id;
-                    console.log('✅ Using first available preset:', presetIdToSelect);
                 }
             }
         }
@@ -200,10 +185,8 @@ async function loadPrompt() {
                         card.classList.add('active');
                     }
                     currentPresetId = presetIdToSelect;
-                    console.log('✅ Preset selected:', presetIdToSelect);
                     return true;
                 }
-                console.log(`⏳ Attempt ${attempts + 1}: Radio button not found for preset ${presetIdToSelect}`);
                 return false;
             };
             
@@ -213,8 +196,6 @@ async function loadPrompt() {
             }
             
             if (attempts >= maxAttempts) {
-                console.error('❌ Failed to select preset after', maxAttempts, 'attempts');
-                console.error('Available preset IDs in DOM:', Array.from(document.querySelectorAll('.preset-radio')).map(r => r.id));
             }
         }
         
@@ -225,7 +206,6 @@ async function loadPrompt() {
                 // User has a saved prompt (their modified version)
                 editor.value = config.prompt;
                 savedPrompt = config.prompt; // Store for reset functionality
-                console.log('✅ Loaded saved prompt from config');
             } else if (presetIdToSelect) {
                 // Try to find preset by string or number ID
                 const preset = globalPresets[presetIdToSelect] || 
@@ -236,21 +216,17 @@ async function loadPrompt() {
                     // No saved prompt, load the preset template
                     editor.value = preset.prompt;
                     savedPrompt = null; // No saved version yet
-                    console.log('✅ Loaded preset template:', preset.name);
                 } else {
-                    console.warn('⚠️ Preset not found, using default prompt');
                     editor.value = getDefaultPrompt(config.bot_name || 'Cortex');
                     savedPrompt = null;
                 }
             } else {
                 // Fallback to default prompt
-                console.log('ℹ️ No preset selected, using default prompt');
                 editor.value = getDefaultPrompt(config.bot_name || 'Cortex');
                 savedPrompt = null;
             }
         }
     } catch (error) {
-        console.error('Failed to load prompt:', error);
         // Fallback to default
         const nameInput = document.getElementById('chatbotName');
         const editor = document.getElementById('promptEditor');
@@ -318,19 +294,17 @@ async function savePrompt() {
     if (promptLoading) promptLoading.style.display = 'block';
     
     try {
+        // Get welcome message
+        const welcomeMessageInput = document.getElementById('welcomeMessage');
+        const welcomeMessage = welcomeMessageInput ? welcomeMessageInput.value.trim() : '';
+        
         // Save both prompt and the preset_id it came from (user-specific)
         const saveData = {
             bot_name: botName,
             prompt: prompt,
-            prompt_preset_id: currentPresetId || null  // Save which preset user is using
+            prompt_preset_id: currentPresetId || null,  // Save which preset user is using
+            welcome_message: welcomeMessage  // Always send, even if empty (to clear it)
         };
-        
-        console.log('💾 Saving prompt config:', {
-            bot_name: botName,
-            has_prompt: !!prompt,
-            prompt_preset_id: currentPresetId,
-            prompt_preset_id_type: typeof currentPresetId
-        });
         
         const response = await fetch('/api/user/chatbot-config', {
             method: 'POST',
@@ -438,7 +412,6 @@ function selectCategory(categoryId, element) {
     });
     element?.classList.add('active');
     
-    console.log(`Selected category: ${categoryId}`);
 }
 
 function setupFileUpload() {
@@ -476,16 +449,12 @@ function setupFileUpload() {
 }
 
 async function handleFileUpload(files) {
-    console.log('handleFileUpload called with', files.length, 'files');
-    console.log('Current website:', currentWebsiteId);
-    console.log('Selected category:', selectedCategory);
     
     const uploadBtn = document.getElementById('uploadBtn');
     const progressDiv = document.getElementById('uploadProgress');
     const progressBar = progressDiv?.querySelector('.progress-bar');
     
     if (!files.length) {
-        console.log('No files to upload');
         return;
     }
     
@@ -499,7 +468,6 @@ async function handleFileUpload(files) {
     // Upload files one by one
     for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        console.log(`Uploading file ${i + 1}/${files.length}:`, file.name);
         
         const formData = new FormData();
         formData.append('file', file);  // Changed from 'files' to 'file'
@@ -518,8 +486,6 @@ async function handleFileUpload(files) {
             });
             
             xhr.addEventListener('load', () => {
-                console.log('Upload response status:', xhr.status);
-                console.log('Upload response:', xhr.responseText);
                 
                 if (xhr.status === 200) {
                     const response = JSON.parse(xhr.responseText);
@@ -545,7 +511,6 @@ async function handleFileUpload(files) {
             });
             
             xhr.addEventListener('error', () => {
-                console.error('Upload network error');
                 showAlert('uploadError', `Upload failed: Network error for ${file.name}`);
             });
             
@@ -558,7 +523,6 @@ async function handleFileUpload(files) {
             });
             
         } catch (error) {
-            console.error('Upload error:', error);
             showAlert('promptError', `Upload failed: ${error.message}`);
         }
     }

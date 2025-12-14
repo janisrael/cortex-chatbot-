@@ -35,7 +35,6 @@ async function loadLLMConfig() {
             is_fallback: false  // API call succeeded, not using fallback
         };
         
-        console.log(`📋 Loaded LLM config: ${llmConfig.effective_provider} / ${llmConfig.effective_model} (user: ${userProvider}/${userModel || 'none'})`);
         
         populateLLMConfig();
         updateLLMStatus();
@@ -45,7 +44,6 @@ async function loadLLMConfig() {
             updateActiveLLMStatus(llmConfig.effective_provider, llmConfig.effective_model);
         }
     } catch (error) {
-        console.error('Failed to load LLM config:', error);
         // Fallback to default values if API fails
         llmConfig = {
             global_provider: 'openai',
@@ -123,7 +121,6 @@ async function saveGlobalConfig() {
         await loadLLMConfig();
         
     } catch (error) {
-        console.error('Failed to save global config:', error);
         showAlert('llmError', 'Failed to save configuration: ' + error.message);
     } finally {
         if (saveBtn) {
@@ -159,7 +156,6 @@ async function loadAdvancedSettings() {
         if (presPenaltyField) presPenaltyField.value = config.presence_penalty ?? 0.0;
         if (systemInstructionsField) systemInstructionsField.value = config.system_instructions ?? '';
     } catch (error) {
-        console.error('Failed to load advanced settings:', error);
         // Use defaults if load fails
     }
 }
@@ -265,7 +261,6 @@ async function saveAdvancedSettings() {
         await loadAdvancedSettings();
         
     } catch (error) {
-        console.error('Failed to save advanced settings:', error);
         let errorMsg = `Failed to save settings: ${error.message}`;
         
         // Handle JSON parse errors
@@ -393,7 +388,6 @@ async function testLLMConnection() {
     hideAlert('llmError');
     
     try {
-        console.log('Testing LLM connection...');
         
         // Get API key from provider settings if available
         const apiKeyField = document.getElementById('llmApiKey');
@@ -423,11 +417,9 @@ async function testLLMConnection() {
         }
         
         const result = await response.json();
-        console.log('Test result:', result);
         
         if (response.ok && result.status === 'success') {
             const message = `Connection successful! Model: ${result.model}${result.response_time ? `, Response time: ${result.response_time}ms` : ''}`;
-            console.log('Success:', message);
             
             // Show floating notification
             if (typeof showSuccessNotification !== 'undefined') {
@@ -438,7 +430,6 @@ async function testLLMConnection() {
             }
         } else {
             const errorMsg = `Connection failed: ${result.error || result.message || 'Unknown error'}`;
-            console.error('Error:', errorMsg);
             
             // Show floating notification
             if (typeof showErrorNotification !== 'undefined') {
@@ -456,7 +447,6 @@ async function testLLMConnection() {
             errorMsg = 'Connection test failed: Server returned an invalid response. Please check your login status and try again.';
         }
         
-        console.error('Exception:', errorMsg);
         
         // Show floating notification
         if (typeof showErrorNotification !== 'undefined') {

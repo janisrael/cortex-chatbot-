@@ -22,9 +22,7 @@ function formatFileSize(bytes) {
  * @param {string} message - Message to display
  */
 function showAlert(alertId, message) {
-    console.log(`showAlert called: ${alertId}, message: ${message}`);
     const alertElement = document.getElementById(alertId);
-    console.log('Alert element found:', alertElement);
     
     if (alertElement) {
         alertElement.textContent = message;
@@ -32,13 +30,10 @@ function showAlert(alertId, message) {
         alertElement.style.opacity = '1';
         alertElement.style.visibility = 'visible';
         
-        console.log('Alert display set to:', window.getComputedStyle(alertElement).display);
-        console.log('Alert classes:', alertElement.className);
         
         // Scroll alert into view
         alertElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     } else {
-        console.error(`Alert element not found: ${alertId}`);
     }
 }
 
@@ -78,7 +73,6 @@ function initializeUtils() {
         }
     });
     
-    console.log('✅ Utils initialized');
 }
 
 // ===========================
@@ -91,7 +85,6 @@ function initializeHamburgerMenu() {
     const headerContent = document.querySelector('.header-content');
     
     if (!hamburger || !navLinks || !headerContent) {
-        console.warn('⚠️ Hamburger menu elements not found');
         return;
     }
     
@@ -136,7 +129,6 @@ function initializeHamburgerMenu() {
         }
     });
     
-    console.log('✅ Hamburger menu initialized');
 }
 
 // Auto-initialize hamburger menu on DOMContentLoaded for all pages

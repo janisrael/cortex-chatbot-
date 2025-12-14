@@ -18,19 +18,16 @@ async function initializeFileManagement() {
         await loadKnowledgeStats(); // Load stats cards
         setupFileUpload();
     } catch (error) {
-        console.error('Failed to initialize file management:', error);
     }
 }
 
 async function loadKnowledgeStats() {
     try {
-        console.log('📊 Loading knowledge stats...');
         const response = await fetch('/api/knowledge-stats', {
             credentials: 'same-origin'
         });
         
         if (!response.ok) {
-            console.error('❌ Failed to load knowledge stats:', response.status, response.statusText);
             // Set default values on error
             const filesCountEl = document.getElementById('knowledgeFilesCount');
             const crawledCountEl = document.getElementById('knowledgeCrawledCount');
@@ -42,7 +39,6 @@ async function loadKnowledgeStats() {
         }
         
         const stats = await response.json();
-        console.log('📊 Knowledge stats received:', stats);
         
         // Update Files Card
         const filesCountEl = document.getElementById('knowledgeFilesCount');
@@ -51,9 +47,7 @@ async function loadKnowledgeStats() {
             const fileCount = (stats.file_count !== undefined && stats.file_count !== null) ? stats.file_count : 0;
             const maxFiles = stats.max_files || 100;
             filesCountEl.textContent = `${fileCount}/${maxFiles}`;
-            console.log(`✅ Updated files count: ${fileCount}/${maxFiles}`);
         } else {
-            console.warn('⚠️ knowledgeFilesCount element not found');
         }
         if (filesLimitEl) {
             filesLimitEl.textContent = `Limit: ${stats.max_files || 100} files`;
@@ -66,9 +60,7 @@ async function loadKnowledgeStats() {
             const crawledCount = (stats.crawled_count !== undefined && stats.crawled_count !== null) ? stats.crawled_count : 0;
             const maxCrawled = stats.max_crawled || 200;
             crawledCountEl.textContent = `${crawledCount}/${maxCrawled}`;
-            console.log(`✅ Updated crawled count: ${crawledCount}/${maxCrawled}`);
         } else {
-            console.warn('⚠️ knowledgeCrawledCount element not found');
         }
         if (crawledLimitEl) {
             crawledLimitEl.textContent = `Limit: ${stats.max_crawled || 200} websites`;
@@ -81,16 +73,13 @@ async function loadKnowledgeStats() {
             const faqCount = (stats.faq_count !== undefined && stats.faq_count !== null) ? stats.faq_count : 0;
             const maxFaqs = stats.max_faqs || 500;
             faqCountEl.textContent = `${faqCount}/${maxFaqs}`;
-            console.log(`✅ Updated FAQ count: ${faqCount}/${maxFaqs}`);
         } else {
-            console.warn('⚠️ knowledgeFaqCount element not found');
         }
         if (faqLimitEl) {
             faqLimitEl.textContent = `Limit: ${stats.max_faqs || 500} FAQs`;
         }
         
     } catch (error) {
-        console.error('❌ Failed to load knowledge stats:', error);
         // Set default values on error
         const filesCountEl = document.getElementById('knowledgeFilesCount');
         const crawledCountEl = document.getElementById('knowledgeCrawledCount');
@@ -112,7 +101,6 @@ async function loadCategories() {
         renderCategoryTabs();
         updateSelectedCategoryInfo();
     } catch (error) {
-        console.error('Failed to load categories:', error);
     }
 }
 
@@ -228,7 +216,6 @@ async function loadFilesByCategory() {
         const categoriesWithFiles = await response.json();
         renderFilesByCategory(categoriesWithFiles);
     } catch (error) {
-        console.error('Failed to load files by category:', error);
     }
 }
 
@@ -398,7 +385,6 @@ function renderFilesByCategory(categoriesWithFiles) {
                         });
                     });
                 } catch (eventError) {
-                    console.error('Error setting up file list event listeners:', eventError);
                 }
             }, 100);
         }
@@ -426,7 +412,6 @@ function setupFileUpload() {
     
     // Prevent multiple initializations
     if (fileUploadInitialized) {
-        console.log('File upload already initialized, skipping...');
         return;
     }
     fileUploadInitialized = true;
@@ -466,7 +451,6 @@ let isUploading = false;
 async function handleFileUpload(files) {
     // Prevent multiple simultaneous uploads
     if (isUploading) {
-        console.log('Upload already in progress, ignoring...');
         return;
     }
     
@@ -536,7 +520,6 @@ async function handleFileUpload(files) {
                 }
                 
             } catch (error) {
-                console.error('Upload error:', error);
                 const errorMessage = 'Failed to upload ' + file.name + ': ' + error.message;
                 
                 // Show toast notification
@@ -854,7 +837,6 @@ async function refreshCrawledUrls() {
         
         listDiv.innerHTML = html;
     } catch (error) {
-        console.error('Failed to load crawled URLs:', error);
         listDiv.innerHTML = `<div style="text-align: center; color: #dc3545; padding: 20px;">Error: ${error.message}</div>`;
     }
 }

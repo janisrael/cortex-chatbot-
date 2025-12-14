@@ -13,7 +13,7 @@ import uuid
 class Conversation:
     """Conversation model for managing chat sessions"""
     
-    def __init__(self, id, user_id, session_id, title=None, created_at=None, updated_at=None, message_count=0, is_active=True):
+    def __init__(self, id, user_id, session_id, title=None, created_at=None, updated_at=None, message_count=0, is_active=True, metadata=None):
         self.id = id
         self.user_id = user_id
         self.session_id = session_id
@@ -22,6 +22,7 @@ class Conversation:
         self.updated_at = updated_at
         self.message_count = message_count
         self.is_active = is_active
+        self.metadata = metadata
     
     @staticmethod
     def _get_db_connection():
@@ -58,12 +59,23 @@ class Conversation:
                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                         message_count INT DEFAULT 0,
                         is_active BOOLEAN DEFAULT 1,
+                        metadata TEXT,
                         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
                         INDEX idx_user_id (user_id),
                         INDEX idx_session_id (session_id),
                         INDEX idx_created_at (created_at)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
                 """)
+                
+                # Check if metadata column exists, add if not
+                cursor.execute("""
+                    SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+                    WHERE TABLE_SCHEMA = DATABASE() 
+                    AND TABLE_NAME = 'conversations' 
+                    AND COLUMN_NAME = 'metadata'
+                """)
+                if cursor.fetchone()[0] == 0:
+                    cursor.execute("ALTER TABLE conversations ADD COLUMN metadata TEXT")
             else:
                 # SQLite table creation
                 cursor.execute("""
@@ -75,13 +87,20 @@ class Conversation:
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         message_count INTEGER DEFAULT 0,
-                        is_active INTEGER DEFAULT 1
+                        is_active INTEGER DEFAULT 1,
+                        metadata TEXT
                     )
                 """)
                 # Create indexes
                 cursor.execute("CREATE INDEX IF NOT EXISTS idx_user_id ON conversations(user_id)")
                 cursor.execute("CREATE INDEX IF NOT EXISTS idx_session_id ON conversations(session_id)")
                 cursor.execute("CREATE INDEX IF NOT EXISTS idx_created_at ON conversations(created_at)")
+                
+                # Check if metadata column exists, add if not (SQLite)
+                cursor.execute("PRAGMA table_info(conversations)")
+                columns = [col[1] for col in cursor.fetchall()]
+                if 'metadata' not in columns:
+                    cursor.execute("ALTER TABLE conversations ADD COLUMN metadata TEXT")
             
             conn.commit()
         except Exception as e:
@@ -362,6 +381,51 @@ class Conversation:
                 cursor.close()
                 conn.close()
     
+    def update_metadata(self, metadata):
+        """Update conversation metadata
+        
+        Args:
+            metadata: Dictionary to store as JSON in metadata field
+        
+        Returns:
+            bool: Success status
+        """
+        conn = None
+        try:
+            import json
+            metadata_json = json.dumps(metadata) if metadata else None
+            
+            conn = Conversation._get_db_connection()
+            cursor = conn.cursor()
+            
+            is_mysql = isinstance(conn, mysql.connector.MySQLConnection)
+            
+            if is_mysql:
+                cursor.execute("""
+                    UPDATE conversations 
+                    SET metadata = %s, updated_at = CURRENT_TIMESTAMP 
+                    WHERE id = %s
+                """, (metadata_json, self.id))
+            else:
+                cursor.execute("""
+                    UPDATE conversations 
+                    SET metadata = ?, updated_at = CURRENT_TIMESTAMP 
+                    WHERE id = ?
+                """, (metadata_json, self.id))
+            
+            conn.commit()
+            self.metadata = metadata
+            return True
+        except Exception as e:
+            print(f"Error updating conversation metadata: {e}")
+            if conn:
+                conn.rollback()
+            return False
+        finally:
+            if conn:
+                cursor.close()
+                conn.close()
+    
     def delete(self):
         """Delete conversation (cascade will delete messages)"""
         conn = None
@@ -395,6 +459,14 @@ class Conversation:
         if isinstance(is_active, int):
             is_active = bool(is_active)
         
+        metadata = row.get('metadata')
+        if metadata and isinstance(metadata, str):
+            try:
+                import json
+                metadata = json.loads(metadata)
+            except:
+                metadata = None
+        
         return Conversation(
             id=row.get('id'),
             user_id=row.get('user_id'),
@@ -403,7 +475,8 @@ class Conversation:
             created_at=row.get('created_at'),
             updated_at=row.get('updated_at'),
             message_count=row.get('message_count', 0),
-            is_active=is_active
+            is_active=is_active,
+            metadata=metadata
         )
     
     def to_dict(self):
@@ -431,6 +504,7 @@ class Conversation:
             'created_at': created_at,
             'updated_at': updated_at,
             'message_count': self.message_count,
-            'is_active': self.is_active
+            'is_active': self.is_active,
+            'metadata': self.metadata
         }
 

@@ -55,6 +55,5 @@ function shareOnInstagram(event) {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('✅ Floating share widget initialized');
 });
 

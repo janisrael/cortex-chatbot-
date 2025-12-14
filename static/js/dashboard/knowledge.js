@@ -9,7 +9,6 @@ async function initializeKnowledgeManagement() {
         await loadKnowledgeStats();
         setupKnowledgeEventListeners();
     } catch (error) {
-        console.error('Failed to initialize knowledge management:', error);
     }
 }
 
@@ -22,7 +21,6 @@ async function loadPrompt() {
             editor.value = result.prompt || '';
         }
     } catch (error) {
-        console.error('Failed to load prompt:', error);
     }
 }
 
@@ -43,7 +41,6 @@ async function loadKnowledgeStats() {
         if (userCount) userCount.textContent = (stats.database && stats.database.users) ? stats.database.users : 0;
         if (backupCount) backupCount.textContent = stats.backups || 0;
     } catch (error) {
-        console.error('Failed to load knowledge stats:', error);
     }
 }
 

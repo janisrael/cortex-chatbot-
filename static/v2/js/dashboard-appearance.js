@@ -38,13 +38,6 @@ async function loadAppearanceConfig() {
         const data = await response.json();
         const config = data.config || data;
         
-        console.log('📥 Loaded config from API:', {
-            primary_color: config.primary_color,
-            primary_color_type: typeof config.primary_color,
-            primary_color_is_string: typeof config.primary_color === 'string',
-            primary_color_is_object: typeof config.primary_color === 'object' && config.primary_color !== null
-        });
-        
         // Load bot name for preview
         if (config.bot_name) {
             const botNameEl = document.getElementById('previewBotName');
@@ -68,7 +61,6 @@ async function loadAppearanceConfig() {
         if (config.primary_color) {
             if (typeof config.primary_color === 'string') {
                 // Legacy format - convert to new format
-                console.log('⚠️ Primary color is string (legacy format), converting to solid');
                 appearanceConfig.primary_color = {
                     type: 'solid',
                     value: config.primary_color,
@@ -76,16 +68,13 @@ async function loadAppearanceConfig() {
                 };
             } else if (typeof config.primary_color === 'object' && config.primary_color !== null) {
                 // New format - should have type and value
-                console.log('✅ Primary color is object:', config.primary_color);
                 appearanceConfig.primary_color = config.primary_color;
                 
                 // Ensure it has type field
                 if (!appearanceConfig.primary_color.type) {
-                    console.warn('⚠️ Primary color object missing type field, defaulting to solid');
                     appearanceConfig.primary_color.type = 'solid';
                 }
             } else {
-                console.warn('⚠️ Primary color is unexpected type:', typeof config.primary_color);
                 appearanceConfig.primary_color = {
                     type: 'solid',
                     value: '#525252',
@@ -93,7 +82,6 @@ async function loadAppearanceConfig() {
                 };
             }
         } else {
-            console.log('ℹ️ No primary color in config, using default');
             // Default primary color
             appearanceConfig.primary_color = {
                 type: 'solid',
@@ -102,7 +90,6 @@ async function loadAppearanceConfig() {
             };
         }
         
-        console.log('✅ Final appearanceConfig.primary_color:', appearanceConfig.primary_color);
         
         // Load avatar
         if (config.avatar) {
@@ -118,10 +105,8 @@ async function loadAppearanceConfig() {
         }
         
         // Load suggested messages
-        console.log('📥 Loading suggested messages:', config.suggested_messages);
         if (config.suggested_messages && Array.isArray(config.suggested_messages) && config.suggested_messages.length > 0) {
             appearanceConfig.suggested_messages = config.suggested_messages;
-            console.log('✅ Loaded suggested messages from config:', appearanceConfig.suggested_messages.length);
         } else {
             // Default messages
             appearanceConfig.suggested_messages = [
@@ -129,24 +114,16 @@ async function loadAppearanceConfig() {
                 { id: 'default_2', text: 'Tell me more', order: 2 },
                 { id: 'default_3', text: 'How can I get started?', order: 3 }
             ];
-            console.log('⚠️ Using default suggested messages');
         }
         
         // Update UI - but wait a bit for DOM to be ready
         setTimeout(() => {
-            console.log('🔄 Updating appearance UI with config:', {
-                colorType: appearanceConfig.primary_color.type,
-                colorValue: appearanceConfig.primary_color.value ? (appearanceConfig.primary_color.value.substring(0, 50) + '...') : 'null',
-                description: appearanceConfig.description,
-                avatar: appearanceConfig.avatar
-            });
             updateColorUI();
             updateAvatarUI();
             updateSuggestedMessagesUI();
             updatePreview();
         }, 150);
     } catch (error) {
-        console.error('Failed to load appearance config:', error);
     }
 }
 
@@ -184,7 +161,6 @@ function setupColorPicker() {
                 
                 // If no gradient colors exist, initialize with defaults
                 if (gradientColors.length === 0) {
-                    console.log('🔄 Initializing gradient colors');
                     addGradientColor('#525252', 0);
                     addGradientColor('#157A73', 100);
                 }
@@ -418,7 +394,6 @@ function updateColorUI() {
     const colorType = appearanceConfig.primary_color.type;
     const colorValue = appearanceConfig.primary_color.value;
     
-    console.log('🎨 Updating color UI:', { colorType, colorValue });
     
     // Get sections and radio buttons
     const solidSection = document.getElementById('solidColorSection');
@@ -438,7 +413,6 @@ function updateColorUI() {
         // User has gradient saved - select gradient radio
         if (gradientRadio) {
             gradientRadio.checked = true;
-            console.log('✅ Gradient radio button selected');
         }
         
         // Set active state on gradient card
@@ -452,13 +426,11 @@ function updateColorUI() {
         if (gradientSection) gradientSection.style.display = 'block';
         
         // Parse and load gradient colors
-        console.log('🔄 Parsing gradient:', colorValue);
         parseGradientValue(colorValue);
     } else {
         // User has solid color saved - select solid radio
         if (solidRadio) {
             solidRadio.checked = true;
-            console.log('✅ Solid radio button selected');
         }
         
         // Set active state on solid card
@@ -476,11 +448,9 @@ function updateColorUI() {
         const solidInput = document.getElementById('solidColorInput');
         if (solidPicker) {
             solidPicker.value = colorValue;
-            console.log('✅ Solid color picker set to:', colorValue);
         }
         if (solidInput) {
             solidInput.value = colorValue;
-            console.log('✅ Solid color input set to:', colorValue);
         }
     }
     
@@ -542,7 +512,6 @@ function setupAvatarSelection() {
             const presetId = presetItem.dataset.preset;
             const presetName = presetItem.dataset.name;
             
-            console.log('🎯 Preset avatar clicked:', { presetId, presetName });
             
             appearanceConfig.avatar = {
                 type: 'preset',
@@ -636,7 +605,6 @@ function setupAvatarSelection() {
                         throw new Error(result.error || 'Failed to upload avatar');
                     }
                 } catch (error) {
-                    console.error('Avatar upload error:', error);
                     alert('Failed to upload avatar: ' + error.message);
                     avatarUpload.value = '';
                     if (fileName) {
@@ -746,14 +714,11 @@ function addSuggestedMessage(text = '', isNew = false) {
 function updateSuggestedMessagesUI() {
     const messagesList = document.getElementById('suggestedMessagesList');
     if (!messagesList) {
-        console.warn('⚠️ suggestedMessagesList element not found');
         return;
     }
     
-    console.log('🔄 Updating suggested messages UI:', appearanceConfig.suggested_messages);
     
     if (!appearanceConfig.suggested_messages || appearanceConfig.suggested_messages.length === 0) {
-        console.warn('⚠️ No suggested messages to display');
         messagesList.innerHTML = '<p style="color: #71717a; font-size: 14px; padding: 10px;">No suggested messages. Click "Add Message" to add one.</p>';
         return;
     }
@@ -911,22 +876,11 @@ async function saveAppearanceConfig() {
         const data = await response.json();
         const currentConfig = data.config || data;
         
-        console.log('💾 Saving appearance config:', {
-            primary_color: appearanceConfig.primary_color,
-            primary_color_type: appearanceConfig.primary_color.type,
-            primary_color_value: appearanceConfig.primary_color.value ? (appearanceConfig.primary_color.value.substring(0, 50) + '...') : 'null'
-        });
-        
         // Update with appearance settings
         currentConfig.short_info = appearanceConfig.description;
         currentConfig.primary_color = appearanceConfig.primary_color; // This should be an object with type and value
         currentConfig.avatar = appearanceConfig.avatar;
         currentConfig.suggested_messages = appearanceConfig.suggested_messages;
-        
-        console.log('📤 Sending to API:', {
-            primary_color: currentConfig.primary_color,
-            primary_color_type: typeof currentConfig.primary_color
-        });
         
         // Save
         const saveResponse = await fetch('/api/user/chatbot-config', {
@@ -951,7 +905,6 @@ async function saveAppearanceConfig() {
             throw new Error(result.error || 'Failed to save appearance settings');
         }
     } catch (error) {
-        console.error('Failed to save appearance config:', error);
         const errorMessage = 'Error: ' + error.message;
         if (errorAlert) {
             errorAlert.textContent = errorMessage;
@@ -1081,10 +1034,8 @@ function updatePreviewMessages() {
 
 // Parse gradient value and populate gradient builder
 function parseGradientValue(gradientValue) {
-    console.log('🔄 Parsing gradient value:', gradientValue);
     
     if (!gradientValue || !gradientValue.includes('linear-gradient')) {
-        console.log('⚠️ Invalid gradient value, using defaults');
         // Default gradient if invalid
         if (gradientColors.length === 0) {
             addGradientColor('#0891b2', 0);
@@ -1098,7 +1049,6 @@ function parseGradientValue(gradientValue) {
     const gradientColorsDiv = document.getElementById('gradientColors');
     if (gradientColorsDiv) {
         gradientColorsDiv.innerHTML = '';
-        console.log('✅ Cleared existing gradient colors');
     }
     
     // Extract direction
@@ -1107,14 +1057,12 @@ function parseGradientValue(gradientValue) {
     const directionSelect = document.getElementById('gradientDirection');
     if (directionSelect) {
         directionSelect.value = direction;
-        console.log('✅ Gradient direction set to:', direction);
     }
     
     // Extract color stops: "linear-gradient(to right, #0891b2 0%, #764ba2 50%, #f093fb 100%)"
     const colorStopsMatch = gradientValue.match(/linear-gradient\([^,]+,\s*(.+)\)/);
     if (colorStopsMatch) {
         const colorStops = colorStopsMatch[1];
-        console.log('📋 Color stops string:', colorStops);
         
         // Split by comma, but be careful with rgba/hsla colors
         // Use a more sophisticated split that handles rgba/hsla
@@ -1137,7 +1085,6 @@ function parseGradientValue(gradientValue) {
             stops.push(currentStop.trim());
         }
         
-        console.log('📋 Parsed stops:', stops);
         
         stops.forEach((stop, index) => {
             // Match color and position: "#0891b2 0%" or "rgba(8, 145, 178, 1) 50%"
@@ -1145,35 +1092,29 @@ function parseGradientValue(gradientValue) {
             if (match) {
                 const color = match[1].trim();
                 const position = parseInt(match[2]);
-                console.log(`  ✓ Adding color stop: ${color} at ${position}%`);
                 addGradientColor(color, position);
             } else {
                 // No position specified, calculate it
                 const position = stops.length > 1 ? (index / (stops.length - 1)) * 100 : (index * 50);
-                console.log(`  ✓ Adding color stop: ${stop.trim()} at ${position}% (calculated)`);
                 addGradientColor(stop.trim(), position);
             }
         });
     } else {
-        console.log('⚠️ Could not parse color stops, trying fallback');
         // Fallback: try to extract colors without positions
         const colorRegex = /#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})|rgba?\([^)]+\)|hsla?\([^)]+\)/gi;
         const colors = gradientValue.match(colorRegex);
         if (colors && colors.length >= 2) {
-            console.log('📋 Found colors via regex:', colors);
             colors.forEach((color, index) => {
                 const position = (index / (colors.length - 1)) * 100;
                 addGradientColor(color, position);
             });
         } else {
-            console.log('⚠️ No colors found, using defaults');
             // Default gradient
             addGradientColor('#0891b2', 0);
             addGradientColor('#764ba2', 100);
         }
     }
     
-    console.log('✅ Gradient parsing complete. Colors:', gradientColors.length);
 }
 
 // Validate hex color

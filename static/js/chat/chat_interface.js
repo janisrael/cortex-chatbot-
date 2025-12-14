@@ -120,7 +120,6 @@ async function sendMessage() {
     } catch (error) {
         hideTyping();
         addMessage('Sorry, I encountered a connection error. Please try again.');
-        console.error('Error:', error);
     }
 
     // Re-enable input
@@ -158,10 +157,8 @@ async function refreshChat() {
             // Show success message
             addMessage('✅ New conversation started!', false);
             
-            console.log('New conversation started');
         } catch (error) {
             addMessage('❌ Error starting new conversation: ' + error.message, false);
-            console.error('New conversation error:', error);
         } finally {
             // Restore button state
             const refreshBtn = document.getElementById('refreshBtn');

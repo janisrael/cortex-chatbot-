@@ -129,7 +129,6 @@ async function loadBackupList() {
         backupsList.style.display = 'block';
         
     } catch (error) {
-        console.error('Failed to load backups:', error);
     }
 }
 

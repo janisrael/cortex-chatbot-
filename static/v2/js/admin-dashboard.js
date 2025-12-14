@@ -18,6 +18,11 @@ function switchAdminTab(tabName) {
         if (activeContent) {
             activeContent.classList.add('active');
             activeContent.style.display = 'block';
+            
+            // Load API keys when tab is switched to api-keys
+            if (tabName === 'api-keys') {
+                loadAPIKeys();
+            }
         }
 
         // Update tab button states
@@ -29,7 +34,6 @@ function switchAdminTab(tabName) {
             activeButton.classList.add('active');
         }
     } catch (err) {
-        console.error('Error switching admin tab:', err);
     }
 }
 
@@ -67,7 +71,6 @@ async function loadSystemStats() {
             throw new Error(data.error || 'Failed to load statistics');
         }
     } catch (error) {
-        console.error('❌ Error loading system stats:', error);
         
         // Show error in UI
         if (typeof showErrorNotification === 'function') {
@@ -134,7 +137,6 @@ async function loadUsers() {
             throw new Error(data.error || 'Failed to load users');
         }
     } catch (error) {
-        console.error('❌ Error loading users:', error);
         
         // Show error in UI
         if (typeof showErrorNotification === 'function') {
@@ -359,7 +361,6 @@ async function loadSubscriptions() {
         currentSubscriptionsPage = 1; // Reset to first page
         renderSubscriptionsPage();
     } catch (error) {
-        console.error('❌ Error loading subscriptions:', error);
         const tbody = document.getElementById('subscriptionsTableBody');
         if (tbody) {
             tbody.innerHTML = `
@@ -531,7 +532,6 @@ function goToSubscriptionsPage(page) {
 
 // Initialize admin dashboard
 async function initializeAdminDashboard() {
-    console.log('✅ Initializing admin dashboard...');
     
     // Ensure Users tab is active by default
     switchAdminTab('users');
@@ -583,12 +583,10 @@ async function initializeAdminDashboard() {
         });
     }
     
-    console.log('✅ Admin dashboard initialized');
 }
 
 // Initialize Analytics Charts using ApexCharts
 function initializeAnalyticsCharts() {
-    console.log('📊 Initializing analytics charts with ApexCharts...');
 
     // User Growth Over Time (Line Chart)
     const userGrowthEl = document.getElementById('userGrowthChart');
@@ -921,7 +919,175 @@ function initializeAnalyticsCharts() {
         revenueByPlanChart.render();
     }
 
-    console.log('✅ Analytics charts initialized with ApexCharts');
+}
+
+// API Key Management Functions
+let currentEditingKeyId = null;
+
+async function loadAPIKeys() {
+    try {
+        const response = await fetch('/admin/api/api-keys');
+        const data = await response.json();
+        
+        if (data.success) {
+            renderAPIKeys(data.api_keys);
+        } else {
+            console.error('Failed to load API keys:', data.error);
+        }
+    } catch (error) {
+        console.error('Error loading API keys:', error);
+    }
+}
+
+function renderAPIKeys(keys) {
+    const container = document.getElementById('api-keys-list');
+    if (!container) return;
+    
+    if (keys.length === 0) {
+        container.innerHTML = '<p style="color: #6b7280;">No API keys found. Create one to get started.</p>';
+        return;
+    }
+    
+    container.innerHTML = keys.map(key => `
+        <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; background: white;">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                <div>
+                    <h4 style="margin: 0 0 4px 0; font-size: 16px;">${escapeHtml(key.name || 'Untitled Key')}</h4>
+                    <span style="font-size: 12px; color: #6b7280; padding: 2px 8px; background: #f3f4f6; border-radius: 4px; display: inline-block;">
+                        ${escapeHtml(key.key_type || 'custom')}
+                    </span>
+                    <span style="font-size: 12px; color: ${key.is_active ? '#10b981' : '#ef4444'}; margin-left: 8px;">
+                        ${key.is_active ? '● Active' : '○ Inactive'}
+                    </span>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button onclick="toggleAPIKey(${key.id}, ${!key.is_active})" 
+                            style="padding: 6px 12px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                        ${key.is_active ? 'Deactivate' : 'Activate'}
+                    </button>
+                    <button onclick="deleteAPIKey(${key.id})" 
+                            style="padding: 6px 12px; border: 1px solid #ef4444; background: white; color: #ef4444; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                        Delete
+                    </button>
+                </div>
+            </div>
+            <div style="font-size: 12px; color: #6b7280;">
+                Created: ${key.created_at ? new Date(key.created_at).toLocaleDateString() : 'N/A'}
+            </div>
+        </div>
+    `).join('');
+}
+
+function createNewAPIKey() {
+    currentEditingKeyId = null;
+    document.getElementById('api-key-modal-title').textContent = 'Create API Key';
+    document.getElementById('api-key-form').reset();
+    document.getElementById('api-key-token-display').style.display = 'none';
+    document.getElementById('api-key-modal').style.display = 'flex';
+}
+
+function closeAPIKeyModal() {
+    document.getElementById('api-key-modal').style.display = 'none';
+    currentEditingKeyId = null;
+}
+
+async function handleAPIKeySubmit(event) {
+    event.preventDefault();
+    
+    const name = document.getElementById('api-key-name').value;
+    const keyType = document.getElementById('api-key-type').value;
+    
+    try {
+        const response = await fetch('/admin/api/api-keys', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: name,
+                key_type: keyType
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('api-key-token').value = data.api_key.token;
+            document.getElementById('api-key-token-display').style.display = 'block';
+            const submitBtn = document.getElementById('api-key-form').querySelector('button[type="submit"]');
+            submitBtn.textContent = 'Close';
+            submitBtn.onclick = closeAPIKeyModal;
+            submitBtn.type = 'button';
+            
+            await loadAPIKeys();
+        } else {
+            alert('Failed to create API key: ' + (data.error || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Error creating API key:', error);
+        alert('Error creating API key. Please try again.');
+    }
+}
+
+function copyAPIKey() {
+    const tokenInput = document.getElementById('api-key-token');
+    tokenInput.select();
+    document.execCommand('copy');
+    alert('API key copied to clipboard!');
+}
+
+async function toggleAPIKey(keyId, isActive) {
+    try {
+        const response = await fetch(`/admin/api/api-keys/${keyId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                is_active: isActive
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            await loadAPIKeys();
+        } else {
+            alert('Failed to update API key: ' + (data.error || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Error updating API key:', error);
+        alert('Error updating API key. Please try again.');
+    }
+}
+
+async function deleteAPIKey(keyId) {
+    if (!confirm('Are you sure you want to delete this API key? This action cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/admin/api/api-keys/${keyId}`, {
+            method: 'DELETE'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            await loadAPIKeys();
+        } else {
+            alert('Failed to delete API key: ' + (data.error || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Error deleting API key:', error);
+        alert('Error deleting API key. Please try again.');
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 // Auto-initialize when DOM is ready

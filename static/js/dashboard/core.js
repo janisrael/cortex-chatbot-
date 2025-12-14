@@ -13,7 +13,6 @@ let currentResetType = '';
 // INITIALIZATION
 // ====================================
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Dashboard initializing...');
     
     // Initialize all components in proper order
     if (typeof initializeMultiWebsite === 'function') {
@@ -29,6 +28,5 @@ document.addEventListener('DOMContentLoaded', function() {
         initializeResetSystem();
     }
     
-    console.log('✅ Dashboard initialized successfully');
 });
 

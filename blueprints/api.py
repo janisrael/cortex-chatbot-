@@ -475,6 +475,11 @@ def get_user_chatbot_config():
                 config['primary_color'] = appearance_dict.get('primary_color')
                 config['avatar'] = appearance_dict.get('avatar')
                 config['suggested_messages'] = appearance_dict.get('suggested_messages')
+                config['welcome_message'] = appearance_dict.get('welcome_message')
+        
+        # Always ensure welcome_message is in config (even if None)
+        if 'welcome_message' not in config:
+            config['welcome_message'] = None
         
         # Generate API key if it doesn't exist
         if not config.get('api_key'):
@@ -509,6 +514,9 @@ def save_user_chatbot_config_endpoint():
             config['prompt'] = data['prompt']
         if 'prompt_preset_id' in data:
             config['prompt_preset_id'] = data['prompt_preset_id']
+        if 'welcome_message' in data:
+            # welcome_message is saved to appearance table below
+            pass
         
         # Advanced chatbot settings
         if 'temperature' in data:
@@ -548,15 +556,21 @@ def save_user_chatbot_config_endpoint():
         primary_color = data.get('primary_color')
         avatar = data.get('avatar')
         suggested_messages = data.get('suggested_messages')
+        # Handle welcome_message: if provided (even empty string), save it
+        welcome_message = None
+        if 'welcome_message' in data:
+            welcome_message = data['welcome_message'].strip() if data['welcome_message'] else None
         
-        if short_info is not None or primary_color is not None or avatar is not None or suggested_messages is not None:
+        # Always try to save if welcome_message key is present in data
+        if short_info is not None or primary_color is not None or avatar is not None or suggested_messages is not None or 'welcome_message' in data:
             appearance_success = ChatbotAppearance.create_or_update(
                 user_id=user_id,
                 short_info=short_info,
                 primary_color=primary_color,
                 avatar_type=avatar.get('type') if avatar else None,
                 avatar_value=avatar.get('value') if avatar else None,
-                suggested_messages=suggested_messages
+                suggested_messages=suggested_messages,
+                welcome_message=welcome_message
             )
             if not appearance_success:
                 print(f"⚠️ Warning: Failed to save appearance config to database for user {user_id}")

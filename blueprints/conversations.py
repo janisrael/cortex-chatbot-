@@ -8,9 +8,16 @@ from services.conversation_service import (
     end_conversation,
     create_conversation
 )
+from services.user_info_service import store_user_info
 from utils.api_key import validate_api_key
 
 conversations_bp = Blueprint('conversations', __name__)
+
+
+@conversations_bp.route("/conversations/test", methods=["GET"])
+def test_route():
+    """Test route to verify blueprint is registered"""
+    return jsonify({"status": "ok", "message": "Conversations blueprint is working"})
 
 
 def get_user_id_from_request():
@@ -152,6 +159,58 @@ def end_conversation_endpoint(conversation_id):
         })
     except Exception as e:
         print(f"Error ending conversation: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+
+@conversations_bp.route("/conversations/<int:conversation_id>/user-info", methods=["POST", "OPTIONS"])
+def store_user_info_endpoint(conversation_id):
+    """Store user information for a conversation"""
+    print(f"🔍 store_user_info_endpoint called: conversation_id={conversation_id}, method={request.method}")
+    
+    if request.method == "OPTIONS":
+        response = jsonify({})
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add("Access-Control-Allow-Headers", "Content-Type, X-API-Key")
+        response.headers.add("Access-Control-Allow-Methods", "POST, OPTIONS")
+        return response
+    
+    try:
+        user_id = get_user_id_from_request()
+        print(f"🔍 User ID from request: {user_id}")
+        if not user_id:
+            print("❌ No user_id found")
+            return jsonify({"error": "Authentication required"}), 401
+        
+        # Verify conversation belongs to user
+        result = get_conversation_with_messages(conversation_id, user_id, message_limit=1)
+        print(f"🔍 Conversation lookup result: {result is not None}")
+        if not result:
+            print(f"❌ Conversation {conversation_id} not found for user {user_id}")
+            return jsonify({"error": "Conversation not found or access denied"}), 404
+        
+        data = request.json or {}
+        name = (data.get("name") or "").strip()
+        email_str = data.get("email")
+        phone_str = data.get("phone")
+        email = email_str.strip() if email_str and isinstance(email_str, str) else None
+        phone = phone_str.strip() if phone_str and isinstance(phone_str, str) else None
+        
+        if not name:
+            return jsonify({"error": "Name is required"}), 400
+        
+        success = store_user_info(conversation_id, name, email, phone)
+        
+        if not success:
+            return jsonify({"error": "Failed to store user info"}), 500
+        
+        return jsonify({
+            "status": "success",
+            "message": "User info stored"
+        })
+    except Exception as e:
+        print(f"Error storing user info: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({"error": str(e)}), 500

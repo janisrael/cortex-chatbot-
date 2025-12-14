@@ -29,7 +29,18 @@ class LLMProvider:
         # Get API key from parameter or environment (provider-specific)
         if not api_key:
             if provider == "openai":
-                api_key = os.getenv("OPENAI_API_KEY", "")
+                # Try database first (default, then fallback), then .env
+                try:
+                    from models.api_key import AdminAPIKey
+                    api_key = AdminAPIKey.get_system_api_key(key_type='default', provider='openai')
+                    if not api_key:
+                        api_key = AdminAPIKey.get_system_api_key(key_type='fallback', provider='openai')
+                except Exception as e:
+                    print(f"Error getting API key from database: {e}")
+                
+                # Fallback to .env if not in database
+                if not api_key:
+                    api_key = os.getenv("OPENAI_API_KEY", "")
             elif provider == "claude":
                 api_key = os.getenv("ANTHROPIC_API_KEY", "")
             elif provider == "gemini":

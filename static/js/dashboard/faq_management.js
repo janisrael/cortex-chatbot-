@@ -15,7 +15,6 @@ async function initializeFAQManagement() {
         }
         await loadFAQs();
     } catch (error) {
-        console.error('Failed to initialize FAQ management:', error);
     }
 }
 
@@ -36,7 +35,6 @@ async function loadFAQs() {
         if (!contentType.includes('application/json')) {
             // Response is not JSON (likely HTML error page or redirect)
             const text = await response.text();
-            console.error('API returned non-JSON response:', text.substring(0, 200));
             
             if (response.status === 302 || response.status === 401 || response.status === 403) {
                 throw new Error('Authentication required. Please refresh the page and log in again.');
@@ -57,7 +55,6 @@ async function loadFAQs() {
             throw new Error(data.error || 'Failed to load FAQs');
         }
     } catch (error) {
-        console.error('Failed to load FAQs:', error);
         const faqList = document.getElementById('faqList');
         if (faqList) {
             faqList.innerHTML = `<div style="color: #f44336; padding: 20px; text-align: center; background: #fee; border: 1px solid #f44336; border-radius: 8px;">
@@ -312,7 +309,6 @@ async function checkJSONResponse(response) {
     const contentType = response.headers.get('content-type') || '';
     if (!contentType.includes('application/json')) {
         const text = await response.text();
-        console.error('API returned non-JSON response:', text.substring(0, 200));
         
         if (response.status === 302 || response.status === 401 || response.status === 403) {
             throw new Error('Authentication required. Please refresh the page and log in again.');

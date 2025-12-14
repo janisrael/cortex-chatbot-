@@ -111,7 +111,7 @@ class ChatbotAppearance:
             conn.close()
     
     @staticmethod
-    def create_or_update(user_id, short_info=None, primary_color=None, avatar_type=None, avatar_value=None, suggested_messages=None):
+    def create_or_update(user_id, short_info=None, primary_color=None, avatar_type=None, avatar_value=None, suggested_messages=None, welcome_message=None):
         """Create or update appearance config for a user"""
         conn = ChatbotAppearance._get_db_connection()
         is_sqlite = ChatbotAppearance._is_sqlite(conn)
@@ -144,6 +144,9 @@ class ChatbotAppearance:
                     if suggested_messages_json is not None:
                         updates.append("suggested_messages = ?")
                         params.append(suggested_messages_json)
+                    if welcome_message is not None:
+                        updates.append("welcome_message = ?")
+                        params.append(welcome_message)
                     updates.append("updated_at = ?")
                     params.append(datetime.now())
                     params.append(user_id)
@@ -173,6 +176,9 @@ class ChatbotAppearance:
                     if suggested_messages_json is not None:
                         updates.append("suggested_messages = %s")
                         params.append(suggested_messages_json)
+                    if welcome_message is not None:
+                        updates.append("welcome_message = %s")
+                        params.append(welcome_message)
                     updates.append("updated_at = %s")
                     params.append(datetime.now())
                     params.append(user_id)
@@ -188,16 +194,16 @@ class ChatbotAppearance:
                 # Create
                 if is_sqlite:
                     conn.execute("""
-                        INSERT INTO chatbot_appearance (user_id, short_info, primary_color, avatar_type, avatar_value, suggested_messages, created_at, updated_at)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                    """, (user_id, short_info, primary_color_json, avatar_type or 'preset', avatar_value, suggested_messages_json, datetime.now(), datetime.now()))
+                        INSERT INTO chatbot_appearance (user_id, short_info, primary_color, avatar_type, avatar_value, suggested_messages, welcome_message, created_at, updated_at)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """, (user_id, short_info, primary_color_json, avatar_type or 'preset', avatar_value, suggested_messages_json, welcome_message, datetime.now(), datetime.now()))
                     conn.commit()
                 else:
                     cursor = conn.cursor()
                     cursor.execute("""
-                        INSERT INTO chatbot_appearance (user_id, short_info, primary_color, avatar_type, avatar_value, suggested_messages, created_at, updated_at)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-                    """, (user_id, short_info, primary_color_json, avatar_type or 'preset', avatar_value, suggested_messages_json, datetime.now(), datetime.now()))
+                        INSERT INTO chatbot_appearance (user_id, short_info, primary_color, avatar_type, avatar_value, suggested_messages, welcome_message, created_at, updated_at)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    """, (user_id, short_info, primary_color_json, avatar_type or 'preset', avatar_value, suggested_messages_json, welcome_message, datetime.now(), datetime.now()))
                     conn.commit()
                     cursor.close()
             return True

@@ -23,7 +23,7 @@
   const WIDGET_CONFIG = {
     apiBaseUrl: getScriptBaseUrl(), // Use the chatbot server URL, not the current website
     widgetUrl: "/widget",
-    triggerButtonText: "💬",
+    triggerButtonText: "",
     position: "bottom-right",
     primaryColor: "#3b82f6",
     zIndex: 999999,
@@ -87,7 +87,23 @@
           display: flex;
           align-items: center;
           justify-content: center;
-          
+          opacity: 0;
+          animation: fadeInGlow 1.5s ease-out forwards;
+        }
+        
+        @keyframes fadeInGlow {
+          0% {
+            opacity: 0;
+            transform: scale(0.8);
+          }
+          50% {
+            opacity: 0.7;
+            transform: scale(1.05);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1);
+          }
         }
 
         .bobot-widget-trigger::before {
@@ -96,10 +112,21 @@
           inset: -6px;
           border-radius: 50%;
           background: conic-gradient(from 0deg, #667eea, #764ba2, #f093fb, #4facfe, #00f2fe, #667eea);
-          opacity: 0;
+          opacity: 0.6;
           transition: opacity 0.3s ease;
-          animation: gradientRotate 3s linear infinite;
+          animation: gradientRotate 3s linear infinite, pulseGlow 2s ease-in-out infinite;
           z-index: -1;
+        }
+        
+        @keyframes pulseGlow {
+          0%, 100% {
+            opacity: 0.4;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 0.8;
+            transform: scale(1.1);
+          }
         }
 
         .bobot-widget-trigger:hover::after {
@@ -200,29 +227,9 @@
           box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4), 0 3px 8px rgba(0, 0, 0, 0.15);
         }
 
-        /* Notification Badge */
+        /* Notification Badge - Hidden */
         .bobot-widget-badge {
-          position: absolute;
-          top: -4px;
-          right: -4px;
-          background: #ef4444;
-          color: white;
-          border-radius: 50%;
-          width: 20px;
-          height: 20px;
-          font-size: 11px;
-          font-weight: 600;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
-          animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-          0% { transform: scale(1); }
-          50% { transform: scale(1.1); }
-          100% { transform: scale(1); }
+          display: none !important;
         }
 
         /* Welcome Message */
@@ -407,8 +414,7 @@
       this.triggerButton.addEventListener("click", () => this.toggleWidget());
       document.body.appendChild(this.triggerButton);
 
-      // Add notification badge (optional)
-      this.addNotificationBadge();
+      // Badge removed - using glowing effect instead
 
       // Show welcome message after delay
       setTimeout(() => this.showWelcomeMessage(), 3000);
@@ -426,25 +432,14 @@
         this.triggerButton.appendChild(img);
         this.triggerButton.style.background = "transparent";
       } else {
-        this.triggerButton.textContent = WIDGET_CONFIG.triggerButtonText;
+        // No emoji, just empty button with gradient background
+        this.triggerButton.textContent = "";
         this.triggerButton.style.background = `linear-gradient(135deg, ${WIDGET_CONFIG.primaryColor} 0%, #2563eb 100%)`;
       }
     }
 
     addNotificationBadge() {
-      const badge = document.createElement("div");
-      badge.className = "bobot-widget-badge";
-      badge.textContent = "1";
-      this.triggerButton.appendChild(badge);
-
-      // Remove badge after first interaction
-      this.triggerButton.addEventListener(
-        "click",
-        () => {
-          badge.remove();
-        },
-        { once: true }
-      );
+      // Badge functionality removed - using glowing effect instead
     }
 
     showWelcomeMessage() {
