@@ -9,6 +9,10 @@ const typingIndicator = document.getElementById('typingIndicator');
 const userId = 'user_' + Math.random().toString(36).substr(2, 9);
 const userName = 'Visitor';
 
+// Conversation state management
+let conversationId = null;
+let sessionId = null;
+
 messageInput.addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
         sendMessage();
@@ -90,10 +94,20 @@ async function sendMessage() {
                 user_id: userId,
                 name: userName,
                 website_id: 'sourceselect',
+                conversation_id: conversationId, // Send conversation_id if available
+                session_id: sessionId, // Send session_id if available
             })
         });
 
         const data = await response.json();
+        
+        // Store conversation_id and session_id from response
+        if (data.conversation_id) {
+            conversationId = data.conversation_id;
+        }
+        if (data.session_id) {
+            sessionId = data.session_id;
+        }
         
         // Hide typing indicator
         hideTyping();
@@ -116,7 +130,7 @@ async function sendMessage() {
 }
 
 async function refreshChat() {
-    if (confirm("Refresh conversation? (Files and AI knowledge will be preserved)")) {
+    if (confirm("Start a new conversation? (Files and AI knowledge will be preserved)")) {
         try {
             // Show loading state
             const refreshBtn = document.getElementById('refreshBtn');
@@ -124,37 +138,30 @@ async function refreshChat() {
             refreshBtn.innerHTML = '⏳';
             refreshBtn.disabled = true;
             
-            const response = await fetch('/refresh', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
-            });
+            // Clear conversation state
+            conversationId = null;
+            sessionId = null;
             
-            const data = await response.json();
-            
-            if (data.status === 'success') {
-                // Clear the chat messages display
-                const chatMessages = document.getElementById('chatMessages');
-                chatMessages.innerHTML = `
-                    <div class="message bot">
-                        <div class="message-content">
-                            👋 Hi there! I'm Bobot AI, your helpful assistant for SourceSelect.ca. How can I help you today?
-                        </div>
+            // Clear the chat messages display
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = `
+                <div class="message bot">
+                    <div class="message-content">
+                        👋 Hi there! I'm Bobot AI, your helpful assistant for SourceSelect.ca. How can I help you today?
                     </div>
-                `;
-                
-                // Clear the input field
-                document.getElementById('messageInput').value = '';
-                
-                // Show success message
-                addMessage('✅ ' + data.message, false);
-                
-                console.log('Chat refreshed successfully');
-            } else {
-                addMessage('❌ Failed to refresh: ' + data.message, false);
-            }
+                </div>
+            `;
+            
+            // Clear the input field
+            document.getElementById('messageInput').value = '';
+            
+            // Show success message
+            addMessage('✅ New conversation started!', false);
+            
+            console.log('New conversation started');
         } catch (error) {
-            addMessage('❌ Error refreshing chat: ' + error.message, false);
-            console.error('Refresh error:', error);
+            addMessage('❌ Error starting new conversation: ' + error.message, false);
+            console.error('New conversation error:', error);
         } finally {
             // Restore button state
             const refreshBtn = document.getElementById('refreshBtn');

@@ -319,7 +319,8 @@ def process_file_for_user(filepath, filename, category, user_id):
                 'source_file': filename,
                 'upload_time': datetime.now().isoformat(),
                 'category': category,
-                'user_id': str(user_id)
+                'user_id': str(user_id),
+                'source_type': 'file_upload'  # Required for proper retrieval prioritization
             })
         
         # Add to user-specific vectorstore

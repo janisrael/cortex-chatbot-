@@ -2,6 +2,11 @@
 from flask import Blueprint, request, jsonify
 from flask_login import current_user
 from services.chatbot_service import get_chatbot_response
+from services.conversation_service import (
+    get_or_create_conversation,
+    add_message,
+    generate_session_id
+)
 from utils.api_key import validate_api_key
 
 chat_bp = Blueprint('chat', __name__)
@@ -18,6 +23,8 @@ def chat():
         data = request.json
         user_input = data.get("message")
         api_key = data.get("api_key") or request.headers.get("X-API-Key")
+        conversation_id = data.get("conversation_id")
+        session_id = data.get("session_id")
         
         # Determine user_id from either login or API key
         user_id = None
@@ -39,13 +46,55 @@ def chat():
         if not user_input:
             return jsonify({"error": "No message provided"}), 400
 
-        # Get chatbot response (system_llm is fallback, user-specific LLM is created in service)
-        reply, error = get_chatbot_response(user_id, user_input, system_llm=llm, name=name)
+        # Get or create conversation
+        conversation, is_new = get_or_create_conversation(
+            user_id=user_id,
+            session_id=session_id,
+            conversation_id=conversation_id
+        )
+        
+        if not conversation:
+            return jsonify({"error": "Failed to create or retrieve conversation"}), 500
+        
+        # Save user message
+        user_message = add_message(
+            conversation_id=conversation.id,
+            role="user",
+            content=user_input
+        )
+        
+        if not user_message:
+            print(f"⚠️ Warning: Failed to save user message for conversation {conversation.id}")
+
+        # Get chatbot response with conversation context
+        reply, error = get_chatbot_response(
+            user_id=user_id,
+            message=user_input,
+            system_llm=llm,
+            name=name,
+            conversation_id=conversation.id
+        )
         
         if error:
             return jsonify({"error": error}), 500
         
-        return jsonify({"response": reply})
+        # Save assistant message
+        assistant_message = add_message(
+            conversation_id=conversation.id,
+            role="assistant",
+            content=reply
+        )
+        
+        if not assistant_message:
+            print(f"⚠️ Warning: Failed to save assistant message for conversation {conversation.id}")
+        
+        # Return response with conversation info
+        return jsonify({
+            "response": reply,
+            "conversation_id": conversation.id,
+            "session_id": conversation.session_id,
+            "is_new_conversation": is_new
+        })
 
     except Exception as e:
         import traceback

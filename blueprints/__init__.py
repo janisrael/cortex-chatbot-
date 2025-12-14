@@ -6,6 +6,7 @@ from .api import api_bp
 from .widget import widget_bp
 from .chat import chat_bp
 from .admin import admin_bp
+from .conversations import conversations_bp
 
 
 def register_blueprints(app: Flask):
@@ -16,4 +17,5 @@ def register_blueprints(app: Flask):
     app.register_blueprint(widget_bp)
     app.register_blueprint(chat_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(conversations_bp)
 

@@ -354,6 +354,26 @@
             }
         }
         
+        // Conversation state management
+        let conversationId = null;
+        
+        // Generate or retrieve session_id from localStorage
+        function getOrCreateSessionId() {
+            let sessionId = localStorage.getItem('cortex_session_id');
+            if (!sessionId) {
+                // Generate UUID v4
+                sessionId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    const r = Math.random() * 16 | 0;
+                    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+                localStorage.setItem('cortex_session_id', sessionId);
+            }
+            return sessionId;
+        }
+        
+        const sessionId = getOrCreateSessionId();
+        
         async function sendMessage() {
             if (!inputField || !sendBtn || !apiKey) return;
             const message = inputField.value.trim();
@@ -371,11 +391,19 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         message: message,
-                        api_key: apiKey
+                        api_key: apiKey,
+                        conversation_id: conversationId, // Send conversation_id if available
+                        session_id: sessionId // Send session_id
                     })
                 });
                 
                 const data = await response.json();
+                
+                // Store conversation_id from response
+                if (data.conversation_id) {
+                    conversationId = data.conversation_id;
+                }
+                
                 hideTyping();
                 addMessage(data.response || 'Sorry, I encountered an error.', true);
             } catch (error) {
@@ -385,6 +413,16 @@
             }
             
             sendBtn.disabled = false;
+        }
+        
+        // Clear chat function
+        function clearChat() {
+            conversationId = null;
+            localStorage.removeItem('cortex_session_id');
+            // Clear messages (if there's a clear function)
+            if (typeof clearMessages === 'function') {
+                clearMessages();
+            }
         }
         
         if (sendBtn) {
