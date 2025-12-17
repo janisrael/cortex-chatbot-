@@ -129,10 +129,11 @@ def get_chatbot_response(user_id, message, system_llm=None, name="User", convers
             # Apply priority ordering: FAQ > Crawl > File Upload
             if docs:
                 # Separate by source type
+                # Note: Accept both 'crawl' and 'web_crawl' for backward compatibility
                 faq_docs = [d for d in docs if d.metadata.get('source_type') == 'faq']
-                crawl_docs = [d for d in docs if d.metadata.get('source_type') == 'crawl']
+                crawl_docs = [d for d in docs if d.metadata.get('source_type') in ['crawl', 'web_crawl']]
                 file_docs = [d for d in docs if d.metadata.get('source_type') == 'file_upload']
-                other_docs = [d for d in docs if d.metadata.get('source_type') not in ['faq', 'crawl', 'file_upload']]
+                other_docs = [d for d in docs if d.metadata.get('source_type') not in ['faq', 'crawl', 'web_crawl', 'file_upload']]
                 
                 # Phase 2: Improved prioritization for FILE documents
                 # Reorder: FAQ first, then crawl, then file, then others
