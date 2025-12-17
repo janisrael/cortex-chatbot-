@@ -14,7 +14,7 @@ A full-stack AI-powered chatbot platform with RAG (Retrieval Augmented Generatio
 - **UI/UX Improvements** - Enhanced login toggle, user info form, admin dashboard, and widget features
 - **API Key Management** - System default API keys with testing and visibility controls
 
-For detailed release notes and full changelog, see [CHANGELOG.md](CHANGELOG.md).
+For detailed release notes, see [GitHub Releases](https://github.com/janisrael/chatbot/releases) or [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
