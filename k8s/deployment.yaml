@@ -1,0 +1,123 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cortex-app
+  namespace: cortex
+  labels:
+    app: cortex
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+  selector:
+    matchLabels:
+      app: cortex
+  template:
+    metadata:
+      labels:
+        app: cortex
+    spec:
+      containers:
+      - name: cortex
+        image: cortex:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 6001
+          protocol: TCP
+        env:
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: cortex-secrets
+              key: OPENAI_API_KEY
+        - name: DB_HOST
+          value: "178.156.162.135"
+        - name: DB_USER
+          value: "cortex"
+        - name: DB_PASSWORD
+          value: "admin123"
+        - name: DB_NAME
+          value: "saturn"
+        - name: SMTP_SERVER
+          valueFrom:
+            secretKeyRef:
+              name: cortex-secrets
+              key: SMTP_SERVER
+        - name: SMTP_PORT
+          valueFrom:
+            secretKeyRef:
+              name: cortex-secrets
+              key: SMTP_PORT
+        - name: SMTP_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: cortex-secrets
+              key: SMTP_USERNAME
+        - name: SMTP_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cortex-secrets
+              key: SMTP_PASSWORD
+        - name: SENDER_EMAIL
+          valueFrom:
+            secretKeyRef:
+              name: cortex-secrets
+              key: SENDER_EMAIL
+        - name: SENDER_NAME
+          valueFrom:
+            secretKeyRef:
+              name: cortex-secrets
+              key: SENDER_NAME
+        - name: SQLITE_DB_PATH
+          value: "/app/data/users.db"
+        volumeMounts:
+        # Database persistence (SQLite)
+        - name: db-storage
+          mountPath: /app/data
+        # ChromaDB persistence (vector database)
+        - name: chromadb-storage
+          mountPath: /app/chroma_db
+        # Config files persistence (user chatbot configs)
+        - name: config-storage
+          mountPath: /app/config
+        resources:
+          requests:
+            cpu: 300m
+            memory: 512Mi
+          limits:
+            cpu: 1
+            memory: 1Gi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 6001
+            scheme: HTTP
+          initialDelaySeconds: 40
+          periodSeconds: 10
+          timeoutSeconds: 1
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 6001
+            scheme: HTTP
+          initialDelaySeconds: 20
+          periodSeconds: 5
+          timeoutSeconds: 1
+          failureThreshold: 3
+        terminationGracePeriodSeconds: 30
+      volumes:
+      - name: db-storage
+        persistentVolumeClaim:
+          claimName: cortex-db-pvc
+      - name: chromadb-storage
+        persistentVolumeClaim:
+          claimName: cortex-chromadb-pvc
+      - name: config-storage
+        persistentVolumeClaim:
+          claimName: cortex-config-pvc
+      restartPolicy: Always
+
