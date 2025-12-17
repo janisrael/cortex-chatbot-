@@ -49,7 +49,8 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           # Install without cache to save disk space
-          pip install --no-cache-dir -r requirements-prod.txt
+          # Use legacy resolver to handle dependency conflicts (langchain packages)
+          pip install --no-cache-dir --use-deprecated=legacy-resolver -r requirements-prod.txt
       
       - name: Run linting
         run: |
@@ -293,7 +294,8 @@ jobs:
           if [ -f "requirements-prod.txt" ]; then
             echo "Installing from requirements-prod.txt (optimized - no torch, no CUDA)"
             # Install without cache to save disk space
-            pip install --no-cache-dir -r requirements-prod.txt
+            # Use legacy resolver to handle dependency conflicts (langchain packages)
+            pip install --no-cache-dir --use-deprecated=legacy-resolver -r requirements-prod.txt
           else
             echo "ERROR: requirements-prod.txt not found!"
             exit 1
@@ -380,10 +382,26 @@ jobs:
             rm /tmp/cortex-source.tar.gz
             
             echo "Building Docker image (this may take several minutes)..."
-            docker build -t cortex:latest . || {
-              echo "❌ Docker build failed"
-              exit 1
-            }
+            # Retry logic for Docker build (handles transient network issues)
+            MAX_RETRIES=3
+            RETRY_COUNT=0
+            BUILD_SUCCESS=false
+            
+            while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+              if docker build -t cortex:latest .; then
+                BUILD_SUCCESS=true
+                break
+              else
+                RETRY_COUNT=$((RETRY_COUNT + 1))
+                if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                  echo "⚠️ Docker build failed, retrying ($RETRY_COUNT/$MAX_RETRIES)..."
+                  sleep 10
+                else
+                  echo "❌ Docker build failed after $MAX_RETRIES attempts"
+                  exit 1
+                fi
+              fi
+            done
             
             echo "Importing image into k3s..."
             docker save cortex:latest | k3s ctr images import - || {
