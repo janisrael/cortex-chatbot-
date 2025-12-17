@@ -14,6 +14,12 @@ def index():
     return redirect(url_for('auth.login'))
 
 
+@dashboard_bp.route("/landing")
+def landing():
+    """Landing page - public marketing page"""
+    return render_template("landing.html")
+
+
 @dashboard_bp.route("/dashboard")
 @login_required
 def dashboard():

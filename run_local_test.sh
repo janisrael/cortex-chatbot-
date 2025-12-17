@@ -42,5 +42,3 @@ python app.py
 
 
 
-
-

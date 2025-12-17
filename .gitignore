@@ -54,6 +54,9 @@ Thumbs.db
 !README.md
 !.github/workflows/README.md
 
+# Development and planning docs (do not commit)
+docs/
+
 # Testing scripts (development only)
 test_*.py
 tests/

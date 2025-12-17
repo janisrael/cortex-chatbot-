@@ -1,10 +1,29 @@
 """Chatbot service - handles chat responses and RAG"""
+import re
+
 from services.knowledge_service import get_user_vectorstore
 from services.config_service import load_user_chatbot_config
 from services.llm_service import LLMProvider
 from services.conversation_service import build_conversation_context
 from services.user_info_service import get_user_name_for_chat
 from utils.prompts import get_default_prompt_with_name
+
+
+def _replace_bot_name(prompt_text: str, bot_name: str) -> str:
+    """Replace any hardcoded 'Cortex' tokens with the current bot name."""
+    if not prompt_text or not bot_name:
+        return prompt_text
+
+    # Replace possessive first to avoid partial overlaps
+    prompt_text = re.sub(r"\bCortex's\b", f"{bot_name}'s", prompt_text)
+    # Replace any remaining standalone occurrences (case-sensitive, boundary-aware)
+    prompt_text = re.sub(r"\bCortex\b", bot_name, prompt_text)
+    # Replace placeholder tokens
+    prompt_text = prompt_text.replace('{bot_name}', bot_name)
+    # Fallback: replace any remaining case-insensitive occurrences (safety net)
+    if bot_name.lower() != 'cortex':
+        prompt_text = re.sub(r"cortex", bot_name, prompt_text, flags=re.IGNORECASE)
+    return prompt_text
 
 
 def get_chatbot_response(user_id, message, system_llm=None, name="User", conversation_id=None):
@@ -92,15 +111,8 @@ def get_chatbot_response(user_id, message, system_llm=None, name="User", convers
         prompt_template_text = get_default_prompt_with_name(bot_name)
         print(f" No custom prompt found, using default prompt")
     
-    # Replace {bot_name} placeholder with actual bot name (at runtime)
-    prompt_template_text = prompt_template_text.replace('{bot_name}', bot_name)
-    
-    # Also replace hardcoded "Cortex" with actual bot_name (for backward compatibility)
-    # This handles prompts that were saved with "Cortex" hardcoded
-    if bot_name != 'Cortex':
-        prompt_template_text = prompt_template_text.replace('You are Cortex,', f'You are {bot_name},')
-        prompt_template_text = prompt_template_text.replace("Cortex's Response:", f"{bot_name}'s Response:")
-        prompt_template_text = prompt_template_text.replace('Cortex, an intelligent', f'{bot_name}, an intelligent')
+    # Normalize bot name usage in the prompt (handles placeholders and hardcoded names)
+    prompt_template_text = _replace_bot_name(prompt_template_text, bot_name)
     
     # Get relevant documents from user's knowledge base (if retriever is available)
     # Priority order: FAQ > Crawl > File Upload

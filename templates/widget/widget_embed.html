@@ -127,11 +127,19 @@
     {% if avatar %}
         {% if avatar.type == 'preset' and avatar.value %}
             {% set widget_avatar_url = base_url + '/static/img/avatar/' + avatar.value + '.png' %}
+    {% elif avatar.value %}
+        {% if avatar.value.startswith('http') %}
+            {% set widget_avatar_url = avatar.value %}
+        {% else %}
+            {% set clean_value = avatar.value.lstrip('/') %}
+            {% set widget_avatar_url = base_url + '/' + clean_value %}
+        {% endif %}
         {% elif avatar.src %}
             {% if avatar.src.startswith('http') %}
                 {% set widget_avatar_url = avatar.src %}
             {% else %}
-                {% set widget_avatar_url = base_url + avatar.src %}
+            {% set clean_src = avatar.src.lstrip('/') %}
+            {% set widget_avatar_url = base_url + '/' + clean_src %}
             {% endif %}
         {% endif %}
     {% endif %}
@@ -155,8 +163,8 @@
         {% set contrast_color = contrast_text|default('#ffffff') %}
         <div style="background: {{ header_bg }}; padding: 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(0, 0, 0, 0.1);">
             <div style="display: flex; align-items: center; gap: 12px;">
-                {% if avatar and avatar.type == 'preset' %}
-                <img src="{{ base_url }}/static/img/avatar/{{ avatar.value }}.png" alt="{{ bot_name }} Avatar" style="width: 48px; height: 48px; border-radius: 50%; object-fit: contain; border: 1px solid rgba(255, 255, 255, 0.3);">
+                {% if widget_avatar_url %}
+                <img src="{{ widget_avatar_url }}" alt="{{ bot_name }} Avatar" style="width: 60px; height: 60px; border-radius: 50%; object-fit: contain; border: 1px solid rgba(255, 255, 255, 0.3);">
                 {% else %}
                 <img src="https://ui-avatars.com/api/?name={{ bot_name }}&background={{ primary_color[1:] if primary_color.startswith('#') else '0891b2' }}&color=fff&size=48" 
                      alt="{{ bot_name }} Avatar" style="width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.3);">
@@ -174,13 +182,13 @@
         <!-- Messages Area -->
         <div id="chatbot-messages" style="flex: 1; overflow-y: auto; padding: 20px; background: #f8f9fa; display: flex; flex-direction: column; gap: 16px;">
             <div class="message bot" style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start; animation: fadeIn 0.3s ease-out;">
-                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                        {% if avatar and avatar.type == 'preset' %}
-                        <img src="{{ base_url }}/static/img/avatar/{{ avatar.value }}.png" alt="Bot Avatar" style="width: 24px; height: 24px; border-radius: 50%; object-fit: contain;">
-                        {% else %}
-                        <img src="https://ui-avatars.com/api/?name={{ bot_name }}&background={{ primary_color[1:] if primary_color.startswith('#') else '0891b2' }}&color=fff&size=24" 
-                             alt="Bot Avatar" style="width: 24px; height: 24px; border-radius: 50%;">
-                        {% endif %}
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                    {% if widget_avatar_url %}
+                    <img src="{{ widget_avatar_url }}" alt="Bot Avatar" style="width: 24px; height: 24px; border-radius: 50%; object-fit: contain;">
+                    {% else %}
+                    <img src="https://ui-avatars.com/api/?name={{ bot_name }}&background={{ primary_color[1:] if primary_color.startswith('#') else '0891b2' }}&color=fff&size=24" 
+                         alt="Bot Avatar" style="width: 24px; height: 24px; border-radius: 50%;">
+                    {% endif %}
                     <span style="font-size: 14px; font-weight: 500; color: #18181b;">{{ bot_name }}</span>
                 </div>
                 <div style="max-width: min(calc(100% - 40px), 65ch); padding: 12px 16px; border-radius: 20px; font-size: 14px; line-height: 1.6; word-wrap: break-word; background: #f4f4f5; color: #27272a; border-bottom-left-radius: 6px;">
@@ -304,10 +312,10 @@
             
             // Convert plain URLs to clickable links (but not if already in <a> tag)
             const urlRegex = /(https?:\/\/[^\s<>"']+)/g;
-            formatted = formatted.replace(urlRegex, function(match, offset, string) {
+            formatted = formatted.replace(urlRegex, function(match, p1, offset, fullString) {
                 // Check if this URL is already inside an <a> tag
-                const beforeMatch = string.substring(0, offset);
-                const afterMatch = string.substring(offset + match.length);
+                const beforeMatch = fullString.substring(0, offset);
+                const afterMatch = fullString.substring(offset + match.length);
                 const beforeTag = beforeMatch.lastIndexOf('<a');
                 const afterTag = afterMatch.indexOf('</a>');
                 
@@ -344,10 +352,11 @@
                 const botName = '{{ bot_name }}';
                 const primaryColor = '{{ primary_color }}';
                 const baseUrl = window.WIDGET_BASE_URL || '{{ base_url }}';
-                {% if avatar and avatar.type == 'preset' and avatar.value %}
-                const avatarUrl = baseUrl + '/static/img/avatar/{{ avatar.value }}.png';
+                // Use widget_avatar_url from template (handles preset, custom upload, and fallback)
+                {% if widget_avatar_url %}
+                const avatarUrl = '{{ widget_avatar_url }}';
                 {% else %}
-                // Extract hex color from primaryColor (handle gradients)
+                // Fallback: Extract hex color from primaryColor (handle gradients)
                 let hexColor = '0891b2'; // default
                 if (primaryColor && primaryColor.startsWith('#')) {
                     hexColor = primaryColor.substring(1).substring(0, 6);

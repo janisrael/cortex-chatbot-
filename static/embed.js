@@ -90,7 +90,13 @@
           opacity: 0;
           animation: fadeInGlow 1.5s ease-out forwards;
         }
-        
+          
+        .bobot-widget-trigger img {
+          border-radius: 50%;
+          width:60px;
+          height: 60px;
+        }
+
         @keyframes fadeInGlow {
           0% {
             opacity: 0;

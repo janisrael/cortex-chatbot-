@@ -31,6 +31,14 @@ login_manager.login_view = 'auth.login'
 login_manager.login_message = 'Please log in to access this page.'
 login_manager.login_message_category = 'info'
 
+@login_manager.unauthorized_handler
+def handle_unauthorized():
+    """Return JSON for API requests, redirect for others."""
+    from flask import request, jsonify, redirect, url_for
+    if request.path.startswith('/api/'):
+        return jsonify({"error": "Authentication required"}), 401
+    return redirect(url_for('auth.login'))
+
 @login_manager.user_loader
 def load_user(user_id):
     """Load user by ID for Flask-Login"""

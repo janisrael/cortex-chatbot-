@@ -219,3 +219,106 @@ def delete_api_key(key_id):
             'error': 'Failed to delete API key'
         }), 500
 
+
+@admin_bp.route('/api/system-api-key/<provider>', methods=['GET'])
+@login_required
+@admin_required
+def get_system_api_key(provider):
+    """Get system API key for a specific LLM provider"""
+    try:
+        # Validate provider
+        valid_providers = ['openai', 'gemini', 'groq']  # Removed deepseek (not free, requires funding)
+        if provider not in valid_providers:
+            return jsonify({
+                'success': False,
+                'error': f'Invalid provider. Must be one of: {", ".join(valid_providers)}'
+            }), 400
+        
+        # Get the key from database
+        api_key = AdminAPIKey.get_system_api_key(key_type='default', provider=provider)
+        
+        if api_key:
+            # Return masked version for security
+            masked = api_key[:8] + '••••••••' + api_key[-4:] if len(api_key) > 12 else '••••••••'
+            return jsonify({
+                'success': True,
+                'api_key': {
+                    'provider': provider,
+                    'key_value_masked': masked,
+                    'has_key': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'success': True,
+                'api_key': {
+                    'provider': provider,
+                    'key_value_masked': None,
+                    'has_key': False
+                }
+            }), 200
+    except Exception as e:
+        print(f"❌ Error getting system API key for {provider}: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': f'Failed to fetch system API key for {provider}'
+        }), 500
+
+
+@admin_bp.route('/api/system-api-key', methods=['POST'])
+@login_required
+@admin_required
+def save_system_api_key():
+    """Save or update system API key for an LLM provider"""
+    try:
+        data = request.json
+        provider = data.get('provider')
+        api_key = data.get('api_key')
+        key_type = data.get('key_type', 'default')
+        
+        # Validate provider
+        valid_providers = ['openai', 'gemini', 'groq']  # Removed deepseek (not free, requires funding)
+        if not provider or provider not in valid_providers:
+            return jsonify({
+                'success': False,
+                'error': f'Invalid provider. Must be one of: {", ".join(valid_providers)}'
+            }), 400
+        
+        # Validate API key
+        if not api_key or not api_key.strip():
+            return jsonify({
+                'success': False,
+                'error': 'API key is required'
+            }), 400
+        
+        # Save the key
+        success = AdminAPIKey.set_system_api_key(
+            key_value=api_key.strip(),
+            key_type=key_type,
+            provider=provider
+        )
+        
+        if success:
+            # Return masked version for confirmation
+            masked = api_key[:8] + '••••••••' + api_key[-4:] if len(api_key) > 12 else '••••••••'
+            return jsonify({
+                'success': True,
+                'message': f'{provider.capitalize()} API key saved successfully',
+                'api_key_masked': masked
+            }), 200
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Failed to save API key'
+            }), 500
+    except Exception as e:
+        print(f"❌ Error saving system API key: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': 'Failed to save API key'
+        }), 500
+

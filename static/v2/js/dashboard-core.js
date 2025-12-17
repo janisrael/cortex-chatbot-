@@ -32,6 +32,30 @@ let categories = {
     }
 };
 
+// Shared chatbot config cache to avoid duplicate fetches across tabs
+let chatbotConfigCache = null;
+let chatbotConfigPromise = null;
+
+async function getChatbotConfig(force = false) {
+    if (!force && chatbotConfigCache) {
+        return chatbotConfigCache;
+    }
+    if (!force && chatbotConfigPromise) {
+        return chatbotConfigPromise;
+    }
+    chatbotConfigPromise = fetch('/api/user/chatbot-config', { credentials: 'same-origin' })
+        .then(async (res) => {
+            if (!res.ok) throw new Error('Failed to load chatbot config');
+            const data = await res.json();
+            chatbotConfigCache = data.config || data || {};
+            return chatbotConfigCache;
+        })
+        .finally(() => {
+            chatbotConfigPromise = null;
+        });
+    return chatbotConfigPromise;
+}
+
 // Initialize dashboard
 document.addEventListener('DOMContentLoaded', function() {
     initializeDashboard();

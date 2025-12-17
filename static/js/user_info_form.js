@@ -32,7 +32,6 @@ class UserInfoForm {
         form.style.cssText = `
             display: flex;
             flex-direction: column;
-            gap: 16px;
         `;
 
         const title = document.createElement('h3');
@@ -115,9 +114,9 @@ class UserInfoForm {
         input.name = name;
         input.required = required;
         input.style.cssText = `
-            padding: 12px 16px;
+            padding: 5px;
             border: 1.5px solid #e4e4e7;
-            border-radius: 12px;
+            border-radius: 6px;
             font-size: 16px;
             font-family: inherit;
             color: #18181b;
@@ -150,8 +149,8 @@ class UserInfoForm {
                 background: ${this.primaryColor};
                 color: ${this.contrastColor};
                 border: none;
-                padding: 12px 20px;
-                border-radius: 10px;
+                padding: 5px;
+                border-radius: 6px;
                 font-size: 16px;
                 font-weight: 500;
                 cursor: pointer;
@@ -175,8 +174,8 @@ class UserInfoForm {
                 background: white;
                 color: #52525b;
                 border: 1.5px solid #e4e4e7;
-                padding: 12px 20px;
-                border-radius: 10px;
+                padding: 5px;
+                border-radius: 6px;
                 font-size: 16px;
                 font-weight: 500;
                 cursor: pointer;
@@ -205,13 +204,18 @@ class UserInfoForm {
         const emailInput = document.getElementById('user-info-email');
         const phoneInput = document.getElementById('user-info-phone');
 
-        const name = nameInput.value.trim();
+        let name = nameInput.value.trim();
         const email = emailInput.value.trim();
         const phone = phoneInput.value.trim();
 
         if (!name) {
             alert('Name is required');
             return;
+        }
+
+        // Capitalize name: first letter uppercase, rest lowercase
+        if (name.length > 0) {
+            name = name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
         }
 
         const confirmBtn = this.formElement.querySelector('button[type="submit"]');

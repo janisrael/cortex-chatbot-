@@ -19,9 +19,9 @@ function switchAdminTab(tabName) {
             activeContent.classList.add('active');
             activeContent.style.display = 'block';
             
-            // Load API keys when tab is switched to api-keys
+            // Load system API keys when tab is switched to api-keys
             if (tabName === 'api-keys') {
-                loadAPIKeys();
+                loadSystemAPIKeys();
             }
         }
 
@@ -921,166 +921,372 @@ function initializeAnalyticsCharts() {
 
 }
 
-// API Key Management Functions
-let currentEditingKeyId = null;
+// System API Key Management Functions (LLM Provider Default Keys)
+const SYSTEM_PROVIDERS = ['openai', 'gemini', 'groq']; // Removed deepseek (not free, requires funding)
 
-async function loadAPIKeys() {
+async function loadSystemAPIKeys() {
     try {
-        const response = await fetch('/admin/api/api-keys');
-        const data = await response.json();
+        const loadingEl = document.getElementById('apiKeysLoading');
+        const successEl = document.getElementById('apiKeysSuccess');
+        const errorEl = document.getElementById('apiKeysError');
         
-        if (data.success) {
-            renderAPIKeys(data.api_keys);
-        } else {
-            console.error('Failed to load API keys:', data.error);
+        if (loadingEl) loadingEl.style.display = 'block';
+        if (successEl) successEl.style.display = 'none';
+        if (errorEl) errorEl.style.display = 'none';
+        
+        // Load keys for all providers
+        const keys = {};
+        for (const provider of SYSTEM_PROVIDERS) {
+            try {
+                const response = await fetch(`/admin/api/system-api-key/${provider}`, {
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.api_key) {
+                        keys[provider] = data.api_key;
+                    }
+                }
+            } catch (err) {
+                console.error(`Error loading ${provider} key:`, err);
+            }
         }
+        
+        // Update UI to show masked keys (if they exist)
+        for (const provider of SYSTEM_PROVIDERS) {
+            const inputEl = document.getElementById(`${provider}-api-key`);
+            if (inputEl && keys[provider] && keys[provider].has_key) {
+                // Populate input with masked key to show that a key exists
+                const masked = keys[provider].key_value_masked || '••••••••••••••••••••';
+                inputEl.value = masked;
+                inputEl.type = 'password'; // Keep as password type
+                inputEl.placeholder = `Current key exists (enter new key to update)`;
+                
+                // Update status to Active
+                const statusEl = document.getElementById(`${provider}-status`);
+                if (statusEl) {
+                    const statusDot = statusEl.querySelector('.status-dot');
+                    const statusText = statusEl.querySelector('.status-text');
+                    if (statusDot && statusText) {
+                        statusDot.style.background = '#22c55e';
+                        statusText.textContent = 'Active';
+                        statusEl.style.background = '#dcfce7';
+                        statusEl.style.color = '#166534';
+                    }
+                }
+            } else {
+                // No key exists - clear input and set status to Inactive
+                if (inputEl) {
+                    inputEl.value = '';
+                    inputEl.placeholder = `Enter ${provider.charAt(0).toUpperCase() + provider.slice(1)} API key`;
+                }
+                
+                const statusEl = document.getElementById(`${provider}-status`);
+                if (statusEl) {
+                    const statusDot = statusEl.querySelector('.status-dot');
+                    const statusText = statusEl.querySelector('.status-text');
+                    if (statusDot && statusText) {
+                        statusDot.style.background = '#94a3b8';
+                        statusText.textContent = 'Inactive';
+                        statusEl.style.background = '#f1f5f9';
+                        statusEl.style.color = '#64748b';
+                    }
+                }
+            }
+        }
+        
+        if (loadingEl) loadingEl.style.display = 'none';
     } catch (error) {
-        console.error('Error loading API keys:', error);
+        console.error('Error loading system API keys:', error);
+        const loadingEl = document.getElementById('apiKeysLoading');
+        const errorEl = document.getElementById('apiKeysError');
+        if (loadingEl) loadingEl.style.display = 'none';
+        if (errorEl) {
+            errorEl.textContent = 'Failed to load API keys. Please refresh the page.';
+            errorEl.style.display = 'block';
+        }
     }
 }
 
-function renderAPIKeys(keys) {
-    const container = document.getElementById('api-keys-list');
-    if (!container) return;
-    
-    if (keys.length === 0) {
-        container.innerHTML = '<p style="color: #6b7280;">No API keys found. Create one to get started.</p>';
-        return;
-    }
-    
-    container.innerHTML = keys.map(key => `
-        <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; background: white;">
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
-                <div>
-                    <h4 style="margin: 0 0 4px 0; font-size: 16px;">${escapeHtml(key.name || 'Untitled Key')}</h4>
-                    <span style="font-size: 12px; color: #6b7280; padding: 2px 8px; background: #f3f4f6; border-radius: 4px; display: inline-block;">
-                        ${escapeHtml(key.key_type || 'custom')}
-                    </span>
-                    <span style="font-size: 12px; color: ${key.is_active ? '#10b981' : '#ef4444'}; margin-left: 8px;">
-                        ${key.is_active ? '● Active' : '○ Inactive'}
-                    </span>
-                </div>
-                <div style="display: flex; gap: 8px;">
-                    <button onclick="toggleAPIKey(${key.id}, ${!key.is_active})" 
-                            style="padding: 6px 12px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 12px;">
-                        ${key.is_active ? 'Deactivate' : 'Activate'}
-                    </button>
-                    <button onclick="deleteAPIKey(${key.id})" 
-                            style="padding: 6px 12px; border: 1px solid #ef4444; background: white; color: #ef4444; border-radius: 4px; cursor: pointer; font-size: 12px;">
-                        Delete
-                    </button>
-                </div>
-            </div>
-            <div style="font-size: 12px; color: #6b7280;">
-                Created: ${key.created_at ? new Date(key.created_at).toLocaleDateString() : 'N/A'}
-            </div>
-        </div>
-    `).join('');
-}
-
-function createNewAPIKey() {
-    currentEditingKeyId = null;
-    document.getElementById('api-key-modal-title').textContent = 'Create API Key';
-    document.getElementById('api-key-form').reset();
-    document.getElementById('api-key-token-display').style.display = 'none';
-    document.getElementById('api-key-modal').style.display = 'flex';
-}
-
-function closeAPIKeyModal() {
-    document.getElementById('api-key-modal').style.display = 'none';
-    currentEditingKeyId = null;
-}
-
-async function handleAPIKeySubmit(event) {
-    event.preventDefault();
-    
-    const name = document.getElementById('api-key-name').value;
-    const keyType = document.getElementById('api-key-type').value;
-    
+// Test API key with provider before saving
+async function testSystemAPIKey(provider, apiKey) {
     try {
-        const response = await fetch('/admin/api/api-keys', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                name: name,
-                key_type: keyType
-            })
-        });
+        // Get default model for provider (matching LLM_PROVIDERS config)
+        // For Gemini, try multiple models in order of compatibility
+        const defaultModels = {
+            'openai': 'gpt-4o-mini',
+            'gemini': 'gemini-2.5-flash', // Updated: Use latest available model
+            'deepseek': 'deepseek-chat',
+            'groq': 'llama-3.1-8b-instant' // Using 8B for faster testing
+        };
         
-        const data = await response.json();
+        // For Gemini, try multiple models if first one fails
+        // Updated to use available models: gemini-2.5-flash, gemini-2.5-pro, gemini-2.0-flash
+        let model = defaultModels[provider] || 'gpt-4o-mini';
+        const geminiFallbackModels = ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash', 'gemini-flash-latest', 'gemini-pro-latest'];
         
-        if (data.success) {
-            document.getElementById('api-key-token').value = data.api_key.token;
-            document.getElementById('api-key-token-display').style.display = 'block';
-            const submitBtn = document.getElementById('api-key-form').querySelector('button[type="submit"]');
-            submitBtn.textContent = 'Close';
-            submitBtn.onclick = closeAPIKeyModal;
-            submitBtn.type = 'button';
+        let lastError = null;
+        let response = null;
+        
+        if (provider === 'gemini') {
+            // Try each Gemini model until one works
+            for (const testModel of geminiFallbackModels) {
+                try {
+                    response = await fetch('/api/test-llm', {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            provider: provider,
+                            model: testModel,
+                            api_key: apiKey
+                        })
+                    });
+                    
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        lastError = 'Server returned invalid response. Please check your login status.';
+                        continue;
+                    }
+                    
+                    const result = await response.json();
+                    
+                    if (response.ok && result.status === 'success') {
+                        // Success! Use this model and return
+                        return { success: true, result: result, model: testModel };
+                    } else {
+                        // This model failed, try next one
+                        lastError = result.error || result.message || 'API key test failed';
+                        continue;
+                    }
+                } catch (error) {
+                    lastError = error.message;
+                    continue;
+                }
+            }
             
-            await loadAPIKeys();
+            // If we get here, all models failed
+            return { success: false, error: lastError || 'All Gemini models failed. Please check your API key.' };
         } else {
-            alert('Failed to create API key: ' + (data.error || 'Unknown error'));
+            // For non-Gemini providers, use single model
+            response = await fetch('/api/test-llm', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    provider: provider,
+                    model: model,
+                    api_key: apiKey
+                })
+            });
+            
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                return { success: false, error: 'Server returned invalid response. Please check your login status.' };
+            }
+            
+            const result = await response.json();
+            
+            if (response.ok && result.status === 'success') {
+                return { success: true, result: result };
+            } else {
+                const errorMsg = result.error || result.message || 'API key test failed';
+                return { success: false, error: errorMsg };
+            }
         }
     } catch (error) {
-        console.error('Error creating API key:', error);
-        alert('Error creating API key. Please try again.');
+        let errorMsg = error.message;
+        if (errorMsg.includes('JSON') || errorMsg.includes('Unexpected token')) {
+            errorMsg = 'Server returned an invalid response. Please check your login status and try again.';
+        }
+        return { success: false, error: errorMsg };
     }
 }
 
-function copyAPIKey() {
-    const tokenInput = document.getElementById('api-key-token');
-    tokenInput.select();
-    document.execCommand('copy');
-    alert('API key copied to clipboard!');
-}
-
-async function toggleAPIKey(keyId, isActive) {
+async function saveSystemAPIKey(provider) {
     try {
-        const response = await fetch(`/admin/api/api-keys/${keyId}`, {
-            method: 'PUT',
+        const inputEl = document.getElementById(`${provider}-api-key`);
+        const loadingEl = document.getElementById('apiKeysLoading');
+        const successEl = document.getElementById('apiKeysSuccess');
+        const errorEl = document.getElementById('apiKeysError');
+        const saveBtn = document.getElementById(`save${provider.charAt(0).toUpperCase() + provider.slice(1)}KeyBtn`);
+        
+        if (!inputEl) {
+            console.error(`Input element not found for provider: ${provider}`);
+            return;
+        }
+        
+        const apiKey = inputEl.value.trim();
+        
+        // If empty, don't update (keep current key)
+        if (!apiKey) {
+            const errorMsg = 'Please enter an API key to save.';
+            if (errorEl) {
+                errorEl.textContent = errorMsg;
+                errorEl.style.display = 'block';
+                setTimeout(() => {
+                    if (errorEl) errorEl.style.display = 'none';
+                }, 3000);
+            }
+            // Always show toast notification
+            if (typeof showWarningNotification === 'function') {
+                showWarningNotification(errorMsg, 4000);
+            }
+            return;
+        }
+        
+        // Check if input contains masked value (don't test masked keys)
+        if (apiKey.includes('••••') || apiKey.length < 10) {
+            const errorMsg = 'Please enter a valid API key (not a masked value).';
+            if (errorEl) {
+                errorEl.textContent = errorMsg;
+                errorEl.style.display = 'block';
+                setTimeout(() => {
+                    if (errorEl) errorEl.style.display = 'none';
+                }, 3000);
+            }
+            // Always show toast notification
+            if (typeof showWarningNotification === 'function') {
+                showWarningNotification(errorMsg, 4000);
+            }
+            return;
+        }
+        
+        // Show loading state
+        if (loadingEl) loadingEl.style.display = 'block';
+        if (successEl) successEl.style.display = 'none';
+        if (errorEl) errorEl.style.display = 'none';
+        if (saveBtn) {
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<span class="material-icons-round" style="vertical-align: middle; font-size: 20px;">hourglass_empty</span> Testing...';
+        }
+        
+        // STEP 1: Test the API key first
+        // Show info toast that testing is starting
+        const providerName = provider.charAt(0).toUpperCase() + provider.slice(1);
+        if (typeof showInfoNotification === 'function') {
+            showInfoNotification(`Testing ${providerName} API key...`, 3000);
+        }
+        
+        const testResult = await testSystemAPIKey(provider, apiKey);
+        
+        if (!testResult.success) {
+            // Test failed - don't save
+            const errorMsg = `API key test failed: ${testResult.error}`;
+            if (errorEl) {
+                errorEl.textContent = errorMsg;
+                errorEl.style.display = 'block';
+            }
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<span class="material-icons-round" style="vertical-align: middle; font-size: 20px;">save</span> Save ' + providerName + ' Key';
+            }
+            if (loadingEl) loadingEl.style.display = 'none';
+            
+            // Always show error toast notification
+            if (typeof showErrorNotification === 'function') {
+                showErrorNotification(errorMsg, 6000);
+            }
+            return;
+        }
+        
+        // STEP 2: Test passed - now save the API key
+        if (saveBtn) {
+            saveBtn.innerHTML = '<span class="material-icons-round" style="vertical-align: middle; font-size: 20px;">hourglass_empty</span> Saving...';
+        }
+        
+        const response = await fetch('/admin/api/system-api-key', {
+            method: 'POST',
+            credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                is_active: isActive
+                provider: provider,
+                api_key: apiKey,
+                key_type: 'default'
             })
         });
         
         const data = await response.json();
         
-        if (data.success) {
-            await loadAPIKeys();
-        } else {
-            alert('Failed to update API key: ' + (data.error || 'Unknown error'));
-        }
-    } catch (error) {
-        console.error('Error updating API key:', error);
-        alert('Error updating API key. Please try again.');
-    }
-}
-
-async function deleteAPIKey(keyId) {
-    if (!confirm('Are you sure you want to delete this API key? This action cannot be undone.')) {
-        return;
-    }
-    
-    try {
-        const response = await fetch(`/admin/api/api-keys/${keyId}`, {
-            method: 'DELETE'
-        });
-        
-        const data = await response.json();
+        if (loadingEl) loadingEl.style.display = 'none';
         
         if (data.success) {
-            await loadAPIKeys();
+            // Reload API keys to update UI with masked key and status
+            await loadSystemAPIKeys();
+            
+            // Show success message
+            const successMsg = `${providerName} API key tested and saved successfully!`;
+            if (successEl) {
+                successEl.textContent = successMsg;
+                successEl.style.display = 'block';
+                setTimeout(() => {
+                    if (successEl) successEl.style.display = 'none';
+                }, 3000);
+            }
+            
+            // Always show success toast notification
+            if (typeof showSuccessNotification === 'function') {
+                showSuccessNotification(successMsg, 4000);
+            }
         } else {
-            alert('Failed to delete API key: ' + (data.error || 'Unknown error'));
+            // Show error message
+            const errorMsg = data.error || 'Failed to save API key. Please try again.';
+            if (errorEl) {
+                errorEl.textContent = errorMsg;
+                errorEl.style.display = 'block';
+                setTimeout(() => {
+                    if (errorEl) errorEl.style.display = 'none';
+                }, 5000);
+            }
+            
+            // Always show error toast notification
+            if (typeof showErrorNotification === 'function') {
+                showErrorNotification(errorMsg, 6000);
+            }
+        }
+        
+        // Restore button
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            const providerName = provider.charAt(0).toUpperCase() + provider.slice(1);
+            saveBtn.innerHTML = `<span class="material-icons-round" style="vertical-align: middle; font-size: 20px;">save</span> Save ${providerName} Key`;
         }
     } catch (error) {
-        console.error('Error deleting API key:', error);
-        alert('Error deleting API key. Please try again.');
+        console.error(`Error saving ${provider} API key:`, error);
+        
+        const loadingEl = document.getElementById('apiKeysLoading');
+        const errorEl = document.getElementById('apiKeysError');
+        const providerName = provider.charAt(0).toUpperCase() + provider.slice(1);
+        const saveBtn = document.getElementById(`save${providerName}KeyBtn`);
+        const errorMsg = 'Error saving API key. Please try again.';
+        
+        if (loadingEl) loadingEl.style.display = 'none';
+        if (errorEl) {
+            errorEl.textContent = errorMsg;
+            errorEl.style.display = 'block';
+            setTimeout(() => {
+                if (errorEl) errorEl.style.display = 'none';
+            }, 5000);
+        }
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = `<span class="material-icons-round" style="vertical-align: middle; font-size: 20px;">save</span> Save ${providerName} Key`;
+        }
+        
+        // Always show error toast notification
+        if (typeof showErrorNotification === 'function') {
+            showErrorNotification(errorMsg, 6000);
+        }
     }
 }
 
