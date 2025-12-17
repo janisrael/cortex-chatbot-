@@ -2,86 +2,19 @@
 
 A full-stack AI-powered chatbot platform with RAG (Retrieval Augmented Generation), multi-LLM support, knowledge base management, and comprehensive admin dashboard.
 
-## Version 2.2 - Release Notes
+## Current Version: 2.2.0
 
-### Major Features
+**Latest Release:** December 17, 2025
 
-#### Multi-LLM Provider Support
-- **Google Gemini** - Activated and fully functional
-- **Groq (Llama)** - Activated and fully functional  
-- **Anthropic Claude** - Activated and fully functional
-- **Together AI (Llama)** - Activated and fully functional
-- **System Default API Keys** - Admin can manage default API keys for free-tier providers
-- **API Key Testing** - Keys are tested with providers before saving
-- **User API Key Override** - Users can provide their own API keys for any provider
+### What's New in Version 2.2
 
-#### Knowledge Base Accuracy Improvements
-- **Optimized Evaluation Thresholds** - Improved accuracy calculation (60% semantic similarity + 40% fact coverage)
-- **Enhanced Pass Criteria** - Updated thresholds (semantic_sim >= 0.60 OR fact_cov >= 0.50)
-- **Better Test Coverage** - Improved FILE and CRAWL test accuracy
+- **Multi-LLM Provider Support** - Google Gemini, Groq, Anthropic Claude, and Together AI now fully activated
+- **Data Persistence** - All data (database, ChromaDB, config) persists across pod restarts
+- **Knowledge Base Accuracy** - Improved evaluation thresholds for better test accuracy
+- **UI/UX Improvements** - Enhanced login toggle, user info form, admin dashboard, and widget features
+- **API Key Management** - System default API keys with testing and visibility controls
 
-#### Data Persistence
-- **Kubernetes PVC Configuration** - All data (database, ChromaDB, config) now persists across pod restarts
-- **Volume Mounts** - Properly configured persistent volumes for `/app/data`, `/app/chroma_db`, `/app/config`
-- **Zero Data Loss** - Data survives pod evictions and server restarts
-
-### UI/UX Improvements
-
-#### Login Page
-- **Compact Toggle Switch** - New smaller toggle design for User/Admin mode switching
-- **Dynamic Label** - Toggle label changes between "User" and "Admin" dynamically
-- **Info Area** - Improved demo account section with concise explanation
-
-#### User Dashboard
-- **Advanced Settings Info Icons** - Clickable info icons with detailed descriptions for all 7 advanced chatbot settings
-- **Info Modal** - Human-readable explanations with recommended values and examples
-- **User Info Form Styling** - Compact design with 5px padding and 6px border-radius
-- **Name Capitalization** - Automatic capitalization (first letter uppercase, rest lowercase)
-- **Settings Tab Styling** - Removed border-left from cards for cleaner look
-
-#### Admin Dashboard
-- **API Keys Tab Component** - Extracted to component-based structure (`admin/components/api_keys_tab.html`)
-- **System LLM Provider Keys** - Manage default API keys for OpenAI, Gemini, Groq
-- **API Key Visibility Toggle** - Eye icon to show/hide API keys
-- **Status Badges** - Active/Inactive indicators for each provider
-- **Gemini Model Fallback** - Automatic fallback to working Gemini models during testing
-
-#### Widget & Chatbot
-- **Custom Avatar Bug Fix** - Fixed issue where custom uploaded avatars weren't consistently displayed
-- **Avatar Display Logic** - All bot messages now use `widget_avatar_url` consistently
-- **Welcome Message Customization** - Users can customize welcome messages
-- **Continuous Conversation** - Improved conversation context building and history management
-
-### Technical Improvements
-
-#### Code Quality
-- **Component-Based Structure** - Admin dashboard tabs extracted to separate component files
-- **Modular Architecture** - Better code organization following coding rules
-- **Error Handling** - Improved error messages and validation
-
-#### Infrastructure
-- **Kubernetes Deployment Files** - Complete k8s manifests in `k8s/` directory
-- **CI/CD Updates** - Deployment workflow applies persistence configuration automatically
-- **OG Image Meta Tags** - Updated Open Graph and Twitter card images
-
-### Documentation
-- **LLM Provider Analysis** - Created `docs/LLM_PROVIDER_ANALYSIS.md`
-- **Database ERD** - Created `docs/diagrams/database_erd.md` (dbdiagram.io format)
-- **Data Persistence Plan** - Created `docs/CORTEX_DATA_PERSISTENCE_PLAN.md`
-- **Deployment Status** - Created `docs/DEPLOYMENT_PERSISTENCE_STATUS.md`
-
-### Bug Fixes
-- Fixed custom avatar not displaying in widget after first message
-- Fixed API Keys tab component missing (restored from main branch)
-- Fixed name capitalization inconsistency
-- Fixed settings tab border styling issues
-- Improved error handling for API key testing
-
----
-
-**Previous Versions:**
-- Version 2.1 - Initial multi-LLM support, RBAC implementation
-- Version 2.0 - Core platform with RAG, knowledge base management
+For detailed release notes and full changelog, see [CHANGELOG.md](CHANGELOG.md).
 
 ## Features
 
