@@ -34,9 +34,9 @@ async function initializeAppearance() {
 // Load appearance configuration
 async function loadAppearanceConfig() {
     try {
-        const response = await fetch('/api/user/chatbot-config');
-        const data = await response.json();
-        const config = data.config || data;
+        const config = (typeof getChatbotConfig === 'function')
+            ? await getChatbotConfig()
+            : await (await fetch('/api/user/chatbot-config')).json().then(d => d.config || d);
         
         // Load bot name for preview
         if (config.bot_name) {
@@ -573,10 +573,19 @@ function setupAvatarSelection() {
                     
                     const response = await fetch('/api/avatar/upload', {
                         method: 'POST',
-                        body: formData
+                        body: formData,
+                        credentials: 'same-origin'
                     });
                     
-                    const result = await response.json();
+                    // Attempt to parse JSON safely
+                    let result = {};
+                    const contentType = response.headers.get('Content-Type') || '';
+                    if (contentType.includes('application/json')) {
+                        result = await response.json();
+                    } else {
+                        const text = await response.text();
+                        throw new Error(text || 'Unexpected response from server');
+                    }
                     
                     if (response.ok) {
                         // Update appearance config with uploaded avatar
@@ -657,12 +666,13 @@ function updateAvatarUI() {
                     }
                 }
             });
-        } else if (appearanceConfig.avatar.type === 'upload') {
-            // Show uploaded avatar
-            const avatarUrl = appearanceConfig.avatar.value.startsWith('/') 
-                ? appearanceConfig.avatar.value 
-                : '/' + appearanceConfig.avatar.value;
-            currentAvatarPreview.innerHTML = `<img src="${avatarUrl}" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+        } else if (appearanceConfig.avatar.type === 'upload' || appearanceConfig.avatar.type === 'custom') {
+            // Show uploaded/custom avatar
+            let avatarUrl = appearanceConfig.avatar.value || '';
+            if (!avatarUrl.startsWith('http')) {
+                avatarUrl = avatarUrl.startsWith('/') ? avatarUrl : '/' + avatarUrl;
+            }
+            currentAvatarPreview.innerHTML = `<img src="${avatarUrl}" alt="Avatar" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">`;
         } else {
             // Default fallback
             currentAvatarPreview.innerHTML = '<span class="material-icons-round" style="font-size: 40px; color: #71717a;">face</span>';

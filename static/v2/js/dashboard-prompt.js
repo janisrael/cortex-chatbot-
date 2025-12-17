@@ -112,13 +112,9 @@ let savedPrompt = null; // Store user's saved prompt for reset functionality
 async function loadPrompt() {
     try {
         // Load user's chatbot config from API
-        const response = await fetch('/api/user/chatbot-config');
-        if (!response.ok) {
-            throw new Error('Failed to load config');
-        }
-        
-        const data = await response.json();
-        const config = data.config || data; // Handle both {config: {...}} and direct config
+        const config = (typeof getChatbotConfig === 'function')
+            ? await getChatbotConfig()
+            : await (await fetch('/api/user/chatbot-config')).json().then(d => d.config || d);
         
         // Load chatbot name
         const nameInput = document.getElementById('chatbotName');
@@ -130,6 +126,20 @@ async function loadPrompt() {
         const welcomeMessageInput = document.getElementById('welcomeMessage');
         if (welcomeMessageInput) {
             welcomeMessageInput.value = config.welcome_message || '';
+        }
+        
+        const botName = config.bot_name || 'Cortex';
+        
+        // Normalize prompt text for display (replace Cortex/{bot_name} with actual bot name)
+        const promptEditor = document.getElementById('promptEditor');
+        if (promptEditor) {
+            let displayPrompt = config.prompt || '';
+            if (displayPrompt) {
+                displayPrompt = displayPrompt.replace(/{bot_name}/g, botName);
+                displayPrompt = displayPrompt.replace(/\bCortex's\b/g, `${botName}'s`);
+                displayPrompt = displayPrompt.replace(/\bCortex\b/g, botName);
+                promptEditor.value = displayPrompt;
+            }
         }
         
         // Load presets first (needed to select default)

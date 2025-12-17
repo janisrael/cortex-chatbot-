@@ -118,7 +118,6 @@ class LLMProvider:
                 raise ValueError(f"Failed to initialize Claude LLM: {error_msg}")
         
         elif provider == "gemini":
-            # TODO: Implement when langchain-google-genai is added
             from langchain_google_genai import ChatGoogleGenerativeAI
             return ChatGoogleGenerativeAI(
                 model=model,

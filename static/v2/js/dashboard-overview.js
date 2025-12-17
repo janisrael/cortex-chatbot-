@@ -639,10 +639,30 @@ function updateOverviewAvatar(config, primaryColorValue, botName) {
     
     let avatarUrl = null;
     if (config.avatar) {
-        if (config.avatar.type === 'preset' && config.avatar.value) {
+        const val = config.avatar.value || '';
+        const src = config.avatar.src || '';
+        const looksLikeUpload =
+            val.includes('uploads/avatars') || src.includes('uploads/avatars');
+
+        if (!looksLikeUpload && config.avatar.type === 'preset' && config.avatar.value) {
             avatarUrl = `/static/img/avatar/${config.avatar.value}.png`;
+        } else if (config.avatar.value) {
+            // Custom/upload avatar stored in value
+            if (config.avatar.value.startsWith('http')) {
+                avatarUrl = config.avatar.value;
+            } else {
+                avatarUrl = config.avatar.value.startsWith('/')
+                    ? config.avatar.value
+                    : `/${config.avatar.value}`;
+            }
         } else if (config.avatar.src) {
-            avatarUrl = config.avatar.src;
+            if (config.avatar.src.startsWith('http')) {
+                avatarUrl = config.avatar.src;
+            } else {
+                avatarUrl = config.avatar.src.startsWith('/')
+                    ? config.avatar.src
+                    : `/${config.avatar.src}`;
+            }
         }
     }
     
@@ -653,6 +673,10 @@ function updateOverviewAvatar(config, primaryColorValue, botName) {
     
     avatarImg.src = avatarUrl;
     avatarImg.alt = `${botName} Avatar`;
+    avatarImg.style.width = '60px';
+    avatarImg.style.height = '60px';
+    avatarImg.style.borderRadius = '50%';
+    avatarImg.style.objectFit = 'cover';
     
     if (primaryColorValue && avatarWrapper) {
         const borderHex = primaryColorValue.startsWith('#') ? primaryColorValue : `#${extractPrimaryColorHex(primaryColorValue)}`;

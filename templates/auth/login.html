@@ -14,70 +14,86 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
     <style>
-        /* Toggle Switch Styles */
-        .toggle-checkbox {
-            display: none;
-        }
-
-        .switch-container {
+        /* New Toggle Switch Styles */
+        .toggle-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
             position: relative;
-            width: 150px;
-            height: 60px;
-            background: #d6d6d6;
-            border-radius: 50px;
-            box-shadow: inset -8px -8px 16px #ffffff, inset 8px 8px 16px #b0b0b0;
+            border-radius: .5em;
+            padding: .125em;
+            background-image: linear-gradient(to bottom, #d5d5d5, #e8e8e8);
+            box-shadow: 0 1px 1px rgb(255 255 255 / .6);
+            font-size: 1.5em;
         }
 
-        .switch {
+        .toggle-checkbox {
+            appearance: none;
             position: absolute;
-            top: 50%;
-            left: 0;
+            z-index: 1;
+            border-radius: inherit;
             width: 100%;
             height: 100%;
-            transform: translateY(-50%);
-            border-radius: 50px;
-            overflow: hidden;
+            font: inherit;
+            opacity: 0;
             cursor: pointer;
         }
 
-        .toggle {
-            position: absolute;
-            width: 80px;
-            height: 50px;
-            background: linear-gradient(145deg, #e2e2e2, #ffffff);
-            border-radius: 50px;
-            top: 5px;
-            left: 5px;
-            box-shadow: -4px -4px 8px #ffffff, 4px 4px 8px #b0b0b0;
-            transition: all 0.3s ease-in-out;
+        .toggle-container {
             display: flex;
             align-items: center;
-            justify-content: flex-start;
-            padding-left: 10px;
+            position: relative;
+            border-radius: .375em;
+            width: 3em;
+            height: 1.5em;
+            background-color: #e8e8e8;
+            box-shadow: inset 0 0 .0625em .125em rgb(255 255 255 / .2), inset 0 .0625em .125em rgb(0 0 0 / .4);
+            transition: background-color .4s linear;
         }
 
-        .led {
-            width: 10px;
-            height: 10px;
-            background: grey;
+        .toggle-checkbox:checked + .toggle-container {
+            background-color: #f3b519;
+        }
+
+        .toggle-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            left: .0625em;
+            border-radius: .3125em;
+            width: 1.375em;
+            height: 1.375em;
+            background-color: #e8e8e8;
+            box-shadow: inset 0 -.0625em .0625em .125em rgb(0 0 0 / .1), inset 0 -.125em .0625em rgb(0 0 0 / .2), inset 0 .1875em .0625em rgb(255 255 255 / .3), 0 .125em .125em rgb(0 0 0 / .5);
+            transition: left .4s;
+        }
+
+        .toggle-checkbox:checked + .toggle-container > .toggle-button {
+            left: 1.5625em;
+        }
+
+        .toggle-button-circles-container {
+            display: grid;
+            grid-template-columns: repeat(3, min-content);
+            gap: .125em;
+            position: absolute;
+            margin: 0 auto;
+        }
+
+        .toggle-button-circle {
             border-radius: 50%;
-            box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease-in-out;
+            width: .125em;
+            height: .125em;
+            background-image: radial-gradient(circle at 50% 0, #f5f5f5, #c4c4c4);
         }
 
-        .toggle-checkbox:checked + .switch .toggle {
-            left: 65px !important;
-            background: linear-gradient(145deg, #cfcfcf, #a9a9a9) !important;
-            box-shadow: -4px -4px 8px #ffffff, 4px 4px 8px #8a8a8a !important;
-        }
-
-        .toggle-checkbox:checked + .switch .led {
-            background: yellow !important;
-            box-shadow: 0 0 15px 4px yellow !important;
-        }
-
-        .switch:hover .toggle {
-            box-shadow: -4px -4px 12px #ffffff, 4px 4px 12px #9b9b9b;
+        .toggle-label {
+            margin-left: 12px;
+            font-size: 18px;
+            font-weight: 500;
+            color: #666;
+            min-width: 50px;
         }
     </style>
 </head>
@@ -94,24 +110,39 @@
                     <p class="subtitle">Sign in to access your dashboard</p>
                 </div>
 
-            <!-- Demo Credentials for Portfolio -->
-            <div class="demo-credentials" style="background: white; border: 1px solid #e0e0e0; border-radius: 12px; padding: 20px; margin-bottom: 24px; color: #333;">
-                <div style="display: flex; align-items: center; justify-content: space-between; flex-direction: column; gap: 15px;">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-outlined" style="font-size: 24px; color: #666;">admin_panel_settings</span>
-                        <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: #333;">Demo Account (Portfolio)</h3>
+            <!-- Demo Account Info Area -->
+            <div class="demo-credentials" style="background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 12px; padding: 20px; margin-bottom: 24px; color: #333;">
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="material-symbols-outlined" style="font-size: 24px; color: #667eea;">info</span>
+                        <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: #333;">Demo Account</h3>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <span style="font-size: 14px; font-weight: 500; color: #666;">Normal</span>
-                        <div class="switch-container">
-                            <input class="toggle-checkbox" id="toggle-switch" type="checkbox" />
-                            <label class="switch" for="toggle-switch">
-                                <div class="toggle">
-                                    <div class="led"></div>
+                    <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #666;">
+                        Portfolio demo, toggle modes or register for full workflow.
+                    </p>
+                    <div style="display: flex; align-items: flex-start; gap: 12px; margin-top: 8px;">
+                        <div class="toggle-wrapper">
+                            <input class="toggle-checkbox" id="toggle-switch" type="checkbox">
+                            <div class="toggle-container">  
+                                <div class="toggle-button">
+                                    <div class="toggle-button-circles-container">
+                                        <div class="toggle-button-circle"></div>
+                                        <div class="toggle-button-circle"></div>
+                                        <div class="toggle-button-circle"></div>
+                                        <div class="toggle-button-circle"></div>
+                                        <div class="toggle-button-circle"></div>
+                                        <div class="toggle-button-circle"></div>
+                                        <div class="toggle-button-circle"></div>
+                                        <div class="toggle-button-circle"></div>
+                                        <div class="toggle-button-circle"></div>
+                                        <div class="toggle-button-circle"></div>
+                                        <div class="toggle-button-circle"></div>
+                                        <div class="toggle-button-circle"></div>
+                                    </div>
                                 </div>
-                            </label>
+                            </div>
                         </div>
-                        <span style="font-size: 14px; font-weight: 500; color: #666;">Admin</span>
+                        <span class="toggle-label" id="toggle-label">User</span>
                     </div>
                 </div>
             </div>
@@ -308,9 +339,17 @@
 
         // Toggle switch handler
         const toggleSwitch = document.getElementById('toggle-switch');
+        const toggleLabel = document.getElementById('toggle-label');
         
         // Default to Normal User (OFF state)
         let isAdmin = false;
+        
+        // Update label based on toggle state
+        function updateToggleLabel() {
+            if (toggleLabel) {
+                toggleLabel.textContent = isAdmin ? 'Admin' : 'User';
+            }
+        }
         
         // Auto-fill demo credentials
         function fillDemoCredentials() {
@@ -333,6 +372,7 @@
         if (toggleSwitch) {
             toggleSwitch.addEventListener('change', function() {
                 isAdmin = this.checked;
+                updateToggleLabel();
                 // Auto-fill when toggled
                 fillDemoCredentials();
             });
@@ -340,6 +380,7 @@
         
         // Auto-fill on page load (Normal User credentials by default)
         window.addEventListener('DOMContentLoaded', function() {
+            updateToggleLabel();
             fillDemoCredentials();
         });
     </script>

@@ -22,13 +22,18 @@ def store_user_info(conversation_id, name, email=None, phone=None):
     if not name or not name.strip():
         return False
     
+    # Capitalize name: first letter uppercase, rest lowercase
+    name = name.strip()
+    if len(name) > 0:
+        name = name[0].upper() + name[1:].lower()
+    
     conversation = Conversation.get_by_id(conversation_id)
     if not conversation:
         return False
     
     metadata = conversation.metadata or {}
     metadata['user_info'] = {
-        'name': name.strip(),
+        'name': name,
         'email': email.strip() if email and isinstance(email, str) else None,
         'phone': phone.strip() if phone and isinstance(phone, str) else None,
         'collected_at': datetime.now().isoformat()

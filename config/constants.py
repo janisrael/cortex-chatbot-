@@ -62,7 +62,7 @@ INSTRUCTIONS:
 - Always finish with a relevant follow-up or offer to help further.
 
 Relevant Info:
-{context}
+{bot_name}
 
 User Question: {question}
 
@@ -87,7 +87,7 @@ INSTRUCTIONS:
 - End with a clear next step or follow-up question.
 
 Relevant Info:
-{context}
+{bot_name}
 
 User Question: {question}
 
@@ -112,7 +112,7 @@ INSTRUCTIONS:
 - Always include a clear call-to-action.
 
 Relevant Info:
-{context}
+{bot_name}
 
 User Question: {question}
 
@@ -137,7 +137,7 @@ INSTRUCTIONS:
 - End with an offer to help further or confirm resolution.
 
 Relevant Info:
-{context}
+{bot_name}
 
 User Question: {question}
 

@@ -200,6 +200,10 @@ def store_user_info_endpoint(conversation_id):
         if not name:
             return jsonify({"error": "Name is required"}), 400
         
+        # Capitalize name: first letter uppercase, rest lowercase
+        if len(name) > 0:
+            name = name[0].upper() + name[1:].lower()
+        
         success = store_user_info(conversation_id, name, email, phone)
         
         if not success:

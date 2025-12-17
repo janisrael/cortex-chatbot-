@@ -12,6 +12,7 @@ from models.prompt_preset import PromptPreset
 from werkzeug.utils import secure_filename
 import os
 from datetime import datetime
+import uuid
 
 api_bp = Blueprint('api', __name__)
 
@@ -135,6 +136,56 @@ def upload_file_multi():
         print(f"Upload error: {error_details}")
         return jsonify({"error": str(e)}), 500
 
+
+@api_bp.route("/api/avatar/upload", methods=["POST"])
+@login_required
+def upload_avatar():
+    """Upload a custom avatar image."""
+    try:
+        if not current_user.is_authenticated:
+            return jsonify({"error": "Authentication required"}), 401
+
+        if 'avatar' not in request.files:
+            return jsonify({"error": "No avatar file provided"}), 400
+
+        avatar_file = request.files['avatar']
+        if avatar_file.filename == '':
+            return jsonify({"error": "No file selected"}), 400
+
+        filename = secure_filename(avatar_file.filename)
+        ext = filename.rsplit('.', 1)[-1].lower() if '.' in filename else ''
+        if ext not in ALLOWED_AVATAR_EXTENSIONS:
+            return jsonify({"error": "File type not allowed"}), 400
+
+        # Enforce size limit
+        avatar_file.stream.seek(0, os.SEEK_END)
+        size_bytes = avatar_file.stream.tell()
+        avatar_file.stream.seek(0)
+        if size_bytes > MAX_AVATAR_SIZE:
+            return jsonify({"error": "File too large. Max 2MB."}), 400
+
+        # Save to static uploads folder
+        avatars_dir = os.path.join('static', 'uploads', 'avatars')
+        os.makedirs(avatars_dir, exist_ok=True)
+        unique_name = f"{current_user.id}_{uuid.uuid4().hex}.{ext}"
+        save_path = os.path.join(avatars_dir, unique_name)
+        avatar_file.save(save_path)
+
+        avatar_url = f"/static/uploads/avatars/{unique_name}"
+
+        return jsonify({
+            "message": "Avatar uploaded successfully",
+            "avatar_url": avatar_url,
+            "avatar": {
+                "type": "custom",
+                "value": avatar_url,
+                "fallback": "ui-avatars"
+            }
+        }), 200
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
 
 @api_bp.route("/api/files", methods=["GET"])
 @login_required
@@ -486,10 +537,18 @@ def get_user_chatbot_config():
             api_key = get_user_api_key(user_id)
             config['api_key'] = api_key
         
-        # If prompt is None, generate default prompt with bot_name
-        if config.get('prompt') is None:
-            bot_name = config.get('bot_name', 'Cortex')
+        # Normalize prompt: use bot_name in all placeholders/hardcoded cases
+        bot_name = config.get('bot_name', 'Cortex')
+        prompt_text = config.get('prompt')
+        if prompt_text is None:
             config['prompt'] = get_default_prompt_with_name(bot_name)
+        else:
+            prompt_text = prompt_text.replace('{bot_name}', bot_name)
+            prompt_text = prompt_text.replace("Cortex's", f"{bot_name}'s")
+            prompt_text = prompt_text.replace("Cortex", bot_name)
+            config['prompt'] = prompt_text
+            # Persist the normalized prompt to the user config file
+            save_user_chatbot_config_file(user_id, config)
         
         return jsonify({"config": config})
     except Exception as e:
@@ -2077,6 +2136,12 @@ def test_llm():
                     error_msg = "Invalid Together AI API key. Please check your API key and try again. Get your key at: https://api.together.xyz/"
                 else:
                     error_msg = f"Invalid API key for {provider}. Please check your API key and try again."
+            # Handle insufficient balance errors (402)
+            elif "402" in error_msg or "insufficient balance" in error_msg.lower() or "insufficient funds" in error_msg.lower():
+                if provider == "deepseek":
+                    error_msg = "DeepSeek API key is valid, but your account has insufficient balance. Please add funds to your DeepSeek account at https://platform.deepseek.com/"
+                else:
+                    error_msg = f"{provider.capitalize()} API key is valid, but your account has insufficient balance. Please add funds to your account."
             # Handle rate limit errors
             elif "429" in error_msg or "rate limit" in error_msg.lower():
                 error_msg = f"Rate limit exceeded for {provider}. Please wait a moment and try again."

@@ -93,11 +93,9 @@ const LLM_PROVIDERS = {
 // Load provider and model from user config
 async function loadLLMProviderConfig() {
     try {
-        const response = await fetch('/api/user/chatbot-config');
-        if (!response.ok) throw new Error('Failed to load config');
-        
-        const data = await response.json();
-        const config = data.config || data;
+        const config = (typeof getChatbotConfig === 'function')
+            ? await getChatbotConfig()
+            : await (await fetch('/api/user/chatbot-config')).json().then(d => d.config || d);
         
         const provider = config.llm_provider || 'openai';
         const model = config.llm_model || LLM_PROVIDERS[provider].defaultModel;
