@@ -391,15 +391,34 @@ jobs:
               exit 1
             }
             
-            echo "Restarting deployment..."
-            kubectl rollout restart deployment/cortex-app -n cortex || {
-              echo "❌ Deployment restart failed"
-              exit 1
-            }
+            echo "Applying deployment with persistence configuration..."
+            if [ -f k8s/deployment.yaml ]; then
+              kubectl apply -f k8s/deployment.yaml || {
+                echo "⚠️ Deployment apply failed, trying rollout restart instead"
+                kubectl rollout restart deployment/cortex-app -n cortex || {
+                  echo "❌ Deployment restart failed"
+                  exit 1
+                }
+              }
+            else
+              echo "⚠️ k8s/deployment.yaml not found, using rollout restart"
+              kubectl rollout restart deployment/cortex-app -n cortex || {
+                echo "❌ Deployment restart failed"
+                exit 1
+              }
+            fi
             
             kubectl rollout status deployment/cortex-app -n cortex --timeout=120s || {
               echo "⚠️ Deployment status check timed out, but may still be in progress"
             }
+            
+            echo "Verifying persistence mounts..."
+            POD=$(kubectl get pods -n cortex -l app=cortex -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || echo "")
+            if [ -n "$POD" ]; then
+              echo "Pod: $POD"
+              echo "Volume mounts:"
+              kubectl get pod "$POD" -n cortex -o jsonpath='{.spec.containers[0].volumeMounts[*].mountPath}' 2>/dev/null | tr ' ' '\n' || echo "Could not verify mounts"
+            fi
             
             echo "Cleaning up..."
             cd /

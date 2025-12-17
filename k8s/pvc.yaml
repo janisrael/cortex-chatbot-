@@ -1,0 +1,42 @@
+# Persistent Volume Claims for Cortex Data Persistence
+# These PVCs ensure data survives pod evictions and restarts
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cortex-db-pvc
+  namespace: cortex
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cortex-chromadb-pvc
+  namespace: cortex
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cortex-config-pvc
+  namespace: cortex
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 1Gi
+
