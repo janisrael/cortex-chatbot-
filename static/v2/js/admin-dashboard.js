@@ -1296,6 +1296,30 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// Toggle password visibility for API key inputs
+function togglePasswordVisibility(inputId, iconElement) {
+    const input = document.getElementById(inputId);
+    if (!input || !iconElement) {
+        console.error('togglePasswordVisibility: Input or icon element not found');
+        return;
+    }
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        iconElement.textContent = 'visibility';
+        iconElement.style.color = '#0891b2'; // Blue when visible
+    } else {
+        input.type = 'password';
+        iconElement.textContent = 'visibility_off';
+        iconElement.style.color = '#64748b'; // Gray when hidden
+    }
+}
+
+// Expose functions to global scope for onclick handlers
+window.saveSystemAPIKey = saveSystemAPIKey;
+window.loadSystemAPIKeys = loadSystemAPIKeys;
+window.togglePasswordVisibility = togglePasswordVisibility;
+
 // Auto-initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeAdminDashboard);
