@@ -185,6 +185,7 @@ def widget_multi():
             # Get avatar
             avatar = appearance_dict.get('avatar', {})
             short_info = appearance_dict.get('short_info', 'Your friendly assistant')
+            welcome_message = appearance_dict.get('welcome_message')
         else:
             # Defaults
             primary_color = '#0891b2'
@@ -192,6 +193,7 @@ def widget_multi():
             suggested = SUGGESTED_MESSAGES if 'SUGGESTED_MESSAGES' in locals() else []
             avatar = {'type': 'preset', 'value': 'avatar_1', 'fallback': 'ui-avatars'}
             short_info = 'Your friendly assistant'
+            welcome_message = None
         
         website_name = bot_name  # Use bot name as website name
     except Exception as e:
@@ -205,6 +207,15 @@ def widget_multi():
         suggested = SUGGESTED_MESSAGES
         avatar = {'type': 'preset', 'value': 'avatar_1', 'fallback': 'ui-avatars'}
         short_info = 'Your friendly assistant'
+        welcome_message = None
+    
+    # Default welcome message if not set
+    if 'welcome_message' not in locals() or not welcome_message:
+        welcome_message = f"Hi there! I'm {bot_name}, your helpful assistant. How can I help you today?"
+    
+    # Ensure welcome_message is always a string (not None)
+    if not welcome_message:
+        welcome_message = f"Hi there! I'm {bot_name}, your helpful assistant. How can I help you today?"
     
     # Pass user-specific config to template - use embeddable widget
     return render_template("widget/widget_embed.html", 
@@ -216,7 +227,8 @@ def widget_multi():
                          api_key=api_key,
                          suggested=suggested,
                          avatar=avatar,
-                         short_info=short_info)
+                         short_info=short_info,
+                         welcome_message=welcome_message)
 
 
 @widget_bp.route("/embed.js")

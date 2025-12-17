@@ -1,0 +1,141 @@
+<!-- API Keys Tab -->
+<div id="admin-tab-api-keys" class="tab-content admin-tab-content" style="display: none;">
+    <div class="card">
+        <h2><span class="material-icons-round" style="vertical-align: middle; font-size: 24px;">vpn_key</span> API Keys</h2>
+        
+        <div class="alert alert-success" id="apiKeysSuccess" style="display: none;"></div>
+        <div class="alert alert-error" id="apiKeysError" style="display: none;"></div>
+        
+        <div class="management-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 20px;">
+            <!-- OpenAI Card -->
+            <div class="management-item" style="background: white; border: 2px solid #e1e5e9; border-radius: 16px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: all 0.3s ease;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #0891b2 0%, #0f766e 100%); display: flex; align-items: center; justify-content: center;">
+                            <span class="material-icons-round" style="font-size: 28px; color: white;">smart_toy</span>
+                        </div>
+                        <h3 style="margin: 0; font-size: 20px; font-weight: 600; color: #1e293b;">OpenAI</h3>
+                    </div>
+                    <div class="api-key-status" id="openai-status" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; background: #f1f5f9; color: #64748b;">
+                        <span class="status-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #94a3b8;"></span>
+                        <span class="status-text">Inactive</span>
+                    </div>
+                </div>
+                <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin-bottom: 16px;">Default API key for OpenAI (GPT models). Used when users don't provide their own key.</p>
+                <div style="background: #f8f9fa; border-radius: 10px; padding: 16px; margin-bottom: 20px;">
+                    <ul style="margin: 0; padding-left: 20px; color: #475569; font-size: 13px; line-height: 1.8;">
+                        <li>Used for widget/chatbot</li>
+                        <li>System default key</li>
+                        <li>Paid service (not free)</li>
+                    </ul>
+                </div>
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 6px; font-weight: 500; color: #1e293b;">API Key</label>
+                    <div style="position: relative;">
+                        <input type="password" id="openai-api-key" class="form-control api-key-input" placeholder="Enter OpenAI API key" style="width: 100%; padding: 10px 40px 10px 10px; border: 1px solid #e1e5e9; border-radius: 8px; font-size: 14px; font-family: monospace;">
+                        <span class="material-icons-round toggle-password-visibility" onclick="togglePasswordVisibility('openai-api-key', this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #64748b; font-size: 20px; user-select: none;">visibility_off</span>
+                    </div>
+                    <small style="color: #71717a; font-size: 12px; margin-top: 4px; display: block;">Leave empty to keep current key</small>
+                </div>
+                <button class="btn" onclick="saveSystemAPIKey('openai')" id="saveOpenAIKeyBtn" style="width: 100%; padding: 12px 24px; font-weight: 600; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, #0891b2 0%, #0f766e 100%); border: none; color: white;">
+                    <span class="material-icons-round" style="vertical-align: middle; font-size: 20px;">save</span> Save OpenAI Key
+                </button>
+            </div>
+            
+            <!-- Google Gemini Card -->
+            <div class="management-item" style="background: white; border: 2px solid #e1e5e9; border-radius: 16px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: all 0.3s ease;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #0891b2 0%, #0f766e 100%); display: flex; align-items: center; justify-content: center;">
+                            <span class="material-icons-round" style="font-size: 28px; color: white;">auto_awesome</span>
+                        </div>
+                        <h3 style="margin: 0; font-size: 20px; font-weight: 600; color: #1e293b;">Google Gemini</h3>
+                    </div>
+                    <div class="api-key-status" id="gemini-status" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; background: #f1f5f9; color: #64748b;">
+                        <span class="status-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #94a3b8;"></span>
+                        <span class="status-text">Inactive</span>
+                    </div>
+                </div>
+                <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin-bottom: 16px;">Default API key for Google Gemini. Used when users don't provide their own key.</p>
+                <div style="background: #f8f9fa; border-radius: 10px; padding: 16px; margin-bottom: 20px;">
+                    <ul style="margin: 0; padding-left: 20px; color: #475569; font-size: 13px; line-height: 1.8;">
+                        <li><strong>✅ Free tier available</strong></li>
+                        <li>Used for widget/chatbot</li>
+                        <li>System default key</li>
+                    </ul>
+                </div>
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 6px; font-weight: 500; color: #1e293b;">API Key</label>
+                    <div style="position: relative;">
+                        <input type="password" id="gemini-api-key" class="form-control api-key-input" placeholder="Enter Google Gemini API key" style="width: 100%; padding: 10px 40px 10px 10px; border: 1px solid #e1e5e9; border-radius: 8px; font-size: 14px; font-family: monospace;">
+                        <span class="material-icons-round toggle-password-visibility" onclick="togglePasswordVisibility('gemini-api-key', this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #64748b; font-size: 20px; user-select: none;">visibility_off</span>
+                    </div>
+                    <small style="color: #71717a; font-size: 12px; margin-top: 4px; display: block;">Leave empty to keep current key</small>
+                </div>
+                <button class="btn" onclick="saveSystemAPIKey('gemini')" id="saveGeminiKeyBtn" style="width: 100%; padding: 12px 24px; font-weight: 600; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, #0891b2 0%, #0f766e 100%); border: none; color: white;">
+                    <span class="material-icons-round" style="vertical-align: middle; font-size: 20px;">save</span> Save Gemini Key
+                </button>
+            </div>
+            
+            <!-- Groq Card -->
+            <div class="management-item" style="background: white; border: 2px solid #e1e5e9; border-radius: 16px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: all 0.3s ease;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #0891b2 0%, #0f766e 100%); display: flex; align-items: center; justify-content: center;">
+                            <span class="material-icons-round" style="font-size: 28px; color: white;">bolt</span>
+                        </div>
+                        <h3 style="margin: 0; font-size: 20px; font-weight: 600; color: #1e293b;">Groq (Llama)</h3>
+                    </div>
+                    <div class="api-key-status" id="groq-status" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; background: #f1f5f9; color: #64748b;">
+                        <span class="status-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #94a3b8;"></span>
+                        <span class="status-text">Inactive</span>
+                    </div>
+                </div>
+                <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin-bottom: 16px;">Default API key for Groq. Used when users don't provide their own key.</p>
+                <div style="background: #f8f9fa; border-radius: 10px; padding: 16px; margin-bottom: 20px;">
+                    <ul style="margin: 0; padding-left: 20px; color: #475569; font-size: 13px; line-height: 1.8;">
+                        <li><strong>✅ Free tier available</strong></li>
+                        <li>Used for widget/chatbot</li>
+                        <li>System default key</li>
+                    </ul>
+                </div>
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 6px; font-weight: 500; color: #1e293b;">API Key</label>
+                    <div style="position: relative;">
+                        <input type="password" id="groq-api-key" class="form-control api-key-input" placeholder="Enter Groq API key" style="width: 100%; padding: 10px 40px 10px 10px; border: 1px solid #e1e5e9; border-radius: 8px; font-size: 14px; font-family: monospace;">
+                        <span class="material-icons-round toggle-password-visibility" onclick="togglePasswordVisibility('groq-api-key', this)" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #64748b; font-size: 20px; user-select: none;">visibility_off</span>
+                    </div>
+                    <small style="color: #71717a; font-size: 12px; margin-top: 4px; display: block;">Leave empty to keep current key</small>
+                </div>
+                <button class="btn" onclick="saveSystemAPIKey('groq')" id="saveGroqKeyBtn" style="width: 100%; padding: 12px 24px; font-weight: 600; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, #0891b2 0%, #0f766e 100%); border: none; color: white;">
+                    <span class="material-icons-round" style="vertical-align: middle; font-size: 20px;">save</span> Save Groq Key
+                </button>
+            </div>
+            
+        </div>
+        
+        <div class="loading" id="apiKeysLoading" style="display: none;">
+            <div class="spinner"></div>
+            Processing API key update...
+        </div>
+    </div>
+</div>
+
+<script>
+// Toggle password visibility for API key inputs
+function togglePasswordVisibility(inputId, iconElement) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        iconElement.textContent = 'visibility';
+        iconElement.style.color = '#0891b2';
+    } else {
+        input.type = 'password';
+        iconElement.textContent = 'visibility_off';
+        iconElement.style.color = '#64748b';
+    }
+}
+</script>
+

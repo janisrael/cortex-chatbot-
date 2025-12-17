@@ -113,9 +113,7 @@ async function initializeDashboard() {
             // updateIntegrationSnippet not available - skip it
         }
         
-        console.log('✅ Dashboard initialized successfully');
     } catch (error) {
         // Final catch-all - don't let initialization errors break the page
-        console.error('Dashboard initialization failed:', error);
     }
 }

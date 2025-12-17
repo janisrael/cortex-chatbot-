@@ -8,7 +8,6 @@ async function initializeMultiWebsite() {
         await loadWebsites();
         setupMultiWebsiteEventListeners();
     } catch (error) {
-        console.error('Failed to initialize multi-website:', error);
     }
 }
 
@@ -28,7 +27,6 @@ async function loadWebsites() {
         }
         
     } catch (error) {
-        console.error('Failed to load websites:', error);
         // Initialize with default if API fails
         websites = {};
         currentWebsiteId = 'default';
@@ -121,7 +119,6 @@ async function loadWebsiteStats(websiteId) {
         if (filesElement) filesElement.textContent = stats.files || 0;
         
     } catch (error) {
-        console.error('Failed to load stats for ' + websiteId + ':', error);
     }
 }
 

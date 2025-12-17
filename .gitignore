@@ -65,3 +65,4 @@ update_*.sh
 sync-env-to-k8s.sh
 update-cortex-smtp.sh
 !migrations/
+__pycache__/

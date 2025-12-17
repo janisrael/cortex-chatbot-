@@ -184,7 +184,7 @@
                     <span style="font-size: 14px; font-weight: 500; color: #18181b;">{{ bot_name }}</span>
                 </div>
                 <div style="max-width: min(calc(100% - 40px), 65ch); padding: 12px 16px; border-radius: 20px; font-size: 14px; line-height: 1.6; word-wrap: break-word; background: #f4f4f5; color: #27272a; border-bottom-left-radius: 6px;">
-                    👋 Hi there! I'm {{ bot_name }}, your helpful assistant. How can I help you today?
+                    {% if welcome_message %}{{ welcome_message }}{% else %}Hi there! I'm {{ bot_name }}, your helpful assistant. How can I help you today?{% endif %}
                 </div>
             </div>
         </div>
@@ -230,6 +230,7 @@
         </div>
     </div>
 
+    <script src="{{ url_for('static', filename='js/user_info_form.js') }}"></script>
     <script>
     // Get API key from URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -275,13 +276,69 @@
             });
         }
         
+        function formatMessage(text) {
+            if (!text) return '';
+            
+            let formatted = String(text);
+            
+            // Preserve existing <br> tags by replacing with placeholder before escaping
+            const brPlaceholder = '__BR_PLACEHOLDER__';
+            formatted = formatted.replace(/<br\s*\/?>/gi, brPlaceholder);
+            
+            // Escape existing HTML to prevent XSS (except what we add)
+            const div = document.createElement('div');
+            div.textContent = formatted;
+            formatted = div.innerHTML;
+            
+            // Restore <br> tags after escaping
+            formatted = formatted.replace(new RegExp(brPlaceholder, 'g'), '<br>');
+            
+            // Convert markdown links [text](url) to HTML <a> FIRST (before URL detection)
+            formatted = formatted.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" style="color: #2563eb; text-decoration: underline;">$1</a>');
+            
+            // Convert markdown bold **text** to HTML <strong>
+            formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+            
+            // Convert markdown italic *text* to HTML <em> (but not if it's part of **)
+            formatted = formatted.replace(/(?<!\*)\*([^*]+?)\*(?!\*)/g, '<em>$1</em>');
+            
+            // Convert plain URLs to clickable links (but not if already in <a> tag)
+            const urlRegex = /(https?:\/\/[^\s<>"']+)/g;
+            formatted = formatted.replace(urlRegex, function(match, offset, string) {
+                // Check if this URL is already inside an <a> tag
+                const beforeMatch = string.substring(0, offset);
+                const afterMatch = string.substring(offset + match.length);
+                const beforeTag = beforeMatch.lastIndexOf('<a');
+                const afterTag = afterMatch.indexOf('</a>');
+                
+                if (beforeTag !== -1 && beforeTag > beforeMatch.lastIndexOf('</a>')) {
+                    // We're inside an <a> tag, don't convert
+                    return match;
+                }
+                
+                return '<a href="' + match + '" target="_blank" rel="noopener noreferrer" style="color: #2563eb; text-decoration: underline;">' + match + '</a>';
+            });
+            
+            // Convert newlines to <br>, but clean up excessive breaks
+            formatted = formatted.replace(/\n/g, '<br>');
+            
+            // Remove excessive <br> tags (more than 2 consecutive)
+            formatted = formatted.replace(/(<br>\s*){3,}/g, '<br><br>');
+            
+            // Remove <br> at the start and end
+            formatted = formatted.replace(/^(<br>\s*)+/, '');
+            formatted = formatted.replace(/(<br>\s*)+$/, '');
+            
+            return formatted;
+        }
+        
         function addMessage(text, isBot) {
             if (!messagesDiv) return;
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message ' + (isBot ? 'bot' : 'user');
             messageDiv.style.cssText = 'display: flex; flex-direction: column; gap: 8px; align-items: ' + (isBot ? 'flex-start' : 'flex-end') + '; animation: fadeIn 0.3s ease-out;';
             
-            const formattedText = text.replace(/<br>/g, '<br>').replace(/\\n/g, '<br>');
+            const formattedText = formatMessage(text);
             
             if (isBot) {
                 const botName = '{{ bot_name }}';
@@ -354,6 +411,28 @@
             }
         }
         
+        // Conversation state management
+        let conversationId = null;
+        
+        // Generate new session_id for each page load (fresh conversation)
+        function generateSessionId() {
+            // Generate UUID v4
+            const sessionId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+            return sessionId;
+        }
+        
+        const sessionId = generateSessionId();
+        
+        let messageCount = 0;
+        let userInfoFormShown = false;
+        let pendingBotResponse = null;
+        let pendingForm = null;
+        let pendingUserMessage = null;
+        
         async function sendMessage() {
             if (!inputField || !sendBtn || !apiKey) return;
             const message = inputField.value.trim();
@@ -363,28 +442,231 @@
             inputField.value = '';
             sendBtn.disabled = true;
             
+            messageCount++;
+            
             showTyping();
             
             try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 60000);
+                
                 const response = await fetch(apiBaseUrl + '/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         message: message,
-                        api_key: apiKey
-                    })
+                        api_key: apiKey,
+                        conversation_id: conversationId,
+                        session_id: sessionId
+                    }),
+                    signal: controller.signal
                 });
                 
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    let errorText = '';
+                    try {
+                        const errorData = await response.json();
+                        errorText = errorData.error || errorData.message || `HTTP ${response.status}`;
+                    } catch (e) {
+                        errorText = await response.text();
+                    }
+                    
+                    if (response.status === 401) {
+                        throw new Error('Authentication failed. Please refresh the page and try again.');
+                    } else if (response.status === 500) {
+                        throw new Error(`Server error: ${errorText.substring(0, 100)}`);
+                    } else {
+                        throw new Error(`Server error (${response.status}): ${errorText.substring(0, 100)}`);
+                    }
+                }
+                
+                const contentType = response.headers.get('content-type') || '';
+                if (!contentType.includes('application/json')) {
+                    const text = await response.text();
+                    throw new Error(`Invalid response format. Expected JSON, got: ${contentType}`);
+                }
+                
                 const data = await response.json();
+                
+                // Store conversation_id from response
+                if (data.conversation_id) {
+                    conversationId = data.conversation_id;
+                    
+                    // Check if conversation already has user info
+                    const hasUserInfo = await checkUserInfo(conversationId);
+                    
+                    // For first message: show form ONLY if no user info exists
+                    if (messageCount === 1 && !userInfoFormShown && conversationId && !hasUserInfo) {
+                        hideTyping();
+                        pendingUserMessage = message;
+                        pendingBotResponse = data.response || 'Sorry, I encountered an error.';
+                        showUserInfoForm();
+                        sendBtn.disabled = false;
+                        return;
+                    }
+                }
+                
                 hideTyping();
                 addMessage(data.response || 'Sorry, I encountered an error.', true);
             } catch (error) {
                 hideTyping();
-                addMessage('Sorry, I encountered a connection error.', true);
-                console.error('Chatbot error:', error);
+                let errorMessage = 'Sorry, I encountered a connection error.';
+                if (error.name === 'AbortError') {
+                    errorMessage = 'Sorry, the request took too long. Please try again.';
+                } else if (error.message) {
+                    if (error.message.includes('Authentication failed')) {
+                        errorMessage = 'Sorry, authentication failed. Please refresh the page and try again.';
+                    } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                        errorMessage = 'Sorry, I encountered a network error. Please check your connection and try again.';
+                    } else if (error.message.includes('timeout') || error.message.includes('aborted')) {
+                        errorMessage = 'Sorry, the request took too long. Please try again.';
+                    } else if (error.message.includes('Server error')) {
+                        errorMessage = 'Sorry, the server encountered an error. Please try again in a moment.';
+                    } else if (error.message.includes('Invalid response format')) {
+                        errorMessage = 'Sorry, I received an invalid response. Please try again.';
+                    }
+                }
+                addMessage(errorMessage, true);
             }
             
             sendBtn.disabled = false;
+        }
+        
+        async function checkUserInfo(convId) {
+            if (!convId) return false;
+            try {
+                const response = await fetch(`${apiBaseUrl}/conversations/${convId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': apiKey || ''
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.conversation && data.conversation.metadata && 
+                           data.conversation.metadata.user_info && 
+                           data.conversation.metadata.user_info.name;
+                }
+            } catch (error) {
+                console.error('Error checking user info:', error);
+            }
+            return false;
+        }
+        
+        function showUserInfoForm() {
+            if (userInfoFormShown || !conversationId) return;
+            userInfoFormShown = true;
+            
+            const primaryColor = '{{ primary_color }}';
+            const contrastColor = '{{ contrast_color|default("#ffffff") }}';
+            
+            const form = new UserInfoForm({
+                conversationId: conversationId,
+                apiKey: apiKey,
+                apiBaseUrl: apiBaseUrl,
+                primaryColor: primaryColor,
+                contrastColor: contrastColor,
+                onSubmit: async function(data) {
+                    if (pendingUserMessage && conversationId) {
+                        showTyping();
+                        try {
+                            const controller = new AbortController();
+                            const timeoutId = setTimeout(() => controller.abort(), 60000);
+                            
+                            const response = await fetch(apiBaseUrl + '/chat', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    message: pendingUserMessage,
+                                    api_key: apiKey,
+                                    conversation_id: conversationId,
+                                    session_id: sessionId
+                                }),
+                                signal: controller.signal
+                            });
+                            
+                            clearTimeout(timeoutId);
+                            if (!response.ok) {
+                                let errorText = '';
+                                try {
+                                    const errorData = await response.json();
+                                    errorText = errorData.error || errorData.message || `HTTP ${response.status}`;
+                                } catch (e) {
+                                    errorText = await response.text();
+                                }
+                                
+                                if (response.status === 401) {
+                                    throw new Error('Authentication failed. Please refresh the page and try again.');
+                                } else if (response.status === 500) {
+                                    throw new Error(`Server error: ${errorText.substring(0, 100)}`);
+                                } else {
+                                    throw new Error(`Server error (${response.status}): ${errorText.substring(0, 100)}`);
+                                }
+                            }
+                            
+                            const contentType = response.headers.get('content-type') || '';
+                            if (!contentType.includes('application/json')) {
+                                const text = await response.text();
+                                throw new Error(`Invalid response format. Expected JSON, got: ${contentType}`);
+                            }
+                            
+                            const responseData = await response.json();
+                            hideTyping();
+                            addMessage(responseData.response || 'Sorry, I encountered an error.', true);
+                        } catch (error) {
+                            hideTyping();
+                            let errorMessage = 'Sorry, I encountered a connection error.';
+                            if (error.name === 'AbortError') {
+                                errorMessage = 'Sorry, the request took too long. Please try again.';
+                            } else if (error.message) {
+                                if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                                    errorMessage = 'Sorry, I encountered a network error. Please check your connection and try again.';
+                                } else if (error.message.includes('timeout') || error.message.includes('aborted')) {
+                                    errorMessage = 'Sorry, the request took too long. Please try again.';
+                                } else if (error.message.includes('Server error')) {
+                                    errorMessage = 'Sorry, the server encountered an error. Please try again in a moment.';
+                                } else if (error.message.includes('Invalid response format')) {
+                                    errorMessage = 'Sorry, I received an invalid response. Please try again.';
+                                }
+                            }
+                            if (pendingBotResponse) {
+                                addMessage(pendingBotResponse, true);
+                            } else {
+                                addMessage(errorMessage, true);
+                            }
+                        }
+                        pendingUserMessage = null;
+                        pendingBotResponse = null;
+                    } else if (pendingBotResponse) {
+                        addMessage(pendingBotResponse, true);
+                        pendingBotResponse = null;
+                    }
+                },
+                onSkip: function() {
+                    if (pendingBotResponse) {
+                        addMessage(pendingBotResponse, true);
+                        pendingBotResponse = null;
+                    }
+                    pendingUserMessage = null;
+                }
+            });
+            
+            pendingForm = form;
+            form.show(messagesDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        // Clear chat function
+        function clearChat() {
+            conversationId = null;
+            localStorage.removeItem('cortex_session_id');
+            // Clear messages (if there's a clear function)
+            if (typeof clearMessages === 'function') {
+                clearMessages();
+            }
         }
         
         if (sendBtn) {

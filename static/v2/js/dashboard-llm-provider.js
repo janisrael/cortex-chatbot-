@@ -122,10 +122,8 @@ async function loadLLMProviderConfig() {
             // Load the actual API key value (not masked)
             if (apiKey && apiKey.trim().length > 0) {
                 apiKeyField.value = apiKey;
-                console.log('✅ Loaded user API key (length: ' + apiKey.length + ')');
             } else {
                 apiKeyField.value = '';
-                console.log('ℹ️ No user API key saved, using system default');
             }
         }
         
@@ -141,7 +139,6 @@ async function loadLLMProviderConfig() {
         // Setup clear button after loading config
         setupApiKeyClearButton();
     } catch (error) {
-        console.error('Failed to load LLM provider config:', error);
     }
 }
 
@@ -149,7 +146,6 @@ async function loadLLMProviderConfig() {
 function updateActiveLLMStatus(provider, model) {
     const providerConfig = LLM_PROVIDERS[provider];
     if (!providerConfig) {
-        console.warn('Provider config not found for:', provider);
         return;
     }
     
@@ -169,14 +165,12 @@ function updateActiveLLMStatus(provider, model) {
             logoImg.style.display = 'block';
             logoImg.alt = `${providerConfig.name} Logo`;
             iconElement.style.display = 'none';
-            console.log(`✅ Loaded logo: ${this.src}`);
         };
         testImg.onerror = function() {
             // No logo found - show Material Icon fallback
             logoImg.style.display = 'none';
             iconElement.style.display = 'block';
             iconElement.textContent = providerConfig.icon || 'smart_toy';
-            console.log(`ℹ️ Logo not found, using Material Icon: ${providerConfig.icon}`);
         };
         testImg.src = logoPng;
     }
@@ -196,71 +190,52 @@ function updateActiveLLMStatus(provider, model) {
         modelElement.textContent = modelLabel;
     }
     
-    console.log(`✅ Updated active LLM status: ${providerConfig.name} / ${model}`);
 }
 
 // Handle provider change - update available models and info box
 function onProviderChange() {
-    console.log('🔄 onProviderChange called');
     
     const providerSelect = document.getElementById('llmProvider');
     const modelSelect = document.getElementById('llmModel');
     
     if (!providerSelect) {
-        console.error('❌ llmProvider element not found in onProviderChange');
         return;
     }
     
     if (!modelSelect) {
-        console.error('❌ llmModel element not found in onProviderChange');
         return;
     }
     
     const selectedProvider = providerSelect.value || 'openai';
-    console.log('📌 Selected provider:', selectedProvider);
     
     // Check if LLM_PROVIDERS is defined
     if (typeof LLM_PROVIDERS === 'undefined') {
-        console.error('❌ LLM_PROVIDERS is not defined!');
-        console.error('This usually means the script failed to load or there was a syntax error.');
         return;
     }
     
-    console.log('Available providers:', Object.keys(LLM_PROVIDERS));
     
     const providerConfig = LLM_PROVIDERS[selectedProvider];
     
     if (!providerConfig) {
-        console.error('❌ Unknown provider:', selectedProvider);
-        console.log('Available providers:', Object.keys(LLM_PROVIDERS));
         return;
     }
     
-    console.log('✅ Provider config found:', providerConfig);
-    console.log('Provider config keys:', Object.keys(providerConfig));
     
     // Check if models array exists
     if (!providerConfig.hasOwnProperty('models')) {
-        console.error('❌ Provider config has no "models" property');
-        console.error('Full config:', JSON.stringify(providerConfig, null, 2));
         return;
     }
     
     if (!Array.isArray(providerConfig.models)) {
-        console.error('❌ Provider config "models" is not an array:', typeof providerConfig.models);
-        console.error('Models value:', providerConfig.models);
         return;
     }
     
     if (providerConfig.models.length === 0) {
-        console.warn('⚠️ Provider config has empty models array');
     }
     
-    console.log('📋 Models to add:', providerConfig.models.length);
     
     // Clear and populate model dropdown
     if (!modelSelect) {
-        console.error('❌ modelSelect is null/undefined, cannot populate models');
         return;
     }
     
@@ -268,13 +243,11 @@ function onProviderChange() {
     
     // Verify modelSelect is still valid after clearing
     if (!modelSelect || !modelSelect.appendChild) {
-        console.error('❌ modelSelect became invalid after clearing innerHTML');
         return;
     }
     
     providerConfig.models.forEach((model, index) => {
         if (!model || !model.value || !model.label) {
-            console.warn(`⚠️ Skipping invalid model at index ${index}:`, model);
             return;
         }
         
@@ -283,14 +256,11 @@ function onProviderChange() {
         option.textContent = model.label;
         if (model.value === providerConfig.defaultModel) {
             option.selected = true;
-            console.log('✅ Set default model:', model.value);
         }
         
         try {
             modelSelect.appendChild(option);
-            console.log(`  ✓ Added model ${index + 1}: ${model.value} - ${model.label}`);
         } catch (e) {
-            console.error(`❌ Failed to add model ${index + 1}:`, e);
         }
     });
     
@@ -304,25 +274,14 @@ function onProviderChange() {
             } else if (modelSelect.options && typeof modelSelect.options.length === 'number') {
                 finalModelCount = modelSelect.options.length;
             } else {
-                console.error('❌ modelSelect.options is not accessible');
-                console.error('modelSelect type:', typeof modelSelect);
-                console.error('modelSelect.tagName:', modelSelect.tagName);
-                console.error('modelSelect.options:', modelSelect.options);
             }
         } else {
-            console.error('❌ modelSelect is not a select element!');
-            console.error('modelSelect:', modelSelect);
-            console.error('modelSelect.tagName:', modelSelect?.tagName);
         }
     } else {
-        console.error('❌ modelSelect is null/undefined');
     }
     
-    console.log(`✅ Populated ${finalModelCount} models`);
     
     if (finalModelCount === 0) {
-        console.warn('⚠️ No models were added to dropdown!');
-        console.warn('This might be normal if models array was empty');
     }
     
     // Update API key placeholder
@@ -392,13 +351,11 @@ async function saveLLMProviderConfig() {
         hideAlert('llmSuccess');
         hideAlert('llmError');
         
-        console.log('🔍 Testing connection before save...');
         const testResult = await testLLMConnectionSilent(provider, model, apiKey);
         
         if (!testResult.success) {
             // Test failed - show error and don't save
             const errorMsg = testResult.error || 'Connection test failed';
-            console.error('❌ Connection test failed:', errorMsg);
             
             if (typeof showErrorNotification === 'function') {
                 showErrorNotification(errorMsg);
@@ -408,7 +365,6 @@ async function saveLLMProviderConfig() {
             return; // Exit - don't save
         }
         
-        console.log('✅ Connection test passed, proceeding to save...');
         
         // STEP 2: Save Configuration (test passed)
         saveBtn.innerHTML = '<span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">save</span> Saving...';
@@ -445,7 +401,6 @@ async function saveLLMProviderConfig() {
         }
         
         // Success!
-        console.log('✅ Settings saved successfully');
         if (typeof showSuccessNotification === 'function') {
             showSuccessNotification('LLM provider settings saved successfully!');
         } else {
@@ -463,7 +418,6 @@ async function saveLLMProviderConfig() {
         if (typeof llmConfig !== 'undefined') {
             llmConfig.effective_provider = provider;
             llmConfig.effective_model = model;
-            console.log(`✅ Updated llmConfig: ${provider} / ${model}`);
         }
         
         // Update status indicators
@@ -477,7 +431,6 @@ async function saveLLMProviderConfig() {
         }
         
     } catch (error) {
-        console.error('Failed to save LLM provider config:', error);
         let errorMsg = `Unable to save settings: ${error.message}`;
         
         // Handle JSON parse errors
@@ -553,12 +506,9 @@ async function testLLMConnectionSilent(provider, model, apiKey) {
 
 // Test LLM provider connection (with UI updates)
 async function testLLMProvider() {
-    console.log('🧪 ========== testLLMProvider() CALLED ==========');
-    console.log('🧪 Function execution started at:', new Date().toISOString());
     
     const testBtn = document.getElementById('testLLMProviderBtn');
     if (!testBtn) {
-        console.error('❌ Test button not found');
         if (typeof showErrorNotification === 'function') {
             showErrorNotification('Test button not found. Please refresh the page.');
         } else {
@@ -566,7 +516,6 @@ async function testLLMProvider() {
         }
         return;
     }
-    console.log('✅ Test button found:', testBtn);
     
     const originalText = testBtn.innerHTML;
     
@@ -600,10 +549,6 @@ async function testLLMProvider() {
         const apiKey = apiKeyInput?.value || '';
         
         // Log what we're testing
-        console.log('🧪 Testing LLM Connection:');
-        console.log('  Provider:', provider);
-        console.log('  Model:', model);
-        console.log('  API Key provided:', apiKey ? (apiKey.includes('...') ? 'Masked (using system default)' : `Yes (${apiKey.length} chars)`) : 'No (using system default)');
         
         // Prepare API key - don't send if masked or too short
         let apiKeyToSend = null;
@@ -625,7 +570,6 @@ async function testLLMProvider() {
             })
         });
         
-        console.log('📡 Response status:', response.status);
         
         // Check if response is JSON
         const contentType = response.headers.get('content-type');
@@ -637,19 +581,15 @@ async function testLLMProvider() {
         const result = await response.json();
         
         if (response.ok && result.status === 'success') {
-            console.log('✅ Test successful:', result);
             const message = `Connection successful! Provider: ${provider}, Model: ${result.model}${result.response_time ? `, Response time: ${result.response_time}ms` : ''}`;
             
             // Always show floating notification (toast)
             if (typeof showSuccessNotification === 'function') {
                 showSuccessNotification(message);
-                console.log('✅ Success notification shown');
             } else {
-                console.warn('⚠️ showSuccessNotification not available, using showAlert');
                 showAlert('llmSuccess', message);
             }
         } else {
-            console.error('❌ Test failed:', result);
             // Extract error message from API response
             const errorMsg = result.error || result.message || 'Unknown error occurred';
             // Create a user-friendly error that will be caught and displayed in toast
@@ -659,7 +599,6 @@ async function testLLMProvider() {
         }
         
     } catch (error) {
-        console.error('❌ LLM provider test failed:', error);
         let errorMsg = error.message;
         
         // Try to extract error from response if it's a fetch error
@@ -687,9 +626,7 @@ async function testLLMProvider() {
         // Always show floating notification (toast) with user-friendly message
         if (typeof showErrorNotification === 'function') {
             showErrorNotification(errorMsg);
-            console.log('✅ Error notification shown:', errorMsg);
         } else {
-            console.warn('⚠️ showErrorNotification not available, using showAlert');
             showAlert('llmError', errorMsg);
         }
     } finally {
@@ -698,28 +635,22 @@ async function testLLMProvider() {
             testBtn.disabled = false;
             testBtn.innerHTML = '<span class="material-icons-round" style="vertical-align: middle; font-size: 18px;">science</span> Test Connection';
         }
-        console.log('🧪 ========== testLLMProvider() FINISHED ==========');
     }
 }
 
 // Initialize on page load
 function initializeLLMProvider() {
-    console.log('🔧 initializeLLMProvider called');
     
     // First, populate models for default provider (OpenAI) if dropdowns exist
     const providerSelect = document.getElementById('llmProvider');
     const modelSelect = document.getElementById('llmModel');
     
-    console.log('Provider select found:', !!providerSelect);
-    console.log('Model select found:', !!modelSelect);
     
     if (!providerSelect) {
-        console.error('❌ llmProvider element not found!');
         return;
     }
     
     if (!modelSelect) {
-        console.error('❌ llmModel element not found!');
         return;
     }
     
@@ -761,11 +692,9 @@ function initializeLLMProvider() {
     // Set default provider if not set
     if (!providerSelect.value) {
         providerSelect.value = 'openai';
-        console.log('✅ Set default provider to openai');
     }
     
     // Populate models for the current provider
-    console.log('📋 Calling onProviderChange()...');
     onProviderChange();
     
     // Setup API key clear button
@@ -775,7 +704,6 @@ function initializeLLMProvider() {
     setTimeout(() => {
         const modelSelectCheck = document.getElementById('llmModel');
         if (!modelSelectCheck) {
-            console.error('❌ modelSelect element not found in timeout check');
             return;
         }
         
@@ -784,11 +712,8 @@ function initializeLLMProvider() {
             modelCount = modelSelectCheck.options.length;
         }
         
-        console.log(`📊 Model dropdown now has ${modelCount} options`);
         if (modelCount === 0) {
-            console.error('❌ Models still not populated!');
         } else {
-            console.log('✅ Models successfully populated!');
         }
     }, 100);
     
@@ -841,18 +766,15 @@ if (typeof window !== 'undefined') {
     window.clearApiKeyInput = clearApiKeyInput;
     window.onProviderChange = onProviderChange;
     window.updateActiveLLMStatus = updateActiveLLMStatus;
-    console.log('✅ LLM provider functions assigned to window');
 }
 
 // Make the real test function globally accessible (MUST be after function definition)
 // Store reference to original function to avoid infinite loop
 const originalTestLLMProvider = testLLMProvider;
 window.testLLMProvider = function() {
-    console.log('🔧 window.testLLMProvider wrapper called');
     if (typeof originalTestLLMProvider === 'function') {
         return originalTestLLMProvider();
     } else {
-        console.error('❌ testLLMProvider function not found!');
         if (typeof showErrorNotification === 'function') {
             showErrorNotification('Test function not loaded. Please refresh the page.');
         } else {
@@ -861,35 +783,24 @@ window.testLLMProvider = function() {
     }
 };
 
-console.log('✅ testLLMProvider function registered globally:', typeof window.testLLMProvider);
-console.log('✅ Direct testLLMProvider function:', typeof testLLMProvider);
 
 // Debug function - can be called directly from console (renamed to avoid conflict)
 window.debugLLMProvider = function() {
-    console.log('🧪 Testing LLM Provider initialization...');
-    console.log('LLM_PROVIDERS available:', typeof LLM_PROVIDERS !== 'undefined');
-    console.log('OpenAI config:', LLM_PROVIDERS?.openai);
     
     const providerSelect = document.getElementById('llmProvider');
     const modelSelect = document.getElementById('llmModel');
     
-    console.log('Provider select:', providerSelect);
-    console.log('Model select:', modelSelect);
     
     if (providerSelect && modelSelect) {
-        console.log('✅ Both elements found!');
-        console.log('Current provider value:', providerSelect.value);
         
         // Safely get current model count
         let currentCount = 0;
         if (modelSelect.options && typeof modelSelect.options.length === 'number') {
             currentCount = modelSelect.options.length;
         }
-        console.log('Current model options:', currentCount);
         
         // Try to populate
         if (typeof onProviderChange === 'function') {
-            console.log('🔄 Calling onProviderChange...');
             onProviderChange();
             
             // Safely check again after call
@@ -898,10 +809,8 @@ window.debugLLMProvider = function() {
             if (modelSelectAfter && modelSelectAfter.options && typeof modelSelectAfter.options.length === 'number') {
                 afterCount = modelSelectAfter.options.length;
             }
-            console.log('After call, model options:', afterCount);
         }
     } else {
-        console.error('❌ Elements not found!');
     }
 };
 
@@ -911,24 +820,20 @@ function tryInitialize() {
     const modelSelect = document.getElementById('llmModel');
     
     if (providerSelect && modelSelect) {
-        console.log('✅ Elements found, initializing...');
         initializeLLMProvider();
     } else {
-        console.log('⏳ Elements not ready yet, retrying...');
         setTimeout(tryInitialize, 200);
     }
 }
 
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        console.log('📄 DOM loaded, trying to initialize...');
         setTimeout(() => {
             tryInitialize();
             setupApiKeyClearButton();
         }, 100);
     });
 } else {
-    console.log('📄 DOM already loaded, trying to initialize...');
     setTimeout(() => {
         tryInitialize();
         setupApiKeyClearButton();
