@@ -14,7 +14,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements-prod.txt .
 # Set PATH in builder stage to avoid warnings
 ENV PATH=/root/.local/bin:$PATH
-RUN pip install --no-cache-dir --user --no-warn-script-location -r requirements-prod.txt
+# Use legacy resolver to handle langchain-google-genai dependency conflict
+# langchain-google-genai 4.0.0 metadata says it requires langchain-core>=1.1.2,
+# but it actually works with 0.3.80 (as verified locally)
+RUN pip install --no-cache-dir --user --no-warn-script-location --use-deprecated=legacy-resolver -r requirements-prod.txt
 
 # Stage 2: Runtime
 FROM python:3.11-slim
