@@ -19,7 +19,9 @@ def set_embeddings(embeddings_instance):
 
 def get_user_knowledge_base_path(user_id):
     """Get the knowledge base path for a specific user"""
-    return f"./chroma_db/user_{user_id}"
+    # Use absolute path to ensure it works regardless of working directory
+    chroma_base = os.getenv('CHROMA_DB_PATH', '/app/chroma_db')
+    return os.path.join(chroma_base, f"user_{user_id}")
 
 
 def get_user_vectorstore(user_id):
