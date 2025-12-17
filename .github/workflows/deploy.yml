@@ -374,6 +374,36 @@ jobs:
             set -e
             set -o pipefail
             
+            echo "=== Checking disk space before cleanup ==="
+            df -h
+            
+            echo "=== Cleaning up disk space ==="
+            # Remove old Docker images (except cortex:latest)
+            docker images --format "{{.Repository}}:{{.Tag}}" | grep -v "REPOSITORY" | grep -v "cortex:latest" | while read img; do
+              if [ -n "$img" ]; then
+                echo "Removing old Docker image: $img"
+                docker rmi "$img" 2>/dev/null || true
+              fi
+            done || true
+            
+            # Prune Docker system
+            docker system prune -af --volumes || true
+            
+            # Clean up old k3s images (except cortex)
+            k3s ctr images ls 2>/dev/null | grep -v "cortex" | awk '{print $1}' | while read img; do
+              if [ -n "$img" ] && [ "$img" != "IMAGE" ] && [ "$img" != "docker.io/library" ]; then
+                echo "Removing old k3s image: $img"
+                k3s ctr images rm "$img" 2>/dev/null || true
+              fi
+            done || true
+            
+            # Clean up old build artifacts
+            rm -rf /tmp/cortex-build* || true
+            rm -rf /tmp/cortex-source.tar.gz || true
+            
+            echo "=== Disk space after cleanup ==="
+            df -h
+            
             cd /tmp
             rm -rf cortex-build || true
             mkdir -p cortex-build
