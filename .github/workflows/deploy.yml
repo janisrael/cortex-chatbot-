@@ -421,8 +421,9 @@ jobs:
               fi
             done || true
             
-            # Clean up old build artifacts (but keep the tarball we just uploaded)
+            # Clean up old build artifacts (DO NOT delete the tarball we just uploaded!)
             rm -rf /tmp/cortex-build* || true
+            # NOTE: Do NOT delete /tmp/cortex-source.tar.gz here - it's needed for extraction
             
             echo "=== Disk space after cleanup ==="
             df -h
