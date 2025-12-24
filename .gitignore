@@ -65,6 +65,7 @@ update_*.py
 update_*.sh
 sync_*.py
 sync_*.sh
+sync-*.sh
 export_*.py
 analyze_*.py
 clear_*.py
@@ -74,12 +75,17 @@ wait_*.sh
 create_admin.py
 run_*.sh
 
+# Old documentation/routes (not needed)
+V1_ROUTES_LIST.txt
+models.py
+
 # Deployment planning docs (local use only)
 DEPLOYMENT_*.md
 !DEPLOYMENT_CHECKLIST.md
 
 # CI/CD temporary files
 .rebuild-trigger
+*.rebuild-trigger
 
 # OS
 .DS_Store
