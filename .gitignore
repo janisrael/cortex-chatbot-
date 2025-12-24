@@ -107,8 +107,9 @@ Thumbs.db
 DEPLOYMENT_*.md
 REPOSITORY_*.md
 CLEANUP_*.md
+# Ignore docs/ but allow specific subdirectories
 docs/
-# Allow docs/details (diagrams and screenshots PNG files)
+# Allow docs/details (diagrams and screenshots PNG files) - MUST come after docs/
 !docs/details/
 !docs/details/**
 # Ignore docs/diagrams (Mermaid source files - not needed in production)
