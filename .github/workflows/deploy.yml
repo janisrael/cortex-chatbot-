@@ -421,19 +421,34 @@ jobs:
               fi
             done || true
             
-            # Clean up old build artifacts
+            # Clean up old build artifacts (but keep the tarball we just uploaded)
             rm -rf /tmp/cortex-build* || true
-            rm -rf /tmp/cortex-source.tar.gz || true
             
             echo "=== Disk space after cleanup ==="
             df -h
+            
+            echo "=== Verifying tarball exists ==="
+            if [ ! -f /tmp/cortex-source.tar.gz ]; then
+              echo "❌ ERROR: Tarball not found at /tmp/cortex-source.tar.gz"
+              echo "This means the upload failed. Check the previous step."
+              exit 1
+            fi
+            
+            echo "Tarball found: $(ls -lh /tmp/cortex-source.tar.gz)"
             
             cd /tmp
             rm -rf cortex-build || true
             mkdir -p cortex-build
             cd cortex-build
-            tar -xzf /tmp/cortex-source.tar.gz
-            rm /tmp/cortex-source.tar.gz
+            
+            echo "=== Extracting tarball ==="
+            if tar -xzf /tmp/cortex-source.tar.gz; then
+              echo "✅ Tarball extracted successfully"
+              rm /tmp/cortex-source.tar.gz
+            else
+              echo "❌ ERROR: Tarball extraction failed"
+              exit 1
+            fi
             
             echo "Building Docker image (this may take several minutes)..."
             # Retry logic for Docker build (handles transient network issues)
