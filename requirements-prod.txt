@@ -26,8 +26,11 @@ pydantic_core==2.33.2
 chromadb==1.0.15
 
 # Embeddings (sentence-transformers - minimal, no full transformers)
-sentence-transformers==5.0.0
-# Note: sentence-transformers will pull in minimal dependencies
+# Pin compatible versions to avoid dependency conflicts
+huggingface-hub<1.0,>=0.34.0
+transformers>=4.21.0,<5.0.0
+sentence-transformers==2.7.0
+# Note: sentence-transformers 2.7.0 is stable and compatible with transformers<5.0
 # It uses transformers internally but we don't need the full library
 
 # LangChain (for RAG) - Compatible versions
