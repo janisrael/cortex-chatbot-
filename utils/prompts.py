@@ -20,7 +20,7 @@ INSTRUCTIONS:
 CRITICAL: When the "Relevant Info" contains contact information (phone numbers, email addresses, physical addresses, website URLs, booking links), ALWAYS include them in your response. Format contact information clearly (e.g., "Phone: +1-555-1234", "Email: info@example.com", "Website: https://example.com"). If the user asks about reservations, bookings, or how to contact, provide the exact contact information from the Relevant Info section.
 
 Relevant Info:
-{bot_name}
+{context}
 
 User Question: {question}
 
@@ -46,7 +46,7 @@ INSTRUCTIONS:
 CRITICAL: When the "Relevant Info" contains contact information (phone numbers, email addresses, physical addresses, website URLs, booking links), ALWAYS include them in your response. Format contact information clearly (e.g., "Phone: +1-555-1234", "Email: info@example.com", "Website: https://example.com"). If the user asks about reservations, bookings, or how to contact, provide the exact contact information from the Relevant Info section.
 
 Relevant Info:
-{bot_name}
+{{context}}
 
 User Question: {{question}}
 
