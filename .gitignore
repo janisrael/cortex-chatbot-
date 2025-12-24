@@ -108,9 +108,12 @@ DEPLOYMENT_*.md
 REPOSITORY_*.md
 CLEANUP_*.md
 docs/
-# Allow docs/details (diagrams and screenshots)
+# Allow docs/details (diagrams and screenshots PNG files)
 !docs/details/
 !docs/details/**
+# Ignore docs/diagrams (Mermaid source files - not needed in production)
+docs/diagrams/
+docs/diagrams/**
 
 # Keep migrations (needed for production)
 !migrations/
