@@ -649,7 +649,61 @@ See [.github/workflows/README.md](.github/workflows/README.md) for detailed CI/C
 
 ## License
 
-This project is proprietary and confidential.
+Copyright (c) 2024 Jan Francis Israel
+
+This project is open source and available for viewing, learning, and educational purposes.
+
+### Permitted Use
+
+You are free to:
+
+- View and study the source code
+- Download and use the code for learning purposes
+- Fork the repository for educational use
+- Reference code snippets in your own projects (with attribution)
+- Use as a reference for building similar projects
+
+### Restrictions
+
+You may NOT:
+
+- Use this code for commercial purposes without explicit written permission
+- Claim this work as your own
+- Remove or alter copyright notices
+- Redistribute this code as part of a commercial product or service
+
+### Attribution
+
+If you use code snippets or concepts from this project, please provide attribution:
+
+```
+Based on Cortex AI by Jan Francis Israel
+https://github.com/janisrael/chatbot
+```
+
+### Disclaimer
+
+This software is provided "AS IS" without warranty of any kind, express or implied. The author is not responsible for any damages or issues arising from the use of this software.
+
+### Commercial Use
+
+For commercial use or licensing inquiries, please contact:
+
+- **Email**: janfrancisisrael@gmail.com
+- **Website**: https://janisrael.com
+
+---
+
+## Author
+
+**Jan Francis Israel**
+
+- **Email**: janfrancisisrael@gmail.com
+- **Website and Portfolio**: https://janisrael.com
+- **GitHub**: https://github.com/janisrael
+- **LinkedIn**: https://linkedin.com/in/jan-francis-israel
+- **HuggingFace**: https://huggingface.co/swordfish7412
+- **Live URL**: https://cortex.janisrael.com
 
 ---
 
