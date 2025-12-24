@@ -97,9 +97,19 @@ jobs:
         run: |
           # Set dummy API key for import tests (actual key not needed for import verification)
           export OPENAI_API_KEY="test-key-for-import-only" || true
-          python -c "import app; print('✅ App imports successfully')"
-          python -c "from blueprints import register_blueprints; print('✅ Blueprints import successfully')"
-          python -c "from services import chatbot_service; print('✅ Services import successfully')"
+          
+          echo "=== Testing Critical Imports ==="
+          python -c "import flask; print('✅ Flask')" || exit 1
+          python -c "import langchain_core; print('✅ langchain-core')" || exit 1
+          python -c "from langchain_openai import ChatOpenAI; print('✅ langchain-openai')" || exit 1
+          python -c "import chromadb; print('✅ ChromaDB')" || exit 1
+          
+          echo "=== Testing Application Imports ==="
+          python -c "import app; print('✅ App imports successfully')" || exit 1
+          python -c "from blueprints import register_blueprints; print('✅ Blueprints import successfully')" || exit 1
+          python -c "from services import chatbot_service; print('✅ Services import successfully')" || exit 1
+          
+          echo "✅ All imports verified successfully"
       
       - name: Cleanup after tests
         if: always()
@@ -364,9 +374,23 @@ jobs:
           
           # Upload source code to Hetzner and build there (avoids GitHub Actions disk space issues)
           echo "=== Uploading source code to Hetzner ==="
-          tar --exclude='.git' --exclude='venv' --exclude='__pycache__' --exclude='*.pyc' --exclude='.env' --exclude='chroma_db' --exclude='uploads' --exclude='*.db' --exclude='*.sqlite*' --exclude='logs' --exclude='data' -czf /tmp/cortex-source.tar.gz .
-          scp $SSH_OPTS /tmp/cortex-source.tar.gz root@${{ secrets.HETZNER_HOST }}:/tmp/
-          rm -f /tmp/cortex-source.tar.gz
+          echo "Creating tarball..."
+          if tar --exclude='.git' --exclude='venv' --exclude='__pycache__' --exclude='*.pyc' --exclude='.env' --exclude='chroma_db' --exclude='uploads' --exclude='*.db' --exclude='*.sqlite*' --exclude='logs' --exclude='data' -czf /tmp/cortex-source.tar.gz .; then
+            echo "Tarball created successfully"
+            ls -lh /tmp/cortex-source.tar.gz
+          else
+            echo "❌ Tarball creation failed"
+            exit 1
+          fi
+          
+          echo "Uploading tarball to Hetzner..."
+          if scp $SSH_OPTS /tmp/cortex-source.tar.gz root@${{ secrets.HETZNER_HOST }}:/tmp/; then
+            echo "Tarball uploaded successfully"
+            rm -f /tmp/cortex-source.tar.gz
+          else
+            echo "❌ Tarball upload failed"
+            exit 1
+          fi
           
           # Build Docker image directly on Hetzner server
           echo "=== Building Docker image on Hetzner ==="
