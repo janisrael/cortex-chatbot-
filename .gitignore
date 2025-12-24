@@ -80,6 +80,7 @@ run_*.sh
 # Allow pre-deployment and server check scripts (needed for CI/CD safety)
 !pre_deploy_test.py
 !check_server_status.sh
+!update_diagrams.sh
 
 # Old documentation/routes (not needed)
 V1_ROUTES_LIST.txt
