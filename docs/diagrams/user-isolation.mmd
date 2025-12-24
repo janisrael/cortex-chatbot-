@@ -1,0 +1,52 @@
+graph TB
+    subgraph "User 1 (user_id: 1)"
+        U1Vectorstore[ChromaDB<br/>chroma_db/user_1]
+        U1Files[Uploaded Files<br/>uploads/user_1]
+        U1Config[Config<br/>config/user_1/chatbot_config.json]
+        U1DB[(User 1 Data<br/>FAQs, Files, Crawls)]
+    end
+    
+    subgraph "User 2 (user_id: 2)"
+        U2Vectorstore[ChromaDB<br/>chroma_db/user_2]
+        U2Files[Uploaded Files<br/>uploads/user_2]
+        U2Config[Config<br/>config/user_2/chatbot_config.json]
+        U2DB[(User 2 Data<br/>FAQs, Files, Crawls)]
+    end
+    
+    subgraph "User N (user_id: N)"
+        UNVectorstore[ChromaDB<br/>chroma_db/user_N]
+        UNFiles[Uploaded Files<br/>uploads/user_N]
+        UNConfig[Config<br/>config/user_N/chatbot_config.json]
+        UNDB[(User N Data<br/>FAQs, Files, Crawls)]
+    end
+    
+    subgraph "Shared Resources"
+        App[Flask Application]
+        MySQL[(MySQL Database<br/>Shared Connection)]
+        LLM[LLM APIs<br/>OpenAI, Gemini, etc.]
+    end
+    
+    App --> U1Vectorstore
+    App --> U2Vectorstore
+    App --> UNVectorstore
+    
+    App --> U1Files
+    App --> U2Files
+    App --> UNFiles
+    
+    App --> U1Config
+    App --> U2Config
+    App --> UNConfig
+    
+    App --> MySQL
+    MySQL --> U1DB
+    MySQL --> U2DB
+    MySQL --> UNDB
+    
+    App --> LLM
+    
+    style U1Vectorstore fill:#4a90e2,stroke:#2c5aa0,color:#fff
+    style U2Vectorstore fill:#4a90e2,stroke:#2c5aa0,color:#fff
+    style UNVectorstore fill:#4a90e2,stroke:#2c5aa0,color:#fff
+    style App fill:#7b68ee,stroke:#5a4fcf,color:#fff
+    style MySQL fill:#ff6b6b,stroke:#d63031,color:#fff

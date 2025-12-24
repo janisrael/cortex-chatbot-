@@ -1,0 +1,46 @@
+graph TB
+    subgraph "Hetzner Cloud Server (178.156.162.135)"
+        subgraph "Kubernetes Cluster (k3s)"
+            subgraph "Cortex Namespace"
+                Pod[Cortex Pod<br/>cortex-app]
+                Service[Service<br/>cortex-service:6001]
+                PVC1[(PVC: cortex-db-pvc<br/>1Gi)]
+                PVC2[(PVC: cortex-chromadb-pvc<br/>10Gi)]
+                PVC3[(PVC: cortex-config-pvc<br/>1Gi)]
+            end
+        end
+        MySQL[(MySQL Database<br/>saturn<br/>178.156.162.135:3306)]
+    end
+    
+    subgraph "External Services"
+        OpenAI[OpenAI API]
+        Gemini[Google Gemini API]
+        Claude[Anthropic Claude API]
+        Groq[Groq API]
+        SMTP[SMTP Server<br/>Gmail]
+    end
+    
+    subgraph "Users"
+        Browser[Web Browser]
+        Widget[Embedded Widget]
+    end
+    
+    Browser -->|HTTPS| Service
+    Widget -->|HTTPS| Service
+    Service --> Pod
+    Pod -->|Read/Write| PVC1
+    Pod -->|Read/Write| PVC2
+    Pod -->|Read/Write| PVC3
+    Pod -->|Query| MySQL
+    Pod -->|API Calls| OpenAI
+    Pod -->|API Calls| Gemini
+    Pod -->|API Calls| Claude
+    Pod -->|API Calls| Groq
+    Pod -->|Send Emails| SMTP
+    
+    style Pod fill:#4a90e2,stroke:#2c5aa0,color:#fff
+    style Service fill:#7b68ee,stroke:#5a4fcf,color:#fff
+    style PVC1 fill:#50c878,stroke:#3a9d5f,color:#fff
+    style PVC2 fill:#50c878,stroke:#3a9d5f,color:#fff
+    style PVC3 fill:#50c878,stroke:#3a9d5f,color:#fff
+    style MySQL fill:#ff6b6b,stroke:#d63031,color:#fff

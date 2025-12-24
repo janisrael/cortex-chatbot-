@@ -1,0 +1,29 @@
+sequenceDiagram
+    participant User
+    participant Browser
+    participant Nginx
+    participant K8s Service
+    participant Cortex Pod
+    participant Knowledge Service
+    participant ChromaDB
+    participant LLM Service
+    participant OpenAI
+    
+    User->>Browser: Types message
+    Browser->>Nginx: POST /api/chat
+    Nginx->>K8s Service: Forward request
+    K8s Service->>Cortex Pod: Route to chat blueprint
+    Cortex Pod->>Cortex Pod: Authenticate user
+    Cortex Pod->>Knowledge Service: Get user vectorstore
+    Knowledge Service->>ChromaDB: Query relevant documents
+    ChromaDB-->>Knowledge Service: Return top 5 documents
+    Knowledge Service-->>Cortex Pod: Return context
+    Cortex Pod->>LLM Service: Generate response with context
+    LLM Service->>OpenAI: API call with prompt + context
+    OpenAI-->>LLM Service: Return response
+    LLM Service-->>Cortex Pod: Return formatted response
+    Cortex Pod->>Cortex Pod: Save to conversation history
+    Cortex Pod-->>K8s Service: Return JSON response
+    K8s Service-->>Nginx: Forward response
+    Nginx-->>Browser: Return response
+    Browser-->>User: Display message

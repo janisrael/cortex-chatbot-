@@ -1,0 +1,85 @@
+erDiagram
+    users ||--o{ faqs : "has"
+    users ||--o{ uploaded_files : "has"
+    users ||--o{ crawled_urls : "has"
+    users ||--o{ conversations : "has"
+    conversations ||--o{ messages : "has"
+    users ||--o{ chatbot_appearance : "has"
+    users ||--o{ prompt_presets : "uses"
+    
+    users {
+        int id PK
+        string email UK
+        string username
+        string password_hash
+        enum role
+        datetime created_at
+        datetime last_login
+    }
+    
+    faqs {
+        int id PK
+        int user_id FK
+        text question
+        text answer
+        string category
+        enum status
+        datetime ingested_at
+        datetime created_at
+    }
+    
+    uploaded_files {
+        int id PK
+        int user_id FK
+        string filename
+        string filepath
+        text extracted_text
+        int word_count
+        int char_count
+        enum status
+        datetime ingested_at
+    }
+    
+    crawled_urls {
+        int id PK
+        int user_id FK
+        string url
+        string title
+        text extracted_text
+        int word_count
+        int char_count
+        enum status
+        datetime ingested_at
+    }
+    
+    conversations {
+        int id PK
+        int user_id FK
+        string title
+        datetime created_at
+        datetime updated_at
+    }
+    
+    messages {
+        int id PK
+        int conversation_id FK
+        string role
+        text content
+        datetime created_at
+    }
+    
+    chatbot_appearance {
+        int id PK
+        int user_id FK
+        string bot_name
+        string widget_avatar_url
+        json theme_settings
+    }
+    
+    system_api_keys {
+        int id PK
+        string key_type
+        string provider
+        text key_value
+        datetime updated_at
+    }

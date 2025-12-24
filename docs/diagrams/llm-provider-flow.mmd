@@ -1,0 +1,38 @@
+graph TD
+    Start[User Sends Message] --> LoadConfig[Load User Config<br/>llm_provider, llm_model]
+    
+    LoadConfig --> CheckKey{User API Key?}
+    
+    CheckKey -->|Yes| UseUserKey[Use User's API Key]
+    CheckKey -->|No| CheckSystemKey{System API Key?}
+    
+    CheckSystemKey -->|Yes| UseSystemKey[Use System API Key<br/>from database]
+    CheckSystemKey -->|No| CheckEnv{Env Variable?}
+    
+    CheckEnv -->|Yes| UseEnvKey[Use OPENAI_API_KEY<br/>from environment]
+    CheckEnv -->|No| Error[Error: No API Key]
+    
+    UseUserKey --> SelectProvider{Provider?}
+    UseSystemKey --> SelectProvider
+    UseEnvKey --> SelectProvider
+    
+    SelectProvider -->|openai| OpenAI[OpenAI Client<br/>api.openai.com]
+    SelectProvider -->|gemini| Gemini[Google Gemini Client<br/>generativelanguage.googleapis.com]
+    SelectProvider -->|claude| Claude[Anthropic Claude Client<br/>api.anthropic.com]
+    SelectProvider -->|groq| Groq[Groq Client<br/>api.groq.com]
+    SelectProvider -->|deepseek| DeepSeek[DeepSeek Client<br/>api.deepseek.com]
+    SelectProvider -->|together| Together[Together AI Client<br/>api.together.xyz]
+    
+    OpenAI --> CallAPI[Call LLM API<br/>with prompt + context]
+    Gemini --> CallAPI
+    Claude --> CallAPI
+    Groq --> CallAPI
+    DeepSeek --> CallAPI
+    Together --> CallAPI
+    
+    CallAPI --> Response[LLM Response]
+    
+    style Start fill:#4a90e2,stroke:#2c5aa0,color:#fff
+    style SelectProvider fill:#7b68ee,stroke:#5a4fcf,color:#fff
+    style CallAPI fill:#50c878,stroke:#3a9d5f,color:#fff
+    style Response fill:#4a90e2,stroke:#2c5aa0,color:#fff

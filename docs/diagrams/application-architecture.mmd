@@ -1,0 +1,78 @@
+graph LR
+    subgraph "Frontend Layer"
+        Dashboard[Dashboard UI<br/>Vue.js Components]
+        Widget[Chat Widget<br/>Embeddable]
+        Admin[Admin Dashboard<br/>Management UI]
+    end
+    
+    subgraph "Flask Application"
+        subgraph "Blueprints"
+            AuthBP[Auth Blueprint<br/>Login/Register/OTP]
+            APIBP[API Blueprint<br/>REST Endpoints]
+            ChatBP[Chat Blueprint<br/>Chat Interface]
+            DashboardBP[Dashboard Blueprint<br/>User Dashboard]
+            WidgetBP[Widget Blueprint<br/>Widget API]
+            AdminBP[Admin Blueprint<br/>Admin Panel]
+            ConversationsBP[Conversations Blueprint<br/>History]
+        end
+        
+        subgraph "Service Layer"
+            ChatbotService[Chatbot Service<br/>RAG + LLM]
+            KnowledgeService[Knowledge Service<br/>Vectorstore]
+            LLMService[LLM Service<br/>Multi-Provider]
+            FileService[File Service<br/>Upload/Process]
+            ConversationService[Conversation Service<br/>Context]
+            AdminService[Admin Service<br/>Management]
+        end
+        
+        subgraph "Model Layer"
+            UserModel[User Model]
+            FAQModel[FAQ Model]
+            FileModel[UploadedFile Model]
+            CrawlModel[CrawledUrl Model]
+            ConversationModel[Conversation Model]
+            MessageModel[Message Model]
+        end
+    end
+    
+    subgraph "Data Layer"
+        MySQL[(MySQL<br/>Users/FAQs)]
+        SQLite[(SQLite<br/>Fallback)]
+        ChromaDB[(ChromaDB<br/>Vectorstore)]
+        ConfigFS[(Config Files<br/>User Settings)]
+    end
+    
+    Dashboard --> AuthBP
+    Dashboard --> DashboardBP
+    Widget --> WidgetBP
+    Admin --> AdminBP
+    
+    AuthBP --> UserModel
+    APIBP --> FileService
+    APIBP --> KnowledgeService
+    ChatBP --> ChatbotService
+    DashboardBP --> ConversationService
+    WidgetBP --> ChatbotService
+    AdminBP --> AdminService
+    
+    ChatbotService --> KnowledgeService
+    ChatbotService --> LLMService
+    ChatbotService --> ConversationService
+    KnowledgeService --> ChromaDB
+    FileService --> FileModel
+    LLMService --> OpenAI
+    LLMService --> Gemini
+    
+    UserModel --> MySQL
+    FAQModel --> MySQL
+    FileModel --> MySQL
+    CrawlModel --> MySQL
+    ConversationModel --> MySQL
+    MessageModel --> MySQL
+    
+    ConversationService --> ConfigFS
+    
+    style ChatbotService fill:#4a90e2,stroke:#2c5aa0,color:#fff
+    style KnowledgeService fill:#7b68ee,stroke:#5a4fcf,color:#fff
+    style LLMService fill:#50c878,stroke:#3a9d5f,color:#fff
+    style ChromaDB fill:#ff6b6b,stroke:#d63031,color:#fff
