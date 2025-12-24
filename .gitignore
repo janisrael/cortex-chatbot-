@@ -58,6 +58,8 @@ test_*.html
 test_*.py
 tests/
 *_test.py
+# Allow pre-deployment test script (needed for CI/CD validation)
+!pre_deploy_test.py
 
 # Utility scripts (one-time use, not needed in production)
 send_*.py
@@ -74,6 +76,10 @@ close_*.py
 wait_*.sh
 create_admin.py
 run_*.sh
+
+# Allow pre-deployment and server check scripts (needed for CI/CD safety)
+!pre_deploy_test.py
+!check_server_status.sh
 
 # Old documentation/routes (not needed)
 V1_ROUTES_LIST.txt
