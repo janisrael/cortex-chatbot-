@@ -8,6 +8,7 @@ __pycache__/
 *$py.class
 *.so
 .Python
+*.pyc
 
 # Environment
 .env
@@ -17,17 +18,26 @@ __pycache__/
 # Logs
 *.log
 logs/
+chatbot.log
+flask.pid
 
 # Database
 *.db
 *.sqlite
 *.sqlite3
 users.db
+db/
+data/db/
+data/*.csv
+data/*.jsonl
 
 # User data (should be on S3/external storage)
 chroma_db/
+chroma_db_default/
 uploads/
 config/user_*/
+test_chroma/
+test_chroma_ingest/
 
 # Archives and backups
 archive/
@@ -44,6 +54,32 @@ backups/
 .pytest_cache/
 .coverage
 htmlcov/
+test_*.html
+test_*.py
+tests/
+*_test.py
+
+# Utility scripts (one-time use, not needed in production)
+send_*.py
+update_*.py
+update_*.sh
+sync_*.py
+sync_*.sh
+export_*.py
+analyze_*.py
+clear_*.py
+close_*.sh
+close_*.py
+wait_*.sh
+create_admin.py
+run_*.sh
+
+# Deployment planning docs (local use only)
+DEPLOYMENT_*.md
+!DEPLOYMENT_CHECKLIST.md
+
+# CI/CD temporary files
+.rebuild-trigger
 
 # OS
 .DS_Store
@@ -53,19 +89,21 @@ Thumbs.db
 *.md
 !README.md
 !.github/workflows/README.md
-
-# Development and planning docs (do not commit)
+!CHANGELOG.md
+# Exclude all planning/deployment/docs files
+DEPLOYMENT_*.md
+REPOSITORY_*.md
+CLEANUP_*.md
 docs/
+# Allow docs/details (diagrams and screenshots)
+!docs/details/
+!docs/details/**
 
-# Testing scripts (development only)
-test_*.py
-tests/
-*_test.py
-
-# Utility scripts (one-time use, not needed in production)
-send_*.py
-update_*.sh
-sync-env-to-k8s.sh
-update-cortex-smtp.sh
+# Keep migrations (needed for production)
 !migrations/
-__pycache__/
+
+# Test results and reports
+*_test_report_*.txt
+*_test_results_*.json
+knowledge_base_test_*.txt
+knowledge_base_test_*.json

@@ -793,10 +793,27 @@ def get_llm_config():
         from dotenv import load_dotenv
         load_dotenv()
         
-        llm_option = os.getenv("LLM_OPTION", "openai")
-        openai_api_key = os.getenv("OPENAI_API_KEY", "")
+        # Check for API key in database first (system keys), then environment
+        openai_api_key = None
+        has_openai_key = False
+        is_fallback = False
         
-        # Check if OpenAI key exists
+        try:
+            from models.api_key import AdminAPIKey
+            # Try default key first
+            openai_api_key = AdminAPIKey.get_system_api_key(key_type='default', provider='openai')
+            if not openai_api_key:
+                # Try fallback key
+                openai_api_key = AdminAPIKey.get_system_api_key(key_type='fallback', provider='openai')
+                if openai_api_key:
+                    is_fallback = True
+        except Exception as e:
+            print(f"Error getting API key from database: {e}")
+        
+        # Fallback to environment variable if not in database
+        if not openai_api_key:
+            openai_api_key = os.getenv("OPENAI_API_KEY", "")
+        
         has_openai_key = bool(openai_api_key and openai_api_key.strip())
         
         # Mask API key for display
@@ -820,7 +837,14 @@ def get_llm_config():
             "openai_key_masked": openai_key_masked,
             "openai_model": openai_model,
             "openai_temperature": openai_temperature,
-            "current_model": current_model
+            "current_model": current_model,
+            "effective_provider": "openai" if has_openai_key else "unknown",
+            "effective_model": openai_model if has_openai_key else "unknown",
+            "is_fallback": is_fallback,
+            "openai": {
+                "has_api_key": has_openai_key,
+                "model": openai_model
+            }
         })
     except Exception as e:
         print(f"Error in get_llm_config: {e}")

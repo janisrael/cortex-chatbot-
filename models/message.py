@@ -33,6 +33,12 @@ class Message:
             return conn
     
     @staticmethod
+    def _is_mysql_connection(conn):
+        """Check if connection is MySQL (handles both MySQLConnection and CMySQLConnection)"""
+        return isinstance(conn, (mysql.connector.MySQLConnection, mysql.connector.connection_cext.CMySQLConnection)) or \
+               type(conn).__name__ in ('MySQLConnection', 'CMySQLConnection')
+    
+    @staticmethod
     def _ensure_tables():
         """Ensure messages table exists (create if not)"""
         conn = None
@@ -41,7 +47,7 @@ class Message:
             cursor = conn.cursor()
             
             # Check if MySQL or SQLite
-            is_mysql = isinstance(conn, mysql.connector.MySQLConnection)
+            is_mysql = Message._is_mysql_connection(conn)
             
             if is_mysql:
                 # MySQL table creation
@@ -98,7 +104,7 @@ class Message:
             # Serialize metadata to JSON string
             metadata_json = json.dumps(metadata) if metadata else None
             
-            is_mysql = isinstance(conn, mysql.connector.MySQLConnection)
+            is_mysql = Message._is_mysql_connection(conn)
             
             if is_mysql:
                 cursor.execute("""
@@ -134,9 +140,9 @@ class Message:
         conn = None
         try:
             conn = Message._get_db_connection()
-            cursor = conn.cursor(dictionary=True) if isinstance(conn, mysql.connector.MySQLConnection) else conn.cursor()
+            cursor = conn.cursor(dictionary=True) if Message._is_mysql_connection(conn) else conn.cursor()
             
-            is_mysql = isinstance(conn, mysql.connector.MySQLConnection)
+            is_mysql = Message._is_mysql_connection(conn)
             
             if is_mysql:
                 cursor.execute("SELECT * FROM messages WHERE id = %s", (message_id,))
@@ -165,9 +171,9 @@ class Message:
         conn = None
         try:
             conn = Message._get_db_connection()
-            cursor = conn.cursor(dictionary=True) if isinstance(conn, mysql.connector.MySQLConnection) else conn.cursor()
+            cursor = conn.cursor(dictionary=True) if Message._is_mysql_connection(conn) else conn.cursor()
             
-            is_mysql = isinstance(conn, mysql.connector.MySQLConnection)
+            is_mysql = Message._is_mysql_connection(conn)
             
             if is_mysql:
                 cursor.execute("""
@@ -207,9 +213,9 @@ class Message:
         conn = None
         try:
             conn = Message._get_db_connection()
-            cursor = conn.cursor(dictionary=True) if isinstance(conn, mysql.connector.MySQLConnection) else conn.cursor()
+            cursor = conn.cursor(dictionary=True) if Message._is_mysql_connection(conn) else conn.cursor()
             
-            is_mysql = isinstance(conn, mysql.connector.MySQLConnection)
+            is_mysql = Message._is_mysql_connection(conn)
             
             if is_mysql:
                 cursor.execute("""
@@ -252,7 +258,7 @@ class Message:
             conn = Message._get_db_connection()
             cursor = conn.cursor()
             
-            is_mysql = isinstance(conn, mysql.connector.MySQLConnection)
+            is_mysql = Message._is_mysql_connection(conn)
             
             if is_mysql:
                 cursor.execute("SELECT COUNT(*) FROM messages WHERE conversation_id = %s", (conversation_id,))
@@ -277,7 +283,7 @@ class Message:
             conn = Message._get_db_connection()
             cursor = conn.cursor()
             
-            is_mysql = isinstance(conn, mysql.connector.MySQLConnection)
+            is_mysql = Message._is_mysql_connection(conn)
             
             if is_mysql:
                 cursor.execute("DELETE FROM messages WHERE id = %s", (self.id,))

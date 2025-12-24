@@ -38,6 +38,9 @@ ENV PATH=/root/.local/bin:$PATH
 # Copy application code
 COPY . .
 
+# Explicitly ensure db_config.py is present
+COPY db_config.py /app/db_config.py
+
 # Create necessary directories
 RUN mkdir -p uploads chroma_db config logs data
 

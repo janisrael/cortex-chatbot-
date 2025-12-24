@@ -37,6 +37,12 @@ class AdminAPIKey:
             return conn
     
     @staticmethod
+    def _is_mysql_connection(conn):
+        """Check if connection is MySQL (handles both MySQLConnection and CMySQLConnection)"""
+        return isinstance(conn, (mysql.connector.MySQLConnection, mysql.connector.connection_cext.CMySQLConnection)) or \
+               type(conn).__name__ in ('MySQLConnection', 'CMySQLConnection')
+    
+    @staticmethod
     def _ensure_tables():
         """Ensure admin_api_keys table exists"""
         conn = None
@@ -44,7 +50,7 @@ class AdminAPIKey:
             conn = AdminAPIKey._get_db_connection()
             cursor = conn.cursor()
             
-            is_mysql = isinstance(conn, mysql.connector.MySQLConnection)
+            is_mysql = AdminAPIKey._is_mysql_connection(conn)
             
             if is_mysql:
                 cursor.execute("""
@@ -121,7 +127,7 @@ class AdminAPIKey:
             
             key_hash = AdminAPIKey.hash_key(api_key)
             
-            is_mysql = isinstance(conn, mysql.connector.MySQLConnection)
+            is_mysql = AdminAPIKey._is_mysql_connection(conn)
             
             if is_mysql:
                 cursor.execute("""
@@ -174,7 +180,7 @@ class AdminAPIKey:
             
             token, key_hash = AdminAPIKey.generate_key()
             
-            is_mysql = isinstance(conn, mysql.connector.MySQLConnection)
+            is_mysql = AdminAPIKey._is_mysql_connection(conn)
             
             if is_mysql:
                 cursor.execute("""
@@ -212,9 +218,9 @@ class AdminAPIKey:
         try:
             AdminAPIKey._ensure_tables()
             conn = AdminAPIKey._get_db_connection()
-            cursor = conn.cursor(dictionary=True if isinstance(conn, mysql.connector.MySQLConnection) else None)
+            cursor = conn.cursor(dictionary=True if AdminAPIKey._is_mysql_connection(conn) else None)
             
-            is_mysql = isinstance(conn, mysql.connector.MySQLConnection)
+            is_mysql = AdminAPIKey._is_mysql_connection(conn)
             
             if is_mysql:
                 cursor.execute("""
@@ -255,11 +261,11 @@ class AdminAPIKey:
             params = []
             
             if name is not None:
-                updates.append("name = %s" if isinstance(conn, mysql.connector.MySQLConnection) else "name = ?")
+                updates.append("name = %s" if AdminAPIKey._is_mysql_connection(conn) else "name = ?")
                 params.append(name)
             
             if is_active is not None:
-                updates.append("is_active = %s" if isinstance(conn, mysql.connector.MySQLConnection) else "is_active = ?")
+                updates.append("is_active = %s" if AdminAPIKey._is_mysql_connection(conn) else "is_active = ?")
                 params.append(1 if is_active else 0)
             
             if not updates:
@@ -267,7 +273,7 @@ class AdminAPIKey:
             
             params.append(id)
             
-            is_mysql = isinstance(conn, mysql.connector.MySQLConnection)
+            is_mysql = AdminAPIKey._is_mysql_connection(conn)
             
             if is_mysql:
                 cursor.execute(f"""
@@ -302,7 +308,7 @@ class AdminAPIKey:
             conn = AdminAPIKey._get_db_connection()
             cursor = conn.cursor()
             
-            is_mysql = isinstance(conn, mysql.connector.MySQLConnection)
+            is_mysql = AdminAPIKey._is_mysql_connection(conn)
             
             if is_mysql:
                 cursor.execute("DELETE FROM admin_api_keys WHERE id = %s", (id,))
@@ -330,7 +336,7 @@ class AdminAPIKey:
             conn = AdminAPIKey._get_db_connection()
             cursor = conn.cursor()
             
-            is_mysql = isinstance(conn, mysql.connector.MySQLConnection)
+            is_mysql = AdminAPIKey._is_mysql_connection(conn)
             
             # Check if key exists
             if is_mysql:
@@ -398,7 +404,7 @@ class AdminAPIKey:
             conn = AdminAPIKey._get_db_connection()
             cursor = conn.cursor()
             
-            is_mysql = isinstance(conn, mysql.connector.MySQLConnection)
+            is_mysql = AdminAPIKey._is_mysql_connection(conn)
             
             if is_mysql:
                 cursor.execute("""
@@ -437,7 +443,7 @@ class AdminAPIKey:
             conn = AdminAPIKey._get_db_connection()
             cursor = conn.cursor()
             
-            is_mysql = isinstance(conn, mysql.connector.MySQLConnection)
+            is_mysql = AdminAPIKey._is_mysql_connection(conn)
             
             if is_mysql:
                 cursor.execute("""

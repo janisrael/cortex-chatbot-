@@ -37,6 +37,12 @@ class Conversation:
             return conn
     
     @staticmethod
+    def _is_mysql_connection(conn):
+        """Check if connection is MySQL (handles both MySQLConnection and CMySQLConnection)"""
+        return isinstance(conn, (mysql.connector.MySQLConnection, mysql.connector.connection_cext.CMySQLConnection)) or \
+               type(conn).__name__ in ('MySQLConnection', 'CMySQLConnection')
+    
+    @staticmethod
     def _ensure_tables():
         """Ensure conversations table exists (create if not)"""
         conn = None
@@ -45,7 +51,7 @@ class Conversation:
             cursor = conn.cursor()
             
             # Check if MySQL or SQLite
-            is_mysql = isinstance(conn, mysql.connector.MySQLConnection)
+            is_mysql = Conversation._is_mysql_connection(conn)
             
             if is_mysql:
                 # MySQL table creation
@@ -125,7 +131,7 @@ class Conversation:
             if not title:
                 title = f"Chat {datetime.now().strftime('%Y-%m-%d %H:%M')}"
             
-            is_mysql = isinstance(conn, mysql.connector.MySQLConnection)
+            is_mysql = Conversation._is_mysql_connection(conn)
             
             if is_mysql:
                 cursor.execute("""
@@ -161,9 +167,9 @@ class Conversation:
         conn = None
         try:
             conn = Conversation._get_db_connection()
-            cursor = conn.cursor(dictionary=True) if isinstance(conn, mysql.connector.MySQLConnection) else conn.cursor()
+            cursor = conn.cursor(dictionary=True) if Conversation._is_mysql_connection(conn) else conn.cursor()
             
-            is_mysql = isinstance(conn, mysql.connector.MySQLConnection)
+            is_mysql = Conversation._is_mysql_connection(conn)
             
             if is_mysql:
                 cursor.execute("SELECT * FROM conversations WHERE id = %s", (conversation_id,))
@@ -192,9 +198,9 @@ class Conversation:
         conn = None
         try:
             conn = Conversation._get_db_connection()
-            cursor = conn.cursor(dictionary=True) if isinstance(conn, mysql.connector.MySQLConnection) else conn.cursor()
+            cursor = conn.cursor(dictionary=True) if Conversation._is_mysql_connection(conn) else conn.cursor()
             
-            is_mysql = isinstance(conn, mysql.connector.MySQLConnection)
+            is_mysql = Conversation._is_mysql_connection(conn)
             
             if active_only:
                 if is_mysql:
@@ -245,9 +251,9 @@ class Conversation:
         conn = None
         try:
             conn = Conversation._get_db_connection()
-            cursor = conn.cursor(dictionary=True) if isinstance(conn, mysql.connector.MySQLConnection) else conn.cursor()
+            cursor = conn.cursor(dictionary=True) if Conversation._is_mysql_connection(conn) else conn.cursor()
             
-            is_mysql = isinstance(conn, mysql.connector.MySQLConnection)
+            is_mysql = Conversation._is_mysql_connection(conn)
             
             if active_only:
                 if is_mysql:
@@ -299,7 +305,7 @@ class Conversation:
             conn = Conversation._get_db_connection()
             cursor = conn.cursor()
             
-            is_mysql = isinstance(conn, mysql.connector.MySQLConnection)
+            is_mysql = Conversation._is_mysql_connection(conn)
             
             if is_mysql:
                 cursor.execute("UPDATE conversations SET title = %s, updated_at = CURRENT_TIMESTAMP WHERE id = %s", (title, self.id))
@@ -326,7 +332,7 @@ class Conversation:
             conn = Conversation._get_db_connection()
             cursor = conn.cursor()
             
-            is_mysql = isinstance(conn, mysql.connector.MySQLConnection)
+            is_mysql = Conversation._is_mysql_connection(conn)
             
             if is_mysql:
                 cursor.execute("""
@@ -361,7 +367,7 @@ class Conversation:
             conn = Conversation._get_db_connection()
             cursor = conn.cursor()
             
-            is_mysql = isinstance(conn, mysql.connector.MySQLConnection)
+            is_mysql = Conversation._is_mysql_connection(conn)
             
             if is_mysql:
                 cursor.execute("UPDATE conversations SET is_active = 0, updated_at = CURRENT_TIMESTAMP WHERE id = %s", (self.id,))
@@ -398,7 +404,7 @@ class Conversation:
             conn = Conversation._get_db_connection()
             cursor = conn.cursor()
             
-            is_mysql = isinstance(conn, mysql.connector.MySQLConnection)
+            is_mysql = Conversation._is_mysql_connection(conn)
             
             if is_mysql:
                 cursor.execute("""
@@ -433,7 +439,7 @@ class Conversation:
             conn = Conversation._get_db_connection()
             cursor = conn.cursor()
             
-            is_mysql = isinstance(conn, mysql.connector.MySQLConnection)
+            is_mysql = Conversation._is_mysql_connection(conn)
             
             if is_mysql:
                 cursor.execute("DELETE FROM conversations WHERE id = %s", (self.id,))
