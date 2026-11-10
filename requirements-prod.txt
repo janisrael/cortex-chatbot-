@@ -27,11 +27,13 @@ chromadb==1.0.15
 
 # Embeddings (sentence-transformers - minimal, no full transformers)
 # Pin compatible versions to avoid dependency conflicts
+# IMPORTANT: Use CPU-only torch to avoid downloading 1.2GB+ of CUDA packages
 huggingface-hub<1.0,>=0.34.0
 transformers>=4.21.0,<5.0.0
+torch==2.7.1+cpu --index-url https://download.pytorch.org/whl/cpu
 sentence-transformers==2.7.0
 # Note: sentence-transformers 2.7.0 is stable and compatible with transformers<5.0
-# It uses transformers internally but we don't need the full library
+# Using CPU-only torch to avoid CUDA dependencies (saves 1.2GB+ download time)
 
 # LangChain (for RAG) - Compatible versions
 langchain==0.3.26
@@ -51,6 +53,7 @@ openai>=1.58.1
 pypdf==5.7.0
 beautifulsoup4==4.13.4
 trafilatura==2.0.0
+lxml_html_clean>=0.4.0
 html2text==2025.4.15
 
 # HTTP & Requests

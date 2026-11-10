@@ -2,10 +2,13 @@
 Text Cleaning Service for Web Crawling
 Extracts clean text from URLs using Trafilatura and html2text
 """
+import os
 import re
 import unicodedata
 import requests
 from html2text import HTML2Text
+
+JINA_READER_BASE = "https://r.jina.ai/"
 
 
 def clean_extracted_text(text):
@@ -76,6 +79,52 @@ def clean_extracted_text(text):
     return text
 
 
+def _jina_fallback_enabled():
+    return os.getenv("CRAWL_JINA_FALLBACK", "true").lower() in ("1", "true", "yes", "on")
+
+
+def _extract_via_jina_reader(url):
+    """Fetch page text via Jina Reader (helps with Cloudflare bot challenges)."""
+    if not _jina_fallback_enabled():
+        return None
+
+    reader_url = f"{JINA_READER_BASE}{url}"
+    try:
+        print("📥 Trying Jina Reader fallback (Cloudflare bypass)...")
+        response = requests.get(
+            reader_url,
+            timeout=45,
+            headers={
+                "Accept": "text/plain",
+                "User-Agent": "Mozilla/5.0 (compatible; CortexCrawler/1.0; +https://cortex.janisrael.com)",
+            },
+        )
+        response.raise_for_status()
+        body = response.text.strip()
+        if not body:
+            return None
+
+        marker = "Markdown Content:"
+        if marker in body:
+            text = body.split(marker, 1)[1].strip()
+        else:
+            text = body
+
+        # Drop markdown image syntax; keep link text where possible
+        text = re.sub(r"!\[[^\]]*\]\([^\)]+\)", " ", text)
+        text = re.sub(r"\[([^\]]+)\]\([^\)]+\)", r"\1", text)
+
+        if text and len(text.strip()) > 50:
+            print(f"✅ Jina Reader extracted {len(text)} characters")
+            return clean_extracted_text(text)
+        print(f"⚠️ Jina Reader returned too little content ({len(text) if text else 0} chars)")
+    except requests.exceptions.RequestException as e:
+        print(f"⚠️ Jina Reader request failed for {url}: {e}")
+    except Exception as e:
+        print(f"⚠️ Jina Reader fallback failed for {url}: {e}")
+    return None
+
+
 def extract_clean_text_from_url(url):
     """Extract clean text from URL using best available method"""
     print(f"🔍 Attempting to extract text from: {url}")
@@ -83,9 +132,14 @@ def extract_clean_text_from_url(url):
     try:
         # Try Trafilatura first (best for most sites)
         import trafilatura
-        
+        from copy import deepcopy
+        from trafilatura.settings import DEFAULT_CONFIG
+
+        config = deepcopy(DEFAULT_CONFIG)
+        config.set("DEFAULT", "DOWNLOAD_TIMEOUT", "15")
+
         print(f"📥 Fetching URL with Trafilatura...")
-        downloaded = trafilatura.fetch_url(url, timeout=15)
+        downloaded = trafilatura.fetch_url(url, config=config)
         
         if downloaded:
             print(f"✅ Content fetched, extracting text...")
@@ -117,7 +171,12 @@ def extract_clean_text_from_url(url):
             url, 
             timeout=15, 
             headers={
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                'User-Agent': (
+                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
+                    '(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                ),
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'Accept-Language': 'en-US,en;q=0.9',
             },
             allow_redirects=True
         )
@@ -138,18 +197,18 @@ def extract_clean_text_from_url(url):
         if text and len(text.strip()) > 50:
             print(f"✅ html2text extracted {len(text)} characters")
             return clean_extracted_text(text)
-        else:
-            print(f"⚠️ html2text extracted too little content ({len(text.strip()) if text else 0} chars)")
-            return None
+        print(f"⚠️ html2text extracted too little content ({len(text.strip()) if text else 0} chars)")
     except requests.exceptions.RequestException as e:
         print(f"⚠️ html2text HTTP request failed for {url}: {e}")
-        return None
     except Exception as e:
         print(f"⚠️ html2text fallback failed for {url}: {e}")
         import traceback
         traceback.print_exc()
-        return None
-    
+
+    jina_text = _extract_via_jina_reader(url)
+    if jina_text:
+        return jina_text
+
     print(f"❌ All extraction methods failed for {url}")
     return None
 
