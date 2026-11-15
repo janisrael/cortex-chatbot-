@@ -1,0 +1,70 @@
+# Hotfix: deploy Cortex to Hetzner k3s only (no tests, no other apps)
+name: Hotfix Cortex Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type hotfix to confirm deploy to production'
+        required: true
+        default: 'hotfix'
+
+jobs:
+  hotfix-cortex:
+    name: Hotfix deploy to Hetzner (cortex only)
+    runs-on: ubuntu-latest
+    if: github.event.inputs.confirm == 'hotfix'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to Hetzner Kubernetes
+        run: |
+          echo "=== Cortex hotfix deploy (skip CI tests) ==="
+
+          mkdir -p ~/.ssh
+          echo "${{ secrets.HETZNER_SSH_PRIVATE_KEY }}" > ~/.ssh/hetzner_key
+          chmod 600 ~/.ssh/hetzner_key
+          ssh-keyscan -H ${{ secrets.HETZNER_HOST }} >> ~/.ssh/known_hosts
+
+          SSH_OPTS="-i ~/.ssh/hetzner_key -o StrictHostKeyChecking=no -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -o ConnectTimeout=30"
+
+          tar --exclude='.git' --exclude='venv' --exclude='venv-prod' --exclude='__pycache__' --exclude='*.pyc' \
+              --exclude='.env' --exclude='chroma_db' --exclude='uploads' --exclude='*.db' --exclude='*.sqlite*' \
+              --exclude='logs' --exclude='data' -czf /tmp/cortex-source.tar.gz .
+
+          scp $SSH_OPTS /tmp/cortex-source.tar.gz root@${{ secrets.HETZNER_HOST }}:/tmp/
+          rm -f /tmp/cortex-source.tar.gz
+
+          ssh $SSH_OPTS root@${{ secrets.HETZNER_HOST }} << 'DEPLOY_SCRIPT'
+            set -e
+            set -o pipefail
+
+            echo "=== Cortex hotfix: build and rollout only ==="
+            docker system prune -f || true
+
+            cd /tmp
+            rm -rf cortex-build
+            mkdir -p cortex-build
+            cd cortex-build
+            tar -xzf /tmp/cortex-source.tar.gz
+            rm -f /tmp/cortex-source.tar.gz
+
+            docker build -t cortex:latest .
+            docker save cortex:latest | k3s ctr images import -
+
+            kubectl apply -f k8s/deployment.yaml -n cortex || kubectl rollout restart deployment/cortex-app -n cortex
+            kubectl rollout status deployment/cortex-app -n cortex --timeout=180s
+
+            POD=$(kubectl get pods -n cortex -l app=cortex -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
+            if [ -n "$POD" ]; then
+              kubectl exec -n cortex "$POD" -- curl -sf http://localhost:6001/health || true
+            fi
+            echo "✅ Cortex hotfix deploy complete"
+          DEPLOY_SCRIPT
+
+      - name: Verify public health
+        run: |
+          sleep 5
+          curl -sf ${{ secrets.HETZNER_APP_URL || 'https://cortex.janisrael.com' }}/health
