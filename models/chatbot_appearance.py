@@ -48,6 +48,7 @@ class ChatbotAppearance:
                         avatar_type VARCHAR(50) DEFAULT 'preset',
                         avatar_value VARCHAR(255),
                         suggested_messages TEXT,
+                        welcome_message TEXT,
                         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -66,6 +67,7 @@ class ChatbotAppearance:
                         avatar_type ENUM('preset', 'upload', 'generated') DEFAULT 'preset',
                         avatar_value VARCHAR(255),
                         suggested_messages TEXT,
+                        welcome_message TEXT,
                         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,

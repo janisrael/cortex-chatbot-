@@ -56,6 +56,22 @@ async function getChatbotConfig(force = false) {
     return chatbotConfigPromise;
 }
 
+function invalidateChatbotConfigCache() {
+    chatbotConfigCache = null;
+    chatbotConfigPromise = null;
+}
+
+function updateChatbotConfigCache(updates) {
+    if (!updates || typeof updates !== 'object') {
+        return;
+    }
+    if (!chatbotConfigCache) {
+        chatbotConfigCache = { ...updates };
+        return;
+    }
+    chatbotConfigCache = { ...chatbotConfigCache, ...updates };
+}
+
 // Initialize dashboard
 document.addEventListener('DOMContentLoaded', function() {
     initializeDashboard();

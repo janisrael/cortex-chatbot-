@@ -84,6 +84,14 @@ except Exception as e:
     print(f"⚠️ Embeddings initialization failed: {e}")
     embeddings = None
 
+# Run database migrations on startup (gunicorn does not use __main__)
+if os.getenv('SKIP_DB_MIGRATIONS', '').lower() not in ('1', 'true', 'yes'):
+    try:
+        from migrations import run_migrations
+        run_migrations()
+    except Exception as migration_error:
+        print(f"⚠️ Database migrations failed: {migration_error}")
+
 # Register all blueprints
 register_blueprints(app)
 
@@ -123,11 +131,6 @@ if __name__ == "__main__":
     print(f"📝 Upload folder: ./uploads")
     print(f"📋 Logs will be saved to: ./logs/")
     print(f"Default admin created: admin@example.com (password set during initialization)")
-    
-    # Initialize database tables and run migrations
-    print("📦 Initializing database...")
-    from migrations import run_migrations
-    run_migrations()
     
     port = int(os.getenv('PORT', 6001))
     app.run(host='0.0.0.0', port=port, debug=True, use_reloader=False)

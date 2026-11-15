@@ -364,8 +364,9 @@ def ingest_uploaded_file(file_id):
             return jsonify({"error": "Failed to access knowledge base. Please check embeddings and vectorstore initialization."}), 500
         
         try:
-            # Ensure write permissions
-            kb_path = f"./chroma_db/user_{user_id}"
+            # Ensure write permissions - use same path as get_user_vectorstore
+            from services.knowledge_service import get_user_knowledge_base_path
+            kb_path = get_user_knowledge_base_path(user_id)
             if os.path.exists(kb_path):
                 os.chmod(kb_path, 0o777)
                 for root, dirs, files in os.walk(kb_path):
@@ -606,33 +607,51 @@ def save_user_chatbot_config_endpoint():
             elif 'llm_api_key' in config:
                 config['llm_api_key'] = None
         
-        # Save basic config to file
-        success = save_user_chatbot_config_file(user_id, config)
-        
-        # Save appearance config to database
+        # Persist appearance fields in config file (source of truth for file + DB merge on GET)
         from models.chatbot_appearance import ChatbotAppearance
-        short_info = data.get('short_info') or data.get('description')
-        primary_color = data.get('primary_color')
-        avatar = data.get('avatar')
-        suggested_messages = data.get('suggested_messages')
-        # Handle welcome_message: if provided (even empty string), save it
+        short_info = data.get('short_info') if 'short_info' in data else (data.get('description') if 'description' in data else None)
+        primary_color = data.get('primary_color') if 'primary_color' in data else None
+        avatar = data.get('avatar') if 'avatar' in data else None
+        suggested_messages = data.get('suggested_messages') if 'suggested_messages' in data else None
         welcome_message = None
         if 'welcome_message' in data:
             welcome_message = data['welcome_message'].strip() if data['welcome_message'] else None
-        
-        # Always try to save if welcome_message key is present in data
-        if short_info is not None or primary_color is not None or avatar is not None or suggested_messages is not None or 'welcome_message' in data:
+
+        appearance_fields_in_request = any(
+            key in data
+            for key in ('short_info', 'description', 'primary_color', 'avatar', 'suggested_messages', 'welcome_message')
+        )
+        if short_info is not None:
+            config['short_info'] = short_info
+        if primary_color is not None:
+            config['primary_color'] = primary_color
+        if avatar is not None:
+            config['avatar'] = avatar
+        if suggested_messages is not None:
+            config['suggested_messages'] = suggested_messages
+        if 'welcome_message' in data:
+            config['welcome_message'] = welcome_message
+
+        success = save_user_chatbot_config_file(user_id, config)
+
+        appearance_success = True
+        if appearance_fields_in_request:
+            avatar_type = avatar.get('type') if isinstance(avatar, dict) else None
+            avatar_value = avatar.get('value') if isinstance(avatar, dict) else None
+            if avatar_type == 'custom':
+                avatar_type = 'upload'
             appearance_success = ChatbotAppearance.create_or_update(
                 user_id=user_id,
                 short_info=short_info,
                 primary_color=primary_color,
-                avatar_type=avatar.get('type') if avatar else None,
-                avatar_value=avatar.get('value') if avatar else None,
+                avatar_type=avatar_type,
+                avatar_value=avatar_value,
                 suggested_messages=suggested_messages,
-                welcome_message=welcome_message
+                welcome_message=welcome_message if 'welcome_message' in data else None
             )
             if not appearance_success:
                 print(f"⚠️ Warning: Failed to save appearance config to database for user {user_id}")
+                return jsonify({"error": "Failed to save appearance settings"}), 500
         
         if success:
             return jsonify({
@@ -1594,8 +1613,9 @@ def ingest_faq(faq_id):
             return jsonify({"error": "Failed to access knowledge base. Please check embeddings and vectorstore initialization."}), 500
         
         try:
-            # Ensure directory and all files are writable before adding documents
-            kb_path = f"./chroma_db/user_{user_id}"
+            # Ensure directory and all files are writable before adding documents - use same path as get_user_vectorstore
+            from services.knowledge_service import get_user_knowledge_base_path
+            kb_path = get_user_knowledge_base_path(user_id)
             import os
             if os.path.exists(kb_path):
                 # Use more permissive permissions to avoid readonly database errors
@@ -1877,7 +1897,8 @@ def restore_knowledge():
         try:
             vector_backup = f"{backup_path}/chroma_db"
             if os.path.exists(vector_backup):
-                user_kb_path = f"./chroma_db/user_{user_id}"
+                from services.knowledge_service import get_user_knowledge_base_path
+                user_kb_path = get_user_knowledge_base_path(user_id)
                 if os.path.exists(user_kb_path):
                     shutil.rmtree(user_kb_path)
                 shutil.copytree(vector_backup, user_kb_path)
@@ -1962,7 +1983,8 @@ def reset_knowledge():
         if reset_type in ['vectors', 'all']:
             # Clear vector database
             try:
-                user_kb_path = f"./chroma_db/user_{user_id}"
+                from services.knowledge_service import get_user_knowledge_base_path
+                user_kb_path = get_user_knowledge_base_path(user_id)
                 if os.path.exists(user_kb_path):
                     shutil.rmtree(user_kb_path)
                     os.makedirs(user_kb_path, exist_ok=True)

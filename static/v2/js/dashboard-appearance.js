@@ -16,27 +16,29 @@ let appearanceConfig = {
 
 let gradientColors = [];
 let messageCounter = 0;
+let appearanceTabSetupDone = false;
 
 // Initialize appearance tab
 async function initializeAppearance() {
-    // Load config first (await it)
-    await loadAppearanceConfig();
-    // Then setup UI components
-    setupDescriptionInput();
-    setupColorPicker();
-    setupGradientBuilder();
-    setupAvatarSelection();
-    setupSuggestedMessages();
-    setupSaveButton();
+    await loadAppearanceConfig(true);
+    if (!appearanceTabSetupDone) {
+        setupDescriptionInput();
+        setupColorPicker();
+        setupGradientBuilder();
+        setupAvatarSelection();
+        setupSuggestedMessages();
+        setupSaveButton();
+        appearanceTabSetupDone = true;
+    }
     updatePreview();
 }
 
 // Load appearance configuration
-async function loadAppearanceConfig() {
+async function loadAppearanceConfig(forceReload = false) {
     try {
         const config = (typeof getChatbotConfig === 'function')
-            ? await getChatbotConfig()
-            : await (await fetch('/api/user/chatbot-config')).json().then(d => d.config || d);
+            ? await getChatbotConfig(forceReload)
+            : await (await fetch('/api/user/chatbot-config', { credentials: 'same-origin' })).json().then(d => d.config || d);
         
         // Load bot name for preview
         if (config.bot_name) {
@@ -907,7 +909,20 @@ async function saveAppearanceConfig() {
                 successAlert.textContent = message;
                 successAlert.style.display = 'block';
             }
-            // Show toast notification
+            const savedConfig = {
+                short_info: appearanceConfig.description,
+                primary_color: appearanceConfig.primary_color,
+                avatar: appearanceConfig.avatar,
+                suggested_messages: appearanceConfig.suggested_messages
+            };
+            if (typeof updateChatbotConfigCache === 'function') {
+                updateChatbotConfigCache(savedConfig);
+            } else if (typeof invalidateChatbotConfigCache === 'function') {
+                invalidateChatbotConfigCache();
+            }
+            if (typeof updateChatbotOverviewCard === 'function') {
+                updateChatbotOverviewCard({ ...currentConfig, ...savedConfig }, {});
+            }
             if (typeof showSuccessNotification === 'function') {
                 showSuccessNotification(message, 5000);
             }
