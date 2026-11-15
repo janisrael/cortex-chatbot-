@@ -27,10 +27,11 @@ chromadb==1.0.15
 
 # Embeddings (sentence-transformers - minimal, no full transformers)
 # Pin compatible versions to avoid dependency conflicts
-# IMPORTANT: Use CPU-only torch to avoid downloading 1.2GB+ of CUDA packages
+# CPU-only PyTorch wheel index (avoids large CUDA packages)
+--extra-index-url https://download.pytorch.org/whl/cpu
 huggingface-hub<1.0,>=0.34.0
 transformers>=4.21.0,<5.0.0
-torch==2.7.1+cpu --index-url https://download.pytorch.org/whl/cpu
+torch==2.7.1+cpu
 sentence-transformers==2.7.0
 # Note: sentence-transformers 2.7.0 is stable and compatible with transformers<5.0
 # Using CPU-only torch to avoid CUDA dependencies (saves 1.2GB+ download time)
