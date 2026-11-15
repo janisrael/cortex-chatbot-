@@ -42,7 +42,7 @@ jobs:
             set -o pipefail
 
             echo "=== Cortex hotfix: build and rollout only ==="
-            docker system prune -f || true
+            # Do not run docker system prune — it breaks multi-stage builds on this host.
 
             cd /tmp
             rm -rf cortex-build
@@ -51,7 +51,7 @@ jobs:
             tar -xzf /tmp/cortex-source.tar.gz
             rm -f /tmp/cortex-source.tar.gz
 
-            docker build -t cortex:latest .
+            docker build --pull=false -t cortex:latest .
             docker save cortex:latest | k3s ctr images import -
 
             kubectl apply -f k8s/deployment.yaml -n cortex || kubectl rollout restart deployment/cortex-app -n cortex
