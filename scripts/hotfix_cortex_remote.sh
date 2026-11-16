@@ -39,10 +39,37 @@ build_and_import() {
   return 1
 }
 
+rollout_k8s() {
+  kubectl apply -f k8s/namespace.yaml 2>/dev/null || kubectl create namespace cortex 2>/dev/null || true
+  kubectl apply -f k8s/pvc.yaml 2>/dev/null || true
+  kubectl apply -f k8s/deployment.yaml
+  kubectl apply -f k8s/service.yaml 2>/dev/null || true
+  if kubectl get deployment cortex-app -n cortex >/dev/null 2>&1; then
+    kubectl rollout restart deployment/cortex-app -n cortex
+    kubectl rollout status deployment/cortex-app -n cortex --timeout=300s
+    return 0
+  fi
+  return 1
+}
+
+deploy_systemd() {
+  echo "=== Cortex hotfix: systemd /opt/cortex ==="
+  mkdir -p /opt/cortex
+  rsync -a --exclude 'venv-prod' --exclude 'chroma_db' --exclude 'uploads' --exclude '.git' \
+    ./ /opt/cortex/
+  if [ -f deployments/systemd/cortex.service ]; then
+    cp deployments/systemd/cortex.service /etc/systemd/system/cortex.service
+    systemctl daemon-reload
+  fi
+  systemctl enable cortex.service 2>/dev/null || true
+  systemctl restart cortex.service
+  systemctl is-active cortex.service
+}
+
 if build_and_import; then
-  kubectl apply -f k8s/deployment.yaml -n cortex 2>/dev/null || true
-  kubectl rollout restart deployment/cortex-app -n cortex
-  kubectl rollout status deployment/cortex-app -n cortex --timeout=300s
+  if ! rollout_k8s; then
+    deploy_systemd
+  fi
 else
   echo "=== Image build failed: patching running pod (until next pod recreate) ==="
   POD=$(kubectl get pods -n cortex -l app=cortex -o jsonpath='{.items[0].metadata.name}')
@@ -50,7 +77,8 @@ else
     kubectl cp "$rel" "cortex/${POD}:/app/${rel}"
   done
   kubectl exec -n cortex "$POD" -- python -c "from migrations import run_migrations; run_migrations()"
-  echo "⚠️ Pod patched in-memory path only. Schedule a full image build when Docker storage is repaired."
+  echo "⚠️ Pod patch only (no image). Trying systemd..."
+  deploy_systemd || true
 fi
 
 POD=$(kubectl get pods -n cortex -l app=cortex -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)

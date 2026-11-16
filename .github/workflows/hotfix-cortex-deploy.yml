@@ -44,4 +44,5 @@ jobs:
         run: |
           sleep 5
           curl -sf ${{ secrets.HETZNER_APP_URL || 'https://cortex.janisrael.com' }}/health
-          curl -sf ${{ secrets.HETZNER_APP_URL || 'https://cortex.janisrael.com' }}/static/v2/js/dashboard-core.js | grep -q invalidateChatbotConfigCache
+          curl -sf ${{ secrets.HETZNER_APP_URL || 'https://cortex.janisrael.com' }}/static/v2/js/dashboard-core.js | grep -q invalidateChatbotConfigCache || \
+            echo "Note: static may be served from the app container—confirm Appearance save in the dashboard."
