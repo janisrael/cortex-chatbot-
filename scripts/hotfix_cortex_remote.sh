@@ -27,6 +27,9 @@ ensure_prod_db_env() {
       echo 'DB_NAME=saturn'
     } >> /opt/cortex/.env
   fi
+  if ! grep -q '^CHROMA_DB_PATH=' /opt/cortex/.env 2>/dev/null; then
+    echo 'CHROMA_DB_PATH=/opt/cortex/chroma_db' >> /opt/cortex/.env
+  fi
   chown www-data:www-data /opt/cortex/.env
   chmod 640 /opt/cortex/.env
 }
