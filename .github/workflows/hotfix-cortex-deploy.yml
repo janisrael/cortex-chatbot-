@@ -51,11 +51,14 @@ jobs:
             tar -xzf /tmp/cortex-source.tar.gz
             rm -f /tmp/cortex-source.tar.gz
 
-            docker build --pull=false -t cortex:latest .
+            # Legacy builder avoids "unknown parent image ID" on multi-stage Dockerfile after partial prunes
+            export DOCKER_BUILDKIT=0
+            docker build --no-cache -t cortex:latest .
             docker save cortex:latest | k3s ctr images import -
 
-            kubectl apply -f k8s/deployment.yaml -n cortex || kubectl rollout restart deployment/cortex-app -n cortex
-            kubectl rollout status deployment/cortex-app -n cortex --timeout=180s
+            kubectl apply -f k8s/deployment.yaml -n cortex 2>/dev/null || true
+            kubectl rollout restart deployment/cortex-app -n cortex
+            kubectl rollout status deployment/cortex-app -n cortex --timeout=300s
 
             POD=$(kubectl get pods -n cortex -l app=cortex -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
             if [ -n "$POD" ]; then

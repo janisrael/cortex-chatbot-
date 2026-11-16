@@ -37,7 +37,8 @@ rm -f /tmp/cortex-hotfix.tar.gz
 set -e
 cd /tmp && rm -rf cortex-build && mkdir cortex-build && cd cortex-build
 tar -xzf /tmp/cortex-hotfix.tar.gz && rm -f /tmp/cortex-hotfix.tar.gz
-docker build --pull=false -t cortex:latest .
+export DOCKER_BUILDKIT=0
+docker build --no-cache -t cortex:latest .
 docker save cortex:latest | k3s ctr images import -
 kubectl apply -f k8s/deployment.yaml -n cortex 2>/dev/null || kubectl rollout restart deployment/cortex-app -n cortex
 kubectl rollout status deployment/cortex-app -n cortex --timeout=180s
