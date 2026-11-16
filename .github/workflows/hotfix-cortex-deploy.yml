@@ -37,36 +37,11 @@ jobs:
           scp $SSH_OPTS /tmp/cortex-source.tar.gz root@${{ secrets.HETZNER_HOST }}:/tmp/
           rm -f /tmp/cortex-source.tar.gz
 
-          ssh $SSH_OPTS root@${{ secrets.HETZNER_HOST }} << 'DEPLOY_SCRIPT'
-            set -e
-            set -o pipefail
-
-            echo "=== Cortex hotfix: build and rollout only ==="
-            # Do not run docker system prune — it breaks multi-stage builds on this host.
-
-            cd /tmp
-            rm -rf cortex-build
-            mkdir -p cortex-build
-            cd cortex-build
-            tar -xzf /tmp/cortex-source.tar.gz
-            rm -f /tmp/cortex-source.tar.gz
-
-            docker pull python:3.11-slim || true
-            docker build -f Dockerfile.hotfix -t cortex:latest .
-            docker save cortex:latest | k3s ctr images import -
-
-            kubectl apply -f k8s/deployment.yaml -n cortex 2>/dev/null || true
-            kubectl rollout restart deployment/cortex-app -n cortex
-            kubectl rollout status deployment/cortex-app -n cortex --timeout=300s
-
-            POD=$(kubectl get pods -n cortex -l app=cortex -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
-            if [ -n "$POD" ]; then
-              kubectl exec -n cortex "$POD" -- curl -sf http://localhost:6001/health || true
-            fi
-            echo "✅ Cortex hotfix deploy complete"
-          DEPLOY_SCRIPT
+          scp $SSH_OPTS scripts/hotfix_cortex_remote.sh root@${{ secrets.HETZNER_HOST }}:/tmp/hotfix_cortex_remote.sh
+          ssh $SSH_OPTS root@${{ secrets.HETZNER_HOST }} "chmod +x /tmp/hotfix_cortex_remote.sh && /tmp/hotfix_cortex_remote.sh"
 
       - name: Verify public health
         run: |
           sleep 5
           curl -sf ${{ secrets.HETZNER_APP_URL || 'https://cortex.janisrael.com' }}/health
+          curl -sf ${{ secrets.HETZNER_APP_URL || 'https://cortex.janisrael.com' }}/static/v2/js/dashboard-core.js | grep -q invalidateChatbotConfigCache
