@@ -647,11 +647,16 @@ def save_user_chatbot_config_endpoint():
                 avatar_type=avatar_type,
                 avatar_value=avatar_value,
                 suggested_messages=suggested_messages,
-                welcome_message=welcome_message if 'welcome_message' in data else None
+                welcome_message=welcome_message if 'welcome_message' in data else None,
+                welcome_message_provided='welcome_message' in data
             )
             if not appearance_success:
-                print(f"⚠️ Warning: Failed to save appearance config to database for user {user_id}")
-                return jsonify({"error": "Failed to save appearance settings"}), 500
+                detail = ChatbotAppearance.get_last_error() or "database write failed"
+                print(f"⚠️ Failed to save appearance config for user {user_id}: {detail}")
+                return jsonify({
+                    "error": "Failed to save appearance settings",
+                    "detail": detail
+                }), 500
         
         if success:
             return jsonify({

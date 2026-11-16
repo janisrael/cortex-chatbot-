@@ -13,7 +13,68 @@ import os
 
 class ChatbotAppearance:
     """Model for chatbot appearance configuration"""
-    
+
+    _last_error = None
+
+    ALLOWED_AVATAR_TYPES = frozenset({'preset', 'upload', 'generated'})
+
+    @staticmethod
+    def get_last_error():
+        return ChatbotAppearance._last_error
+
+    @staticmethod
+    def _normalize_avatar_type(avatar_type):
+        if not avatar_type:
+            return 'preset'
+        avatar_type = str(avatar_type).lower()
+        if avatar_type in ('custom', 'uploaded'):
+            return 'upload'
+        if avatar_type in ChatbotAppearance.ALLOWED_AVATAR_TYPES:
+            return avatar_type
+        return 'preset'
+
+    @staticmethod
+    def ensure_schema():
+        """Ensure table exists and has columns required for saves (idempotent)."""
+        ChatbotAppearance.init_db()
+        conn = ChatbotAppearance._get_db_connection()
+        is_sqlite = ChatbotAppearance._is_sqlite(conn)
+        try:
+            if is_sqlite:
+                cursor = conn.execute("PRAGMA table_info(chatbot_appearance)")
+                columns = {row[1] for row in cursor.fetchall()}
+                if 'welcome_message' not in columns:
+                    conn.execute("ALTER TABLE chatbot_appearance ADD COLUMN welcome_message TEXT")
+                    conn.commit()
+            else:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE TABLE_SCHEMA = DATABASE()
+                    AND TABLE_NAME = 'chatbot_appearance'
+                    AND COLUMN_NAME = 'welcome_message'
+                """)
+                if cursor.fetchone()[0] == 0:
+                    cursor.execute("ALTER TABLE chatbot_appearance ADD COLUMN welcome_message TEXT")
+                    conn.commit()
+                cursor.execute("""
+                    SELECT CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE TABLE_SCHEMA = DATABASE()
+                    AND TABLE_NAME = 'chatbot_appearance'
+                    AND COLUMN_NAME = 'avatar_value'
+                """)
+                row = cursor.fetchone()
+                if row and (row[0] or 0) < 512:
+                    cursor.execute(
+                        "ALTER TABLE chatbot_appearance MODIFY COLUMN avatar_value VARCHAR(512)"
+                    )
+                    conn.commit()
+                cursor.close()
+        except Exception as e:
+            print(f"⚠️ ensure_schema chatbot_appearance: {e}")
+        finally:
+            conn.close()
+
     @staticmethod
     def _get_db_connection():
         """Get database connection (MySQL or SQLite fallback)"""
@@ -113,8 +174,32 @@ class ChatbotAppearance:
             conn.close()
     
     @staticmethod
-    def create_or_update(user_id, short_info=None, primary_color=None, avatar_type=None, avatar_value=None, suggested_messages=None, welcome_message=None):
+    def _row_exists(conn, user_id, is_sqlite):
+        if is_sqlite:
+            row = conn.execute(
+                "SELECT 1 FROM chatbot_appearance WHERE user_id = ? LIMIT 1", (user_id,)
+            ).fetchone()
+        else:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT 1 FROM chatbot_appearance WHERE user_id = %s LIMIT 1", (user_id,)
+            )
+            row = cursor.fetchone()
+            cursor.close()
+        return row is not None
+
+    @staticmethod
+    def create_or_update(user_id, short_info=None, primary_color=None, avatar_type=None, avatar_value=None, suggested_messages=None, welcome_message=None, welcome_message_provided=False):
         """Create or update appearance config for a user"""
+        ChatbotAppearance._last_error = None
+        ChatbotAppearance.ensure_schema()
+
+        avatar_type = ChatbotAppearance._normalize_avatar_type(avatar_type)
+        if short_info is not None and len(short_info) > 200:
+            short_info = short_info[:200]
+        if avatar_value is not None and len(str(avatar_value)) > 512:
+            avatar_value = str(avatar_value)[:512]
+
         conn = ChatbotAppearance._get_db_connection()
         is_sqlite = ChatbotAppearance._is_sqlite(conn)
         
@@ -123,8 +208,7 @@ class ChatbotAppearance:
             primary_color_json = json.dumps(primary_color) if primary_color and isinstance(primary_color, dict) else primary_color
             suggested_messages_json = json.dumps(suggested_messages) if suggested_messages and isinstance(suggested_messages, list) else suggested_messages
             
-            # Check if exists
-            existing = ChatbotAppearance.get_by_user(user_id)
+            existing = ChatbotAppearance._row_exists(conn, user_id, is_sqlite)
             
             if existing:
                 # Update
@@ -146,7 +230,7 @@ class ChatbotAppearance:
                     if suggested_messages_json is not None:
                         updates.append("suggested_messages = ?")
                         params.append(suggested_messages_json)
-                    if welcome_message is not None:
+                    if welcome_message_provided:
                         updates.append("welcome_message = ?")
                         params.append(welcome_message)
                     updates.append("updated_at = ?")
@@ -178,7 +262,7 @@ class ChatbotAppearance:
                     if suggested_messages_json is not None:
                         updates.append("suggested_messages = %s")
                         params.append(suggested_messages_json)
-                    if welcome_message is not None:
+                    if welcome_message_provided:
                         updates.append("welcome_message = %s")
                         params.append(welcome_message)
                     updates.append("updated_at = %s")
@@ -210,6 +294,7 @@ class ChatbotAppearance:
                     cursor.close()
             return True
         except Exception as e:
+            ChatbotAppearance._last_error = str(e)
             print(f"❌ Error saving appearance config: {e}")
             import traceback
             traceback.print_exc()

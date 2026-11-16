@@ -927,7 +927,8 @@ async function saveAppearanceConfig() {
                 showSuccessNotification(message, 5000);
             }
         } else {
-            throw new Error(result.error || 'Failed to save appearance settings');
+            const detail = result.detail ? ` (${result.detail})` : '';
+            throw new Error((result.error || 'Failed to save appearance settings') + detail);
         }
     } catch (error) {
         const errorMessage = 'Error: ' + error.message;
