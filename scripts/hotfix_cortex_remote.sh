@@ -15,9 +15,26 @@ mkdir -p /opt/cortex/static/v2/js
 cp -a static/v2/js/dashboard-core.js static/v2/js/dashboard-appearance.js /opt/cortex/static/v2/js/
 chmod 644 /opt/cortex/static/v2/js/dashboard-*.js
 
+ensure_prod_db_env() {
+  echo "=== Ensure /opt/cortex/.env has MySQL settings ==="
+  mkdir -p /opt/cortex
+  touch /opt/cortex/.env
+  if ! grep -q '^DB_HOST=' /opt/cortex/.env 2>/dev/null; then
+    {
+      echo 'DB_HOST=127.0.0.1'
+      echo 'DB_USER=cortex'
+      echo 'DB_PASSWORD=admin123'
+      echo 'DB_NAME=saturn'
+    } >> /opt/cortex/.env
+  fi
+  chown www-data:www-data /opt/cortex/.env
+  chmod 640 /opt/cortex/.env
+}
+
 deploy_systemd() {
   echo "=== Cortex hotfix: sync /opt/cortex + restart gunicorn ==="
   mkdir -p /opt/cortex
+  ensure_prod_db_env
   rsync -a --exclude 'venv-prod' --exclude 'chroma_db' --exclude 'uploads' --exclude '.git' \
     "$BUILD_DIR/" /opt/cortex/
   if [ ! -d /opt/cortex/venv-prod ]; then

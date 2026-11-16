@@ -107,8 +107,12 @@ class ChatbotAppearance:
         try:
             return mysql.connector.connect(**DB_CONFIG)
         except (Error, Exception) as e:
-            # Fallback to SQLite if MySQL is not available
-            db_path = 'users.db'
+            if os.getenv('FLASK_ENV', '').lower() == 'production':
+                raise ConnectionError(
+                    f"MySQL unavailable (configure DB_HOST, DB_USER, DB_PASSWORD, DB_NAME in "
+                    f"/opt/cortex/.env and restart cortex): {e}"
+                ) from e
+            db_path = os.getenv('SQLITE_DB_PATH', 'users.db')
             conn = sqlite3.connect(db_path)
             conn.row_factory = sqlite3.Row
             return conn
