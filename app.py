@@ -12,6 +12,10 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
+from utils.ml_cache import configure_ml_cache
+
+configure_ml_cache()
+
 # Import models and blueprints
 from models import User
 from models.prompt_preset import PromptPreset
@@ -72,16 +76,16 @@ app.config['LLM'] = llm
 
 # 🔍 Embeddings setup
 try:
-    from langchain_community.embeddings import HuggingFaceEmbeddings
-    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-    
-    # Set embeddings in knowledge service
+    from utils.ml_cache import load_embeddings
     from services.knowledge_service import set_embeddings
+
+    embeddings = load_embeddings()
     set_embeddings(embeddings)
-    
     print("✅ Embeddings loaded successfully")
 except Exception as e:
     print(f"⚠️ Embeddings initialization failed: {e}")
+    import traceback
+    traceback.print_exc()
     embeddings = None
 
 # Run database migrations on startup (gunicorn does not use __main__)

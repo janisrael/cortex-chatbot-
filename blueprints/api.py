@@ -16,6 +16,19 @@ import uuid
 
 api_bp = Blueprint('api', __name__)
 
+
+def _knowledge_base_unavailable_response():
+    from services.knowledge_service import get_last_vectorstore_error
+
+    payload = {
+        "error": "Failed to access knowledge base. Please check embeddings and vectorstore initialization.",
+    }
+    detail = get_last_vectorstore_error()
+    if detail:
+        payload["detail"] = detail
+    return jsonify(payload), 500
+
+
 # Allowed avatar file extensions
 ALLOWED_AVATAR_EXTENSIONS = {'png', 'jpg', 'jpeg', 'svg', 'webp'}
 MAX_AVATAR_SIZE = 2 * 1024 * 1024  # 2MB
@@ -361,7 +374,7 @@ def ingest_uploaded_file(file_id):
         user_vectorstore = get_user_vectorstore(user_id)
         if user_vectorstore is None:
             print(f"❌ Failed to get vectorstore for user {user_id}")
-            return jsonify({"error": "Failed to access knowledge base. Please check embeddings and vectorstore initialization."}), 500
+            return _knowledge_base_unavailable_response()
         
         try:
             # Ensure write permissions - use same path as get_user_vectorstore
@@ -1305,7 +1318,7 @@ def ingest_crawled_url(crawled_id):
         user_vectorstore = get_user_vectorstore(user_id)
         if user_vectorstore is None:
             print(f"❌ Failed to get vectorstore for user {user_id}")
-            return jsonify({"error": "Failed to access knowledge base. Please check embeddings and vectorstore initialization."}), 500
+            return _knowledge_base_unavailable_response()
         
         try:
             print(f"📝 Adding {len(chunks)} chunks to vectorstore...")
@@ -1633,7 +1646,7 @@ def ingest_faq(faq_id):
         user_vectorstore = get_user_vectorstore(user_id)
         if user_vectorstore is None:
             print(f"❌ Failed to get vectorstore for user {user_id}")
-            return jsonify({"error": "Failed to access knowledge base. Please check embeddings and vectorstore initialization."}), 500
+            return _knowledge_base_unavailable_response()
         
         try:
             # Ensure directory and all files are writable before adding documents - use same path as get_user_vectorstore

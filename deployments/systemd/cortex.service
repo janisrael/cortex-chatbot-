@@ -24,7 +24,7 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=/opt/cortex/uploads /opt/cortex/chroma_db /opt/cortex/data /opt/cortex/logs /opt/cortex/config /opt/cortex/users.db
+ReadWritePaths=/opt/cortex/uploads /opt/cortex/chroma_db /opt/cortex/data /opt/cortex/logs /opt/cortex/config /opt/cortex/users.db /opt/cortex/.cache
 
 [Install]
 WantedBy=multi-user.target

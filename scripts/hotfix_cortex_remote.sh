@@ -30,8 +30,29 @@ ensure_prod_db_env() {
   if ! grep -q '^CHROMA_DB_PATH=' /opt/cortex/.env 2>/dev/null; then
     echo 'CHROMA_DB_PATH=/opt/cortex/chroma_db' >> /opt/cortex/.env
   fi
+  if ! grep -q '^HF_HOME=' /opt/cortex/.env 2>/dev/null; then
+    echo 'HF_HOME=/opt/cortex/.cache/huggingface' >> /opt/cortex/.env
+    echo 'SENTENCE_TRANSFORMERS_HOME=/opt/cortex/.cache/sentence_transformers' >> /opt/cortex/.env
+    echo 'CORTEX_ML_CACHE=/opt/cortex/.cache' >> /opt/cortex/.env
+  fi
+  mkdir -p /opt/cortex/.cache/huggingface /opt/cortex/.cache/sentence_transformers
+  chown -R www-data:www-data /opt/cortex/.cache
   chown www-data:www-data /opt/cortex/.env
   chmod 640 /opt/cortex/.env
+}
+
+warm_embeddings_model() {
+  echo "=== Preload embedding model (sentence-transformers) ==="
+  if [ -x /opt/cortex/venv-prod/bin/python ]; then
+    chown -R www-data:www-data /opt/cortex/.cache 2>/dev/null || true
+    sudo -u www-data env "$(grep -E '^(HF_HOME|SENTENCE_TRANSFORMERS_HOME|CORTEX_ML_CACHE|CHROMA_DB_PATH)=' /opt/cortex/.env 2>/dev/null | xargs)" \
+      FLASK_ENV=production \
+      /opt/cortex/venv-prod/bin/python -c "
+from utils.ml_cache import load_embeddings
+load_embeddings()
+print('embeddings_ok')
+" || echo "⚠️ embedding warmup failed (may download on first ingest)"
+  fi
 }
 
 deploy_systemd() {
@@ -86,6 +107,7 @@ rollout_k8s() {
 
 # Primary hotfix path: systemd + nginx (production serves cortex on :6001 this way)
 deploy_systemd
+warm_embeddings_model
 
 echo "=== Run appearance DB schema patch ==="
 if [ -x /opt/cortex/venv-prod/bin/python ]; then

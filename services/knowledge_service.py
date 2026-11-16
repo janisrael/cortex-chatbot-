@@ -6,6 +6,11 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 
 # Global embeddings - initialized in app.py
 embeddings = None
+_last_vectorstore_error = None
+
+
+def get_last_vectorstore_error():
+    return _last_vectorstore_error
 
 # Export embeddings for use in other modules
 __all__ = ['embeddings', 'set_embeddings', 'get_user_vectorstore', 'get_knowledge_stats', 'remove_file_from_vectorstore']
@@ -31,16 +36,18 @@ def get_user_knowledge_base_path(user_id):
 
 def get_user_vectorstore(user_id):
     """Get or create vectorstore for specific user"""
-    global embeddings
+    global embeddings, _last_vectorstore_error
+    _last_vectorstore_error = None
     if not embeddings:
         print("❌ Embeddings not available for vectorstore - trying to initialize...")
-        # Try to initialize embeddings if not set
         try:
-            from langchain_community.embeddings import HuggingFaceEmbeddings
-            embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+            from utils.ml_cache import load_embeddings
+
+            embeddings = load_embeddings()
             set_embeddings(embeddings)
             print("✅ Embeddings initialized on-demand")
         except Exception as e:
+            _last_vectorstore_error = f"Embeddings init failed: {e}"
             print(f"❌ Failed to initialize embeddings: {e}")
             import traceback
             traceback.print_exc()
@@ -110,6 +117,7 @@ def get_user_vectorstore(user_id):
                     client = chromadb.PersistentClient(path=kb_path)
                     print(f"✅ PersistentClient created after reset")
                 except Exception as final_error:
+                    _last_vectorstore_error = f"Chroma init failed: {final_error}"
                     print(f"❌ Failed to create PersistentClient even after reset: {final_error}")
                     import traceback
                     traceback.print_exc()
@@ -160,15 +168,18 @@ def get_user_vectorstore(user_id):
                     # Return it anyway - it might still work
                     return user_vectorstore
             except Exception as chroma_error:
+                _last_vectorstore_error = f"Chroma vectorstore: {chroma_error}"
                 print(f"❌ Error creating Chroma vectorstore: {chroma_error}")
                 import traceback
                 traceback.print_exc()
                 return None
         else:
+            _last_vectorstore_error = "Chroma client unavailable"
             print(f"❌ No client available to create vectorstore")
             return None
             
     except Exception as e:
+        _last_vectorstore_error = str(e)
         print(f"❌ Error creating vectorstore for user {user_id}: {e}")
         import traceback
         traceback.print_exc()
