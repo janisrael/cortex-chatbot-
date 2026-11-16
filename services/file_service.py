@@ -1,5 +1,6 @@
 """File upload and management service"""
 import os
+import uuid
 from datetime import datetime
 from werkzeug.utils import secure_filename
 from utils.helpers import allowed_file
@@ -7,10 +8,22 @@ from langchain_community.document_loaders import PyPDFLoader, TextLoader, CSVLoa
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 
+def resolve_upload_filename(original_name: str) -> str:
+    """Stable filename for disk storage (handles empty secure_filename for unicode names)."""
+    original_name = original_name or "upload"
+    filename = secure_filename(original_name)
+    if filename:
+        return filename
+    ext = original_name.rsplit(".", 1)[-1].lower() if "." in original_name else "bin"
+    if ext not in {"txt", "pdf", "doc", "docx", "csv"}:
+        ext = "bin"
+    return f"upload_{uuid.uuid4().hex[:12]}.{ext}"
+
+
 def save_uploaded_file(user_id, file, category):
     """Save uploaded file to user's directory"""
-    filename = secure_filename(file.filename)
-    user_upload_dir = f"uploads/user_{user_id}"
+    filename = resolve_upload_filename(file.filename)
+    user_upload_dir = os.path.join("uploads", f"user_{user_id}")
     category_dir = os.path.join(user_upload_dir, category)
     os.makedirs(category_dir, exist_ok=True)
     
@@ -156,17 +169,29 @@ def extract_text_from_file(filepath, filename):
                 return full_text
             elif file_ext == 'docx':
                 try:
+                    import docx2txt
+
+                    full_text = docx2txt.process(filepath)
+                    if full_text and len(full_text.strip()) > 0:
+                        print(f"✅ Extracted {len(full_text)} characters from DOCX (docx2txt)")
+                        return full_text.strip()
+                except ImportError:
+                    print("⚠️ docx2txt not available, trying Docx2txtLoader...")
+                except Exception as e:
+                    print(f"⚠️ docx2txt failed: {e}")
+                try:
                     loader = Docx2txtLoader(filepath)
                     documents = loader.load()
                     print(f"📚 Loaded {len(documents)} sections from DOCX")
                     full_text = "\n\n".join([doc.page_content for doc in documents])
-                    return full_text
+                    if full_text and full_text.strip():
+                        return full_text
                 except Exception as e:
-                    print(f"⚠️ Could not load .docx file, trying as text: {e}")
-                    loader = TextLoader(filepath, encoding='utf-8')
-                    documents = loader.load()
-                    full_text = "\n\n".join([doc.page_content for doc in documents])
-                    return full_text
+                    print(f"⚠️ Could not load .docx file: {e}")
+                return (
+                    "⚠️ Could not extract text from this .docx file. "
+                    "Try saving as PDF or plain text and upload again."
+                )
             elif file_ext == 'doc':
                 # .doc files (older Microsoft Word format) require special handling
                 # Try python-docx2txt first, then fallback methods

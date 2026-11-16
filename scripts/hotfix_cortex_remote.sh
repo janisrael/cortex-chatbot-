@@ -55,10 +55,18 @@ print('embeddings_ok')
   fi
 }
 
+ensure_upload_dirs() {
+  echo "=== Ensure upload directories writable by www-data ==="
+  mkdir -p /opt/cortex/uploads /opt/cortex/static/uploads/avatars
+  chown -R www-data:www-data /opt/cortex/uploads /opt/cortex/static/uploads
+  chmod -R u+rwX,g+rwX /opt/cortex/uploads /opt/cortex/static/uploads 2>/dev/null || true
+}
+
 deploy_systemd() {
   echo "=== Cortex hotfix: sync /opt/cortex + restart gunicorn ==="
   mkdir -p /opt/cortex
   ensure_prod_db_env
+  ensure_upload_dirs
   rsync -a --exclude 'venv-prod' --exclude 'chroma_db' --exclude 'uploads' --exclude '.git' \
     "$BUILD_DIR/" /opt/cortex/
   if [ ! -d /opt/cortex/venv-prod ]; then
@@ -67,6 +75,7 @@ deploy_systemd() {
     /opt/cortex/venv-prod/bin/pip install --no-cache-dir --use-deprecated=legacy-resolver -r /opt/cortex/requirements-prod.txt
     /opt/cortex/venv-prod/bin/pip install gunicorn
   fi
+  /opt/cortex/venv-prod/bin/pip install --no-cache-dir 'docx2txt>=0.8' 2>/dev/null || true
   if [ -f /opt/cortex/deployments/systemd/cortex.service ]; then
     cp /opt/cortex/deployments/systemd/cortex.service /etc/systemd/system/cortex.service
     systemctl daemon-reload
@@ -109,12 +118,15 @@ rollout_k8s() {
 deploy_systemd
 warm_embeddings_model
 
-echo "=== Run appearance DB schema patch ==="
+echo "=== Run DB schema patches ==="
 if [ -x /opt/cortex/venv-prod/bin/python ]; then
   (cd /opt/cortex && /opt/cortex/venv-prod/bin/python -c "
 from models.chatbot_appearance import ChatbotAppearance
+from models.uploaded_file import UploadedFile
 cols = ChatbotAppearance.ensure_schema()
 print('chatbot_appearance columns:', 'welcome_message' in (cols or set()))
+UploadedFile.ensure_schema()
+print('uploaded_files schema ok')
 ")
 fi
 

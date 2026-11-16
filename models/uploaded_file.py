@@ -12,18 +12,55 @@ import os
 
 class UploadedFile:
     """Model for uploaded files"""
-    
+
+    _last_error = None
+
+    @staticmethod
+    def get_last_error():
+        return UploadedFile._last_error
+
     @staticmethod
     def _get_db_connection():
         """Get database connection (MySQL or SQLite fallback)"""
         try:
             return mysql.connector.connect(**DB_CONFIG)
         except (Error, Exception) as e:
-            # Fallback to SQLite if MySQL is not available
-            db_path = 'users.db'
+            if os.getenv('FLASK_ENV', '').lower() == 'production':
+                raise ConnectionError(f"MySQL unavailable: {e}") from e
+            db_path = os.getenv('SQLITE_DB_PATH', 'users.db')
             conn = sqlite3.connect(db_path)
             conn.row_factory = sqlite3.Row
             return conn
+
+    @staticmethod
+    def ensure_schema():
+        """Ensure uploaded_files table exists and supports large extracted text."""
+        UploadedFile.init_db()
+        conn = UploadedFile._get_db_connection()
+        is_sqlite = UploadedFile._is_sqlite(conn)
+        try:
+            if not is_sqlite:
+                cursor = conn.cursor()
+                cursor.execute(
+                    """
+                    SELECT DATA_TYPE, CHARACTER_MAXIMUM_LENGTH
+                    FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE TABLE_SCHEMA = %s AND TABLE_NAME = 'uploaded_files'
+                      AND COLUMN_NAME = 'extracted_text'
+                    """,
+                    (DB_CONFIG.get('database') or os.getenv('DB_NAME', 'saturn'),),
+                )
+                row = cursor.fetchone()
+                if row and (row[0] or '').lower() == 'text':
+                    cursor.execute(
+                        "ALTER TABLE uploaded_files MODIFY COLUMN extracted_text MEDIUMTEXT"
+                    )
+                    conn.commit()
+                cursor.close()
+        except Exception as e:
+            print(f"⚠️ ensure_schema uploaded_files: {e}")
+        finally:
+            conn.close()
     
     @staticmethod
     def _is_sqlite(conn):
@@ -92,6 +129,8 @@ class UploadedFile:
     @staticmethod
     def create(user_id, filename, filepath, category='company_details', extracted_text=None, word_count=0, char_count=0, status='preview'):
         """Create a new uploaded file entry"""
+        UploadedFile._last_error = None
+        UploadedFile.ensure_schema()
         conn = UploadedFile._get_db_connection()
         is_sqlite = UploadedFile._is_sqlite(conn)
         
@@ -114,6 +153,7 @@ class UploadedFile:
                 cursor.close()
                 return file_id
         except Exception as e:
+            UploadedFile._last_error = str(e)
             print(f"❌ Error creating uploaded file: {e}")
             return None
         finally:

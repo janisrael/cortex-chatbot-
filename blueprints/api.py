@@ -69,8 +69,13 @@ def upload_file_multi():
                 "error": f"File upload limit reached. Maximum {MAX_FILES_PER_USER} files per user. Please delete some files before uploading new ones."
             }), 400
         
-        # Save file
-        filepath, filename = save_uploaded_file(user_id, file, category)
+        try:
+            filepath, filename = save_uploaded_file(user_id, file, category)
+        except OSError as e:
+            return jsonify({
+                "error": "Failed to save uploaded file on server",
+                "detail": str(e),
+            }), 500
         
         # Get AI cleaning preference (default: True)
         use_ai_cleaning = request.form.get('use_ai_cleaning', 'true').lower() == 'true'
@@ -82,7 +87,10 @@ def upload_file_multi():
         extracted_text = extract_text_from_file(filepath, filename)
         
         if extracted_text is None:
-            return jsonify({"error": "Failed to extract text from file"}), 500
+            return jsonify({
+                "error": "Failed to extract text from file",
+                "detail": "Unsupported format, corrupt file, or missing document libraries on server.",
+            }), 500
         
         # Log extraction results for debugging
         print(f"📊 Extraction results for {filename}:")
@@ -141,7 +149,13 @@ def upload_file_multi():
                 "remaining_files": remaining_files
             })
         else:
-            return jsonify({"error": "Failed to save file information"}), 500
+            from models.uploaded_file import UploadedFile as UploadedFileModel
+
+            payload = {"error": "Failed to save file information"}
+            detail = UploadedFileModel.get_last_error()
+            if detail:
+                payload["detail"] = detail
+            return jsonify(payload), 500
             
     except Exception as e:
         import traceback

@@ -516,7 +516,8 @@ async function handleFileUpload(files) {
                         uploadSuccess.style.display = 'block';
                     }
                 } else {
-                    throw new Error(result.error || `Upload failed with status ${response.status}`);
+                    const detail = result.detail ? ` (${result.detail})` : '';
+                    throw new Error((result.error || `Upload failed with status ${response.status}`) + detail);
                 }
                 
             } catch (error) {
