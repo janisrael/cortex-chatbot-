@@ -67,6 +67,15 @@ rollout_k8s() {
 # Primary hotfix path: systemd + nginx (production serves cortex on :6001 this way)
 deploy_systemd
 
+echo "=== Run appearance DB schema patch ==="
+if [ -x /opt/cortex/venv-prod/bin/python ]; then
+  (cd /opt/cortex && /opt/cortex/venv-prod/bin/python -c "
+from models.chatbot_appearance import ChatbotAppearance
+cols = ChatbotAppearance.ensure_schema()
+print('chatbot_appearance columns:', 'welcome_message' in (cols or set()))
+")
+fi
+
 if build_and_import; then
   rollout_k8s || true
 fi

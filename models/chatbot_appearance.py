@@ -34,35 +34,55 @@ class ChatbotAppearance:
         return 'preset'
 
     @staticmethod
-    def ensure_schema():
+    def _table_columns(conn, is_sqlite):
+        if is_sqlite:
+            cursor = conn.execute("PRAGMA table_info(chatbot_appearance)")
+            return {row[1] for row in cursor.fetchall()}
+        cursor = conn.cursor()
+        db_name = DB_CONFIG.get('database') or os.getenv('DB_NAME', 'saturn')
+        cursor.execute(
+            """
+            SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_SCHEMA = %s AND TABLE_NAME = 'chatbot_appearance'
+            """,
+            (db_name,),
+        )
+        columns = {row[0] for row in cursor.fetchall()}
+        cursor.close()
+        return columns
+
+    @staticmethod
+    def ensure_schema(conn=None):
         """Ensure table exists and has columns required for saves (idempotent)."""
         ChatbotAppearance.init_db()
-        conn = ChatbotAppearance._get_db_connection()
+        own_conn = conn is None
+        if own_conn:
+            conn = ChatbotAppearance._get_db_connection()
         is_sqlite = ChatbotAppearance._is_sqlite(conn)
         try:
-            if is_sqlite:
-                cursor = conn.execute("PRAGMA table_info(chatbot_appearance)")
-                columns = {row[1] for row in cursor.fetchall()}
-                if 'welcome_message' not in columns:
+            columns = ChatbotAppearance._table_columns(conn, is_sqlite)
+            if not columns:
+                return columns
+            if 'welcome_message' not in columns:
+                if is_sqlite:
                     conn.execute("ALTER TABLE chatbot_appearance ADD COLUMN welcome_message TEXT")
-                    conn.commit()
-            else:
-                cursor = conn.cursor()
-                cursor.execute("""
-                    SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
-                    WHERE TABLE_SCHEMA = DATABASE()
-                    AND TABLE_NAME = 'chatbot_appearance'
-                    AND COLUMN_NAME = 'welcome_message'
-                """)
-                if cursor.fetchone()[0] == 0:
+                else:
+                    cursor = conn.cursor()
                     cursor.execute("ALTER TABLE chatbot_appearance ADD COLUMN welcome_message TEXT")
-                    conn.commit()
-                cursor.execute("""
+                    cursor.close()
+                conn.commit()
+                columns = ChatbotAppearance._table_columns(conn, is_sqlite)
+            if not is_sqlite and 'avatar_value' in columns:
+                cursor = conn.cursor()
+                db_name = DB_CONFIG.get('database') or os.getenv('DB_NAME', 'saturn')
+                cursor.execute(
+                    """
                     SELECT CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS
-                    WHERE TABLE_SCHEMA = DATABASE()
-                    AND TABLE_NAME = 'chatbot_appearance'
+                    WHERE TABLE_SCHEMA = %s AND TABLE_NAME = 'chatbot_appearance'
                     AND COLUMN_NAME = 'avatar_value'
-                """)
+                    """,
+                    (db_name,),
+                )
                 row = cursor.fetchone()
                 if row and (row[0] or 0) < 512:
                     cursor.execute(
@@ -70,10 +90,16 @@ class ChatbotAppearance:
                     )
                     conn.commit()
                 cursor.close()
+            return columns
         except Exception as e:
             print(f"⚠️ ensure_schema chatbot_appearance: {e}")
+            try:
+                return ChatbotAppearance._table_columns(conn, is_sqlite)
+            except Exception:
+                return set()
         finally:
-            conn.close()
+            if own_conn:
+                conn.close()
 
     @staticmethod
     def _get_db_connection():
@@ -192,7 +218,6 @@ class ChatbotAppearance:
     def create_or_update(user_id, short_info=None, primary_color=None, avatar_type=None, avatar_value=None, suggested_messages=None, welcome_message=None, welcome_message_provided=False):
         """Create or update appearance config for a user"""
         ChatbotAppearance._last_error = None
-        ChatbotAppearance.ensure_schema()
 
         avatar_type = ChatbotAppearance._normalize_avatar_type(avatar_type)
         if short_info is not None and len(short_info) > 200:
@@ -204,6 +229,9 @@ class ChatbotAppearance:
         is_sqlite = ChatbotAppearance._is_sqlite(conn)
         
         try:
+            columns = ChatbotAppearance.ensure_schema(conn)
+            has_welcome_message = 'welcome_message' in columns
+
             # Serialize complex fields
             primary_color_json = json.dumps(primary_color) if primary_color and isinstance(primary_color, dict) else primary_color
             suggested_messages_json = json.dumps(suggested_messages) if suggested_messages and isinstance(suggested_messages, list) else suggested_messages
@@ -230,7 +258,7 @@ class ChatbotAppearance:
                     if suggested_messages_json is not None:
                         updates.append("suggested_messages = ?")
                         params.append(suggested_messages_json)
-                    if welcome_message_provided:
+                    if has_welcome_message and welcome_message_provided:
                         updates.append("welcome_message = ?")
                         params.append(welcome_message)
                     updates.append("updated_at = ?")
@@ -262,7 +290,7 @@ class ChatbotAppearance:
                     if suggested_messages_json is not None:
                         updates.append("suggested_messages = %s")
                         params.append(suggested_messages_json)
-                    if welcome_message_provided:
+                    if has_welcome_message and welcome_message_provided:
                         updates.append("welcome_message = %s")
                         params.append(welcome_message)
                     updates.append("updated_at = %s")
@@ -278,18 +306,31 @@ class ChatbotAppearance:
                     cursor.close()
             else:
                 # Create
+                now = datetime.now()
                 if is_sqlite:
-                    conn.execute("""
-                        INSERT INTO chatbot_appearance (user_id, short_info, primary_color, avatar_type, avatar_value, suggested_messages, welcome_message, created_at, updated_at)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    """, (user_id, short_info, primary_color_json, avatar_type or 'preset', avatar_value, suggested_messages_json, welcome_message, datetime.now(), datetime.now()))
+                    if has_welcome_message:
+                        conn.execute("""
+                            INSERT INTO chatbot_appearance (user_id, short_info, primary_color, avatar_type, avatar_value, suggested_messages, welcome_message, created_at, updated_at)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """, (user_id, short_info, primary_color_json, avatar_type or 'preset', avatar_value, suggested_messages_json, welcome_message, now, now))
+                    else:
+                        conn.execute("""
+                            INSERT INTO chatbot_appearance (user_id, short_info, primary_color, avatar_type, avatar_value, suggested_messages, created_at, updated_at)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        """, (user_id, short_info, primary_color_json, avatar_type or 'preset', avatar_value, suggested_messages_json, now, now))
                     conn.commit()
                 else:
                     cursor = conn.cursor()
-                    cursor.execute("""
-                        INSERT INTO chatbot_appearance (user_id, short_info, primary_color, avatar_type, avatar_value, suggested_messages, welcome_message, created_at, updated_at)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-                    """, (user_id, short_info, primary_color_json, avatar_type or 'preset', avatar_value, suggested_messages_json, welcome_message, datetime.now(), datetime.now()))
+                    if has_welcome_message:
+                        cursor.execute("""
+                            INSERT INTO chatbot_appearance (user_id, short_info, primary_color, avatar_type, avatar_value, suggested_messages, welcome_message, created_at, updated_at)
+                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        """, (user_id, short_info, primary_color_json, avatar_type or 'preset', avatar_value, suggested_messages_json, welcome_message, now, now))
+                    else:
+                        cursor.execute("""
+                            INSERT INTO chatbot_appearance (user_id, short_info, primary_color, avatar_type, avatar_value, suggested_messages, created_at, updated_at)
+                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                        """, (user_id, short_info, primary_color_json, avatar_type or 'preset', avatar_value, suggested_messages_json, now, now))
                     conn.commit()
                     cursor.close()
             return True
