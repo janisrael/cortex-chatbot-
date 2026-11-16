@@ -637,7 +637,8 @@ async function crawlUrl() {
                 showSuccessNotification(message, 5000);
             }
         } else {
-            throw new Error(result.error || 'Failed to crawl URL');
+            const detail = result.detail ? ` (${result.detail})` : '';
+            throw new Error((result.error || 'Failed to crawl URL') + detail);
         }
     } catch (error) {
         const errorMessage = 'Failed to crawl URL: ' + error.message;

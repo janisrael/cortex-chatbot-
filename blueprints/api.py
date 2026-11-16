@@ -1062,6 +1062,9 @@ def crawl_url_preview():
         
         if not url:
             return jsonify({"error": "No URL provided"}), 400
+
+        from services.text_cleaning_service import normalize_crawl_url
+        url = normalize_crawl_url(url)
         
         user_id = current_user.id
         
@@ -1076,7 +1079,7 @@ def crawl_url_preview():
             }), 400
         
         # Extract clean text
-        from services.text_cleaning_service import extract_clean_text_from_url
+        from services.text_cleaning_service import extract_clean_text_from_url, get_extraction_diagnostics
         from services.ai_text_cleaning import clean_text_with_ai
         
         try:
@@ -1088,7 +1091,22 @@ def crawl_url_preview():
             return jsonify({"error": f"Failed to extract content from URL: {str(e)}"}), 400
         
         if not text:
-            return jsonify({"error": "Failed to extract content from URL. The URL may be inaccessible, require authentication, or contain no extractable text."}), 400
+            diagnostics = get_extraction_diagnostics()
+            detail = None
+            if diagnostics:
+                failed = [d for d in diagnostics if d.get("status") not in ("ok", "skipped", "http")]
+                if failed:
+                    detail = failed[-1].get("detail") or failed[-1].get("step")
+                elif diagnostics:
+                    detail = diagnostics[-1].get("detail") or diagnostics[-1].get("step")
+            payload = {
+                "error": "Failed to extract content from URL. The URL may be inaccessible, require authentication, or contain no extractable text.",
+            }
+            if detail:
+                payload["detail"] = detail
+            if diagnostics:
+                payload["extraction_log"] = diagnostics[-8:]
+            return jsonify(payload), 400
         
         # Apply AI cleaning to extract only essential content (if enabled)
         # Uses system OpenAI credentials for AI-powered features
