@@ -51,9 +51,8 @@ jobs:
             tar -xzf /tmp/cortex-source.tar.gz
             rm -f /tmp/cortex-source.tar.gz
 
-            # Legacy builder avoids "unknown parent image ID" on multi-stage Dockerfile after partial prunes
-            export DOCKER_BUILDKIT=0
-            docker build --no-cache -t cortex:latest .
+            docker pull python:3.11-slim || true
+            docker build -f Dockerfile.hotfix -t cortex:latest .
             docker save cortex:latest | k3s ctr images import -
 
             kubectl apply -f k8s/deployment.yaml -n cortex 2>/dev/null || true
