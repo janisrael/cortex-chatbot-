@@ -385,12 +385,12 @@ class User(UserMixin):
                 created_at = datetime.now()
                 
                 if is_sqlite:
-                    conn.execute("""
+                    cursor = conn.execute("""
                         INSERT INTO users (email, username, password_hash, role, created_at)
                         VALUES (?, ?, ?, ?, ?)
                     """, ('admin@example.com', 'admin', admin_password, 'admin', created_at))
                     conn.commit()
-                    user_id = conn.lastrowid
+                    user_id = cursor.lastrowid
                 else:
                     insert_admin_query = """
                         INSERT INTO users (email, username, password_hash, role, created_at)
